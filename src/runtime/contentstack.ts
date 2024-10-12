@@ -27,10 +27,12 @@ export default defineNuxtPlugin((_nuxtApp) => {
 
   return {
     provide: {
-      livePreviewEnabled,
-      editableTags,
-      stack,
-      ContentstackLivePreview,
+      contentstack: {
+        livePreviewEnabled,
+        editableTags,
+        stack,
+        ContentstackLivePreview,
+      },
     },
   }
 })

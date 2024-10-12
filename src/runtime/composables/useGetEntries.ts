@@ -4,12 +4,12 @@ import { addEditableTags, jsonToHTML } from '@contentstack/utils'
 import { QueryOperator } from '@contentstack/delivery-sdk'
 
 export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPath?: string[], jsonRtePath?: string[], query?: { queryOperator?: string, filterQuery?: Array<{ key: string, value: string | number | boolean }> }, limit?: number, locale?: string) => {
-  const { $editableTags, $stack, $livePreviewEnabled } = useNuxtApp()
+  const { editableTags, stack, livePreviewEnabled } = useNuxtApp().$contentstack
 
   const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${locale}`, async () => {
     let result: { entries: T[] } | null = null
 
-    const entryQuery = $stack.contentType(contentTypeUid)
+    const entryQuery = stack.contentType(contentTypeUid)
       .entry()
       .locale(locale)
       .includeFallback()
@@ -22,11 +22,11 @@ export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPat
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const queries = query?.filterQuery?.map((q: any) => {
           if (typeof Object.values(q)?.[0] === 'string') {
-            return $stack.contentType(contentTypeUid).entry().query().equalTo(Object.keys(q)?.[0], Object.values(q)?.[0] as string)
+            return stack.contentType(contentTypeUid).entry().query().equalTo(Object.keys(q)?.[0], Object.values(q)?.[0] as string)
           }
 
           // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          return $stack.contentType(contentTypeUid).entry().query().containedIn(Object.keys(q)?.[0], Object.values(q)?.[0] as any)
+          return stack.contentType(contentTypeUid).entry().query().containedIn(Object.keys(q)?.[0], Object.values(q)?.[0] as any)
         })
 
         entryQuery.queryOperator(QueryOperator.OR, ...queries)
@@ -52,7 +52,7 @@ export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPat
           })
         }
 
-        if ($editableTags) {
+        if (editableTags) {
           addEditableTags(entry, contentTypeUid, true, locale)
         }
       })
@@ -61,7 +61,7 @@ export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPat
     }
   })
 
-  if (import.meta.client && $livePreviewEnabled) {
+  if (import.meta.client && livePreviewEnabled) {
     ContentstackLivePreview.onEntryChange(refresh)
   }
 

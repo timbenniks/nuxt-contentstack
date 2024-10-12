@@ -3,11 +3,11 @@ import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedde
 import { addEditableTags, jsonToHTML } from '@contentstack/utils'
 
 export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, referenceFieldPath?: string[], jsonRtePath?: string[], locale: string = 'en-us') => {
-  const { $editableTags, $stack, $livePreviewEnabled } = useNuxtApp()
+  const { editableTags, stack, livePreviewEnabled } = useNuxtApp().$contentstack
   const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${url}-${locale}`, async () => {
     let result: { entries: T[] } | null = null
 
-    const entryQuery = $stack.contentType(contentTypeUid)
+    const entryQuery = stack.contentType(contentTypeUid)
       .entry()
       .locale(locale)
       .includeFallback()
@@ -34,7 +34,7 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
         })
       }
 
-      if ($editableTags) {
+      if (editableTags) {
         addEditableTags(data, contentTypeUid, true, locale)
       }
 
@@ -42,7 +42,7 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
     }
   })
 
-  if (import.meta.client && $livePreviewEnabled) {
+  if (import.meta.client && livePreviewEnabled) {
     ContentstackLivePreview.onEntryChange(refresh)
   }
 
