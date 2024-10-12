@@ -5,7 +5,7 @@ import { QueryOperator } from '@contentstack/delivery-sdk'
 
 export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPath?: string[], jsonRtePath?: string[], query?: { queryOperator?: string, filterQuery?: Array<{ key: string, value: string | number | boolean }> }, limit?: number, locale?: string) => {
   const { editableTags, stack, livePreviewEnabled } = useNuxtApp().$contentstack
-
+  const { contentstack: opts } = useRuntimeConfig().public
   const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${locale}`, async () => {
     let result: { entries: T[] } | null = null
 
@@ -18,7 +18,7 @@ export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPat
       .query()
 
     if (entryQuery) {
-      if (query?.filterQuery?.length > 0 && query.queryOperator === 'or') {
+      if (query?.filterQuery?.length > 0 && query?.queryOperator === 'or') {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const queries = query?.filterQuery?.map((q: any) => {
           if (typeof Object.values(q)?.[0] === 'string') {
@@ -33,7 +33,7 @@ export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPat
       }
 
       if (query?.filterQuery?.key && query?.filterQuery?.value) { // filterQuery is an object consisting key value pair
-        entryQuery.equalTo(query.filterQuery.key, query.filterQuery.value)
+        entryQuery.equalTo(query.filterQuery?.key, query.filterQuery?.value)
       }
 
       if (limit !== 0) {
@@ -61,8 +61,15 @@ export const useGetEntries = async <T>(contentTypeUid: string, referenceFieldPat
     }
   })
 
-  if (import.meta.client && livePreviewEnabled) {
-    ContentstackLivePreview.onEntryChange(refresh)
+  if (livePreviewEnabled) {
+    if (import.meta.client) {
+      ContentstackLivePreview.onEntryChange(refresh)
+    }
+
+    if (import.meta.server && opts.livePreviewSdkOptions.ssr) {
+      const route = useRoute()
+      stack.livePreviewQuery(route.query)
+    }
   }
 
   return { data, status, refresh }

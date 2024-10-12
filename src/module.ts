@@ -78,7 +78,7 @@ export default defineNuxtModule<ModuleOptions>({
     logger.success(`Contentstack region: ${chalk.bold(_options.deliverySdkOptions.region)}`)
     logger.success(`Contentstack branch: ${chalk.bold(_options.deliverySdkOptions.branch)}`)
 
-    if (_options.deliverySdkOptions.live_preview.enable) {
+    if (_options.deliverySdkOptions?.live_preview?.enable) {
       _options.livePreviewSdkOptions.enable = true
       _options.deliverySdkOptions.live_preview.host = getURLsforRegion(_options.deliverySdkOptions.region).preview
       _options.livePreviewSdkOptions.clientUrlParams.host = getURLsforRegion(_options.deliverySdkOptions.region).app
@@ -86,7 +86,7 @@ export default defineNuxtModule<ModuleOptions>({
       logger.box(`${chalk.bold('⚡️')} Contentstack Live preview enabled`)
     }
 
-    if (_options.deliverySdkOptions.live_preview.enable && !_options.deliverySdkOptions.live_preview.preview_token) {
+    if (_options.deliverySdkOptions?.live_preview?.enable && !_options.deliverySdkOptions.live_preview.preview_token) {
       logger.error(`No Contentstack live preview token. Make sure you specify a ${chalk.bold('preview_token')} in your Contentstack live_preview config.`)
     }
 

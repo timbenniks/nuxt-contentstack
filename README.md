@@ -18,6 +18,13 @@ Contentstack integration for Nuxt.
 - 🚠 &nbsp;Live Preview & Visual builder
 - 🌲 &nbsp;Future: Personalize
 
+## TODO:
+- Live preview with SSR mode
+- Peronalization
+- Docs site
+- Release to NPM
+- List on Nuxt modules page
+
 ## Quick Setup
 
 Install the module to your Nuxt application with one command:

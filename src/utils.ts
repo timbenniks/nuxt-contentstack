@@ -21,7 +21,7 @@ export type Urls = {
 }
 
 export function getURLsforRegion(region: Region = Region.US) {
-  let urls: Urls
+  let urls: Urls = {}
 
   switch (region) {
     case Region.US:

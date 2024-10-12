@@ -11,7 +11,7 @@ export default defineNuxtPlugin((_nuxtApp) => {
   } = _nuxtApp.$config.public.contentstack
 
   const stack = contentstack.stack(deliverySdkOptions)
-  const livePreviewEnabled = deliverySdkOptions.live_preview.enable
+  const livePreviewEnabled = deliverySdkOptions?.live_preview?.enable
   const { editableTags } = livePreviewSdkOptions
 
   if (livePreviewEnabled) {
