@@ -22,13 +22,15 @@ Contentstack integration for Nuxt.
 
 Install the module to your Nuxt application with one command:
 
-```bash
+<!-- ```bash
 npx nuxi module add nuxt-contentstack
-```
+``` -->
 
-Add config:
+Add to `nuxt.config.ts`:
 
-```
+```js
+modules: ['nuxt-contentstack'],
+
 contentstack: {
   debug: true,
   deliverySdkOptions: {
