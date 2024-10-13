@@ -1,9 +1,8 @@
+import contentstack from '@contentstack/delivery-sdk'
 import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
-import { jsonToHTML } from '@contentstack/utils'
-import contentstack from '@contentstack/delivery-sdk'
-import { toRaw } from 'vue'
 import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
+import { toRaw } from 'vue'
 import { useRuntimeConfig, useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
 
 export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, referenceFieldPath?: string[], jsonRtePath?: string[], locale: string = 'en-us'): Promise<AsyncData<T | null, Error>> => {
@@ -36,7 +35,7 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
       const data = result?.entries?.[0] as EmbeddedItem
 
       if (jsonRtePath && data) {
-        jsonToHTML({
+        contentstack.Utils.jsonToHTML({
           entry: data,
           paths: jsonRtePath,
         })
