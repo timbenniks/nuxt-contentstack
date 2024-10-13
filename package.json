@@ -1,6 +1,6 @@
 {
   "name": "nuxt-contentstack",
-  "version": "0.0.4",
+  "version": "0.0.2",
   "description": "Contentstack integration for Nuxt",
   "repository": "timbenniks/nuxt-contentstack",
   "license": "MIT",
