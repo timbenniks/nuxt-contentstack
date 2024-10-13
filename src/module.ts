@@ -12,7 +12,7 @@ export interface ModuleOptions {
 }
 
 const logger = useLogger(name)
-const CONFIG_KEY = 'contentstack' as const
+const CONFIG_KEY = 'nuxt-contentstack' as const
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {

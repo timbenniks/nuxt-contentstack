@@ -2,7 +2,7 @@
   "name": "nuxt-contentstack",
   "version": "0.0.4",
   "description": "Contentstack integration for Nuxt",
-  "repository": "timbenniks/contentstack",
+  "repository": "timbenniks/nuxt-contentstack",
   "license": "MIT",
   "type": "module",
   "exports": {
