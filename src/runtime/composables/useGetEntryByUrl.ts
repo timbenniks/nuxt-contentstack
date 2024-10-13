@@ -1,6 +1,7 @@
 import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
-import { addEditableTags, jsonToHTML } from '@contentstack/utils'
+import { jsonToHTML } from '@contentstack/utils'
+import contentstack from '@contentstack/delivery-sdk'
 import { toRaw } from 'vue'
 import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
 import { useRuntimeConfig, useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
@@ -42,7 +43,7 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
       }
 
       if (editableTags) {
-        addEditableTags(data, contentTypeUid, true, locale)
+        contentstack.Utils.addEditableTags(data, contentTypeUid, true, locale)
       }
 
       return data

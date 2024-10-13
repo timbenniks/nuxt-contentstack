@@ -1,11 +1,11 @@
 import { Region } from '@contentstack/delivery-sdk'
 
 export default defineNuxtConfig({
-  modules: ['../src/module'],
-  devtools: { enabled: true },
-  compatibilityDate: '2024-10-12',
+  'modules': ['../src/module'],
+  'devtools': { enabled: true },
+  'compatibilityDate': '2024-10-12',
 
-  contentstack: {
+  'nuxt-contentstack': {
     debug: true,
     deliverySdkOptions: {
       apiKey: 'blte766efb491f96715',

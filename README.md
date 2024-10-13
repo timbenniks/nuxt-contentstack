@@ -31,7 +31,7 @@ Or: add to `nuxt.config.ts`:
 ```js
 modules: ['nuxt-contentstack'],
 
-contentstack: {
+'nuxt-contentstack': {
   debug: true,
   deliverySdkOptions: {
     apiKey: 'blte766efb491f96715',
