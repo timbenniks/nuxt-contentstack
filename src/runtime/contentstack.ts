@@ -1,10 +1,11 @@
 import contentstack from '@contentstack/delivery-sdk'
 import { ContentstackLivePreview, type IStackSdk } from '@contentstack/live-preview-utils'
+import type { Plugin } from 'nuxt/app'
 import type { LivePreviewSdkOptions, DeliverySdkOptions } from '../utils'
 import { defineNuxtPlugin } from '#app'
 
-export default defineNuxtPlugin((_nuxtApp) => {
-  // @ts-expect-error Region is seen as String rathe than Region...
+const contentstackPlugin: Plugin = (_nuxtApp) => {
+  // @ts-expect-error Region is seen as String rather than Region...
   const { deliverySdkOptions, livePreviewSdkOptions }: {
     deliverySdkOptions: DeliverySdkOptions
     livePreviewSdkOptions: LivePreviewSdkOptions
@@ -35,4 +36,6 @@ export default defineNuxtPlugin((_nuxtApp) => {
       },
     },
   }
-})
+}
+
+export default defineNuxtPlugin(contentstackPlugin)

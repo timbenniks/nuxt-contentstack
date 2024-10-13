@@ -3,9 +3,9 @@ import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedde
 import { addEditableTags, jsonToHTML } from '@contentstack/utils'
 import { toRaw } from 'vue'
 import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
-import { useRuntimeConfig, useAsyncData, useNuxtApp, useRoute } from '#app'
+import { useRuntimeConfig, useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
 
-export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, referenceFieldPath?: string[], jsonRtePath?: string[], locale: string = 'en-us') => {
+export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, referenceFieldPath?: string[], jsonRtePath?: string[], locale: string = 'en-us'): Promise<AsyncData<T | null, Error>> => {
   const { editableTags, stack, livePreviewEnabled } = useNuxtApp().$contentstack
   const { contentstack: opts } = useRuntimeConfig().public
   const route = useRoute()
