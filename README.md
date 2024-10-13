@@ -13,28 +13,20 @@ Contentstack integration for Nuxt.
 
 ## Features
 
-<!-- Highlight some of the features your module provide here -->
-- ⛰ &nbsp;Query Entries
-- 🚠 &nbsp;Live Preview & Visual builder
-- 🌲 &nbsp;Future: Personalize
-
-## TODO:
-- Live preview with SSR mode
-- Peronalization
-- Docs site
-- Release to NPM
-- List on Nuxt modules page
-- Add all regions to the endpoint URL generator
+- ⚡️ Easy setup
+- ⚡️ Exposed stack
+- ⚡️ Query Entries
+- ⚡️ Live Preview & Visual builder setup
 
 ## Quick Setup
 
 Install the module to your Nuxt application with one command:
 
-<!-- ```bash
+```bash
 npx nuxi module add nuxt-contentstack
-``` -->
+```
 
-Add to `nuxt.config.ts`:
+Or: add to `nuxt.config.ts`:
 
 ```js
 modules: ['nuxt-contentstack'],
@@ -59,6 +51,42 @@ contentstack: {
   },
 }
 ```
+
+## Options
+### debug
+general debug dumping the complete settings object into the terminal. Also turns on debug mode in preview SDK.
+
+### deliverySdkOptions
+This is the full Contentstack StackConfig. See: https://www.contentstack.com/docs/developers/sdks/content-delivery-sdk/typescript/reference
+
+### livePreviewSdkOptions
+This is the full Contentstack configuration for Live Preview Utils.
+Learn more: https://www.contentstack.com/docs/developers/set-up-live-preview/get-started-with-live-preview-utils-sdk
+
+## Provides
+This module provides a `$contentstack` object with:
+
+- `stack`: The Stack object from the Delivery SDK. Query all the things with this.
+- `ContentstackLivePreview`: The instance of Live Preview Utils SDK.
+- `livePreviewEnabled`: Was live preview enabled?
+- `editableTags`: Do we want editable tags fo visual building?
+
+```ts
+  const { editableTags, stack, livePreviewEnabled, ContentstackLivePreview } = useNuxtApp().$contentstack
+```
+
+## Compoasables
+This module offers a composable `useGetEntryByUrl` which allows you to query any entry with a URL field. It also listens to live editing changes and will refresh your content based on entry changes in the CMS.
+
+```ts
+const { data: page } = await useGetEntryByUrl('page', '/about', ['reference.fields'], ['jsonRtePath'], 'en-us')
+
+```
+
+## TODO:
+- Live preview with SSR mode
+- Add all regions to the endpoint URL generator
+- Personalization
 
 ## Contribution
 
