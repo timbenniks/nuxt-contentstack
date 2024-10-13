@@ -2,7 +2,8 @@ import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
 import { addEditableTags, jsonToHTML } from '@contentstack/utils'
 import { toRaw } from 'vue'
-import { useRuntimeConfig } from '#app'
+import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
+import { useRuntimeConfig, useAsyncData, useNuxtApp, useRoute } from '#app'
 
 export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, referenceFieldPath?: string[], jsonRtePath?: string[], locale: string = 'en-us') => {
   const { editableTags, stack, livePreviewEnabled } = useNuxtApp().$contentstack
@@ -54,7 +55,7 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
     }
 
     if (opts.livePreviewSdkOptions.ssr) {
-      stack.livePreviewQuery(qs)
+      stack.livePreviewQuery(qs as unknown as LivePreviewQuery)
     }
   }
 

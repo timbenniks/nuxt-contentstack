@@ -1,14 +1,13 @@
 import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger } from '@nuxt/kit'
 import { Region } from '@contentstack/delivery-sdk'
-import type { StackConfig } from '@contentstack/delivery-sdk'
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
-import { getURLsforRegion, type LivePreviewSdkOptions } from './utils'
+import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions } from './utils'
 
 export interface ModuleOptions {
   debug: boolean
-  deliverySdkOptions: StackConfig
+  deliverySdkOptions: DeliverySdkOptions
   livePreviewSdkOptions: LivePreviewSdkOptions
 }
 
@@ -81,7 +80,10 @@ export default defineNuxtModule<ModuleOptions>({
     if (_options.deliverySdkOptions?.live_preview?.enable) {
       _options.livePreviewSdkOptions.enable = true
       _options.deliverySdkOptions.live_preview.host = getURLsforRegion(_options.deliverySdkOptions.region).preview
-      _options.livePreviewSdkOptions.clientUrlParams.host = getURLsforRegion(_options.deliverySdkOptions.region).app
+
+      if (_options.livePreviewSdkOptions.clientUrlParams) {
+        _options.livePreviewSdkOptions.clientUrlParams.host = getURLsforRegion(_options.deliverySdkOptions.region).app
+      }
 
       logger.box(`${chalk.bold('⚡️')} Contentstack Live preview enabled`)
     }

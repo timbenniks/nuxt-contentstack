@@ -24,6 +24,7 @@ Contentstack integration for Nuxt.
 - Docs site
 - Release to NPM
 - List on Nuxt modules page
+- Add all regions to the endpoint URL generator
 
 ## Quick Setup
 

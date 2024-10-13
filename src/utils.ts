@@ -1,5 +1,6 @@
-import { Region } from '@contentstack/delivery-sdk'
-import type { IConfigEditButton } from '@contentstack/live-preview-utils/dist/legacy/utils/types'
+import { Region, type StackConfig } from '@contentstack/delivery-sdk'
+
+export type DeliverySdkOptions = StackConfig
 
 export type LivePreviewSdkOptions = {
   ssr?: boolean
@@ -9,9 +10,14 @@ export type LivePreviewSdkOptions = {
   enable?: boolean
   debug?: boolean
   clientUrlParams?: {
-    host: string
+    host?: string
   }
-  editButton?: IConfigEditButton
+  editButton?: {
+    enable: boolean
+    exclude?: ('insideLivePreviewPortal' | 'outsideLivePreviewPortal')[]
+    includeByQueryParameter?: boolean
+    position?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'top-center' | 'bottom-left' | 'bottom-right' | 'bottom-center'
+  }
 }
 
 export type Urls = {
