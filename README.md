@@ -1,3 +1,5 @@
+> Notice: This is an OSS project by @timbenniks and not an officially maintained package by the Contentstack team. Support requests can come through Github issues and via direct channels to @timbenniks.
+
 # Nuxt Contentstack
 
 [![npm version][npm-version-src]][npm-version-href]
@@ -7,16 +9,17 @@
 
 Contentstack integration for Nuxt.
 
-<!-- - [✨ &nbsp;Release Notes](/CHANGELOG.md) -->
+- [✨ &nbsp;Release Notes](/CHANGELOG.md)
 - [🏀 Online playground](https://stackblitz.com/github/timbenniks/nuxt-contentstack?file=playground%2Fapp.vue)
 <!-- - [📖 &nbsp;Documentation](https://example.com) -->
 
 ## Features
 
 - ⚡️ Easy setup
-- ⚡️ Exposed stack
 - ⚡️ Query Entries
-- ⚡️ Live Preview & Visual builder setup
+- ⚡️ Live Preview & Visual builder
+- ⚡️ Personalization
+- ⚡️ Exposed SDks: TS Delivery SDK, Live preview Utils SDK, Personalize SDK.
 
 ## Quick Setup
 
@@ -71,6 +74,24 @@ Learn more: https://www.contentstack.com/docs/developers/set-up-live-preview/get
 - `enable`: enable personalization
 - `projectUid`: your personalization peroject UID (to be found in Contentstack UI)
 
+### Personalization examples
+```ts
+// get Personalize SDK
+const { Personalize } = useNuxtApp().$contentstack
+
+// set attribute
+await Personalize.set({ age: 20 });
+
+// trigger impression
+// experienceShortId to be found on the experiences list page in contentstack
+experienceShortId = 0 
+await Personalize.triggerImpression(experienceShortId);
+
+// trigger conversion event
+// 'eventKey' can be found when creatign an event in Contentstack Personalize
+await Personalize.triggerEvent('eventKey');
+```
+
 ## Provides
 This module provides a `$contentstack` object with:
 
@@ -97,7 +118,6 @@ This module offers a composable `useGetEntryByUrl` which allows you to query any
 
 ```ts
 const { data: page } = await useGetEntryByUrl('page', '/about', ['reference.fields'], ['jsonRtePath'], 'en-us')
-
 ```
 
 ## TODO:
