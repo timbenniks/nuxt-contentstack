@@ -34,6 +34,7 @@
   "dependencies": {
     "@contentstack/delivery-sdk": "^4.3.0",
     "@contentstack/live-preview-utils": "^2.0.4",
+    "@contentstack/personalize-edge-sdk": "^1.0.3",
     "@nuxt/kit": "^3.13.2",
     "chalk": "^5.3.0",
     "defu": "^6.1.4"

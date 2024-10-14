@@ -1,14 +1,15 @@
-import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger } from '@nuxt/kit'
+import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, addServerHandler } from '@nuxt/kit'
 import { Region } from '@contentstack/delivery-sdk'
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
-import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions } from './utils'
+import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions } from './utils'
 
 export interface ModuleOptions {
   debug: boolean
   deliverySdkOptions: DeliverySdkOptions
   livePreviewSdkOptions: LivePreviewSdkOptions
+  personalizeSdkOptions: PersonalizeSdkOptions
 }
 
 const logger = useLogger(name)
@@ -41,8 +42,8 @@ export default defineNuxtModule<ModuleOptions>({
       },
     },
     livePreviewSdkOptions: {
-      ssr: false,
       editableTags: false,
+      ssr: false,
       enable: false,
       debug: false,
       clientUrlParams: {
@@ -54,6 +55,11 @@ export default defineNuxtModule<ModuleOptions>({
         includeByQueryParameter: false,
         position: 'top',
       },
+    },
+    personalizeSdkOptions: {
+      projectUid: '',
+      enable: false,
+      host: '',
     },
   },
 
@@ -92,6 +98,10 @@ export default defineNuxtModule<ModuleOptions>({
       logger.error(`No Contentstack live preview token. Make sure you specify a ${chalk.bold('preview_token')} in your Contentstack live_preview config.`)
     }
 
+    if (_options.personalizeSdkOptions.enable) {
+      _options.personalizeSdkOptions.host = getURLsforRegion(_options.deliverySdkOptions.region).personalize
+    }
+
     if (_options.debug) {
       _options.livePreviewSdkOptions.debug = true
 
@@ -100,5 +110,10 @@ export default defineNuxtModule<ModuleOptions>({
 
     addPlugin(resolver.resolve('./runtime/contentstack'))
     addImportsDir(resolver.resolve('./runtime/composables'))
+
+    addServerHandler({
+      handler: resolver.resolve('./runtime/server/middleware/personalize'),
+      middleware: true,
+    })
   },
 })

@@ -6,7 +6,7 @@ import { toRaw } from 'vue'
 import { useRuntimeConfig, useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
 
 export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, referenceFieldPath?: string[], jsonRtePath?: string[], locale: string = 'en-us'): Promise<AsyncData<T | null, Error>> => {
-  const { editableTags, stack, livePreviewEnabled } = useNuxtApp().$contentstack
+  const { editableTags, stack, livePreviewEnabled, variantAlias } = useNuxtApp().$contentstack
   const { contentstack: opts } = useRuntimeConfig().public
   const route = useRoute()
   const qs = toRaw(route.query)
@@ -20,6 +20,12 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
       .includeFallback()
       .includeEmbeddedItems()
       .includeReference(referenceFieldPath ?? [])
+
+    if (variantAlias && variantAlias.value !== '') {
+      const variants = toRaw(variantAlias.value)
+      entryQuery.addParams({ include_applied_variants: true })
+      entryQuery.variants(variants)
+    }
 
     if (referenceFieldPath) {
       for (const path of referenceFieldPath) {

@@ -8,12 +8,12 @@ export default defineNuxtConfig({
   'nuxt-contentstack': {
     debug: true,
     deliverySdkOptions: {
-      apiKey: 'blte766efb491f96715',
-      deliveryToken: 'cs620decb0e6bb175e31210ce9',
+      apiKey: 'blt34bdc2becb9eb935',
+      deliveryToken: 'csd38b9b7f1076de03fc347531',
       region: Region.EU,
       environment: 'preview',
       live_preview: {
-        preview_token: 'csa128deacffe0b26386090915',
+        preview_token: 'csa2fe339f6713f8a52eff086c',
         enable: true,
       },
     },
@@ -22,6 +22,10 @@ export default defineNuxtConfig({
       editButton: {
         enable: true,
       },
+    },
+    personalizeSdkOptions: {
+      enable: true,
+      projectUid: '67054a4e564522fcfa170c43',
     },
   },
 })

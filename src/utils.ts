@@ -20,6 +20,12 @@ export type LivePreviewSdkOptions = {
   }
 }
 
+export type PersonalizeSdkOptions = {
+  enable: boolean
+  projectUid?: string
+  host?: string
+}
+
 export type Urls = {
   app?: string
   preview?: string
@@ -34,7 +40,7 @@ export function getURLsforRegion(region: Region = Region.US) {
       urls = {
         app: 'app.contentstack.com',
         preview: 'rest-preview.contentstack.com',
-        personalize: 'personalize-edge-api.contentstack.com',
+        personalize: 'personalize-edge.contentstack.com',
       }
 
       break
@@ -43,7 +49,7 @@ export function getURLsforRegion(region: Region = Region.US) {
       urls = {
         app: 'eu-app.contentstack.com',
         preview: 'eu-rest-preview.contentstack.com',
-        personalize: 'eu-personalize-edge-api.contentstack.com',
+        personalize: 'eu-personalize-edge.contentstack.com',
       }
 
       break

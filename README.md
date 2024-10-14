@@ -86,7 +86,6 @@ const { data: page } = await useGetEntryByUrl('page', '/about', ['reference.fiel
 ## TODO:
 - Live preview with SSR mode
 - Add all regions to the endpoint URL generator
-- Personalization
 
 ## Contribution
 
