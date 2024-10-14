@@ -34,12 +34,12 @@ modules: ['nuxt-contentstack'],
 'nuxt-contentstack': {
   debug: true,
   deliverySdkOptions: {
-    apiKey: 'blte766efb491f96715',
-    deliveryToken: 'cs620decb0e6bb175e31210ce9',
+    apiKey: 'blt34bdc2becb9eb935',
+    deliveryToken: 'csd38b9b7f1076de03fc347531',
     region: Region.EU,
     environment: 'preview',
     live_preview: {
-      preview_token: 'csa128deacffe0b26386090915',
+      preview_token: 'csa2fe339f6713f8a52eff086c',
       enable: true,
     },
   },
@@ -49,7 +49,11 @@ modules: ['nuxt-contentstack'],
       enable: true,
     },
   },
-}
+  personalizeSdkOptions: {
+    enable: true,
+    projectUid: '67054a4e564522fcfa170c43',
+  },
+},
 ```
 
 ## Options
@@ -63,6 +67,10 @@ This is the full Contentstack StackConfig. See: https://www.contentstack.com/doc
 This is the full Contentstack configuration for Live Preview Utils.
 Learn more: https://www.contentstack.com/docs/developers/set-up-live-preview/get-started-with-live-preview-utils-sdk
 
+### personalizeSdkOptions
+- `enable`: enable personalization
+- `projectUid`: your personalization peroject UID (to be found in Contentstack UI)
+
 ## Provides
 This module provides a `$contentstack` object with:
 
@@ -70,13 +78,22 @@ This module provides a `$contentstack` object with:
 - `ContentstackLivePreview`: The instance of Live Preview Utils SDK.
 - `livePreviewEnabled`: Was live preview enabled?
 - `editableTags`: Do we want editable tags fo visual building?
+- `Personalize`: The instance of Personalize SDK.
+- `variantAlias`: The variant manifest to pass to the Delivery SDK.
 
 ```ts
-  const { editableTags, stack, livePreviewEnabled, ContentstackLivePreview } = useNuxtApp().$contentstack
+const { 
+  editableTags, 
+  stack, 
+  livePreviewEnabled, 
+  ContentstackLivePreview, 
+  Personalize, 
+  variantAlias
+} = useNuxtApp().$contentstack
 ```
 
 ## Compoasables
-This module offers a composable `useGetEntryByUrl` which allows you to query any entry with a URL field. It also listens to live editing changes and will refresh your content based on entry changes in the CMS.
+This module offers a composable `useGetEntryByUrl` which allows you to query any entry with a URL field. It also listens to live editing changes and will refresh your content based on entry changes in the CMS, and it understands personalization.
 
 ```ts
 const { data: page } = await useGetEntryByUrl('page', '/about', ['reference.fields'], ['jsonRtePath'], 'en-us')
