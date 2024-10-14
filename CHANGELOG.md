@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.7
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.6...v0.0.7)
+
+### 🏡 Chore
+
+- **release:** V0.0.6 ([b6e1fba](https://github.com/timbenniks/nuxt-contentstack/commit/b6e1fba))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.6
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.5...v0.0.6)
