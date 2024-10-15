@@ -1,7 +1,7 @@
 import Personalize from '@contentstack/personalize-edge-sdk'
 import { toWebRequest, setCookie, defineEventHandler } from 'h3'
-import { useRuntimeConfig } from '@nuxt/kit'
 import type { PersonalizeSdkOptions } from '../../../utils'
+import { useRuntimeConfig } from '#imports'
 
 export default defineEventHandler(async (event) => {
   // get options
