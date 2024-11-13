@@ -2,18 +2,18 @@ import { Region } from '@contentstack/delivery-sdk'
 
 export default defineNuxtConfig({
   'modules': ['../src/module'],
-  'devtools': { enabled: true },
-  'compatibilityDate': '2024-10-12',
+  'devtools': { enabled: false },
+  'compatibilityDate': '2024-11-13',
 
   'nuxt-contentstack': {
     debug: true,
     deliverySdkOptions: {
-      apiKey: 'blt34bdc2becb9eb935',
-      deliveryToken: 'csd38b9b7f1076de03fc347531',
+      apiKey: 'bltf1a2bb701d537d95',
+      deliveryToken: 'csa5b6b7935b22e4f08772c1d0',
       region: Region.EU,
       environment: 'preview',
       live_preview: {
-        preview_token: 'csa2fe339f6713f8a52eff086c',
+        preview_token: 'csd1571d7d8b2386120730db85',
         enable: true,
       },
     },
@@ -25,7 +25,7 @@ export default defineNuxtConfig({
     },
     personalizeSdkOptions: {
       enable: true,
-      projectUid: '67054a4e564522fcfa170c43',
+      projectUid: '671a14b9658bc90e1fa85cf5',
     },
   },
 })

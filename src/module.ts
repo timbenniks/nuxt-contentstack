@@ -46,6 +46,7 @@ export default defineNuxtModule<ModuleOptions>({
       ssr: false,
       enable: false,
       debug: false,
+      mode: 'preview',
       clientUrlParams: {
         host: '',
       },

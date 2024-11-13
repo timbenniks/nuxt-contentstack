@@ -32,10 +32,10 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
-    "@contentstack/delivery-sdk": "^4.3.0",
-    "@contentstack/live-preview-utils": "^2.0.4",
+    "@contentstack/delivery-sdk": "4.4.1",
+    "@contentstack/live-preview-utils": "^3.0.0",
     "@contentstack/personalize-edge-sdk": "^1.0.3",
-    "@nuxt/kit": "^3.13.2",
+    "@nuxt/kit": "^3.14.159",
     "chalk": "^5.3.0",
     "defu": "^6.1.4"
   },

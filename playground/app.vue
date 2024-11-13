@@ -24,8 +24,8 @@ const { data: page } = await useGetEntryByUrl('page', '/')
       <img
         v-if="page?.image"
         class="mb-4"
-        width="300"
-        height="300"
+        width="640"
+        height="360"
         :src="page?.image.url"
         :alt="page?.image.title"
         v-bind="page?.image?.$ && page?.image?.$.url"
