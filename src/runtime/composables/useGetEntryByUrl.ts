@@ -73,6 +73,7 @@ export const useGetEntryByUrl = async <T>(options: {
       .locale(options.locale)
       .includeFallback()
       .includeEmbeddedItems()
+      .includeReference(options.referenceFieldPath)
 
     entryQuery.addParams({ include_all: true })
     entryQuery.addParams({ include_dimension: true })
