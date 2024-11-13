@@ -58,3 +58,26 @@ export function getURLsforRegion(region: Region = Region.US) {
 
   return urls
 }
+
+export function replaceCslp(obj: Record<string, unknown> | unknown[]): Record<string, unknown> | unknown[] {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => replaceCslp(item as Record<string, unknown> | unknown[]))
+  }
+
+  const newObj: Record<string, unknown> = {}
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      if (key === '$') {
+        newObj['cslp'] = replaceCslp(obj[key] as Record<string, unknown> | unknown[])
+      }
+      else {
+        newObj[key] = replaceCslp(obj[key] as Record<string, unknown> | unknown[])
+      }
+    }
+  }
+  return newObj
+}

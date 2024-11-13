@@ -3,9 +3,35 @@ import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-prev
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
 import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
 import { toRaw } from 'vue'
-import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
+import { replaceCslp } from '../../utils'
+import { useAsyncData, useNuxtApp, useRoute } from '#app'
 
-export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, referenceFieldPath?: string[], jsonRtePath?: string[], locale: string = 'en-us'): Promise<AsyncData<T | null, Error>> => {
+type Props = {
+  contentTypeUid: string
+  url: string
+  referenceFieldPath?: string[]
+  jsonRtePath?: string[]
+  locale?: string
+  replaceHtmlCslp?: boolean
+}
+
+export async function useGetEntryByUrl(options: Props) {
+  if (!options.locale) {
+    options.locale = 'en-us'
+  }
+
+  if (!options.referenceFieldPath) {
+    options.referenceFieldPath = []
+  }
+
+  if (!options.jsonRtePath) {
+    options.jsonRtePath = []
+  }
+
+  if (!options.replaceHtmlCslp) {
+    options.replaceHtmlCslp = false
+  }
+
   const { editableTags, stack, livePreviewEnabled, variantAlias } = useNuxtApp().$contentstack as {
     editableTags: boolean
     stack: IStackSdk
@@ -19,15 +45,14 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
     stack.livePreviewQuery(qs as unknown as LivePreviewQuery)
   }
 
-  const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${url}-${locale}-${variantAlias.value}`, async () => {
-    let result: { entries: T[] } | null = null
+  const { data, status, refresh } = await useAsyncData(`${options.contentTypeUid}-${options.url}-${options.locale}-${variantAlias.value ? variantAlias.value : ''}`, async () => {
+    let result = null
 
-    const entryQuery = stack.contentType(contentTypeUid)
+    const entryQuery = stack.contentType(options.contentTypeUid)
       .entry()
-      .locale(locale)
+      .locale(options.locale)
       .includeFallback()
       .includeEmbeddedItems()
-      .includeReference(referenceFieldPath ?? [])
 
     entryQuery.addParams({ include_all: true })
     entryQuery.addParams({ include_dimension: true })
@@ -38,33 +63,40 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
       entryQuery.variants(variants)
     }
 
-    if (referenceFieldPath) {
-      for (const path of referenceFieldPath) {
+    if (options.referenceFieldPath) {
+      for (const path of options.referenceFieldPath) {
         entryQuery.includeReference(path)
       }
     }
 
     if (entryQuery) {
-      console.log('query', entryQuery)
-
       result = await entryQuery.query()
-        .where('url', QueryOperation.EQUALS, url)
-        .find() as { entries: T[] }
+        .where('url', QueryOperation.EQUALS, options.url)
+        .find() as { entries: [] }
 
-      const data = result?.entries?.[0] as EmbeddedItem
+      const data = result?.entries && result?.entries?.[0] as unknown as EmbeddedItem
 
-      if (jsonRtePath && data) {
+      if (options.jsonRtePath && data) {
         contentstack.Utils.jsonToHTML({
           entry: data,
-          paths: jsonRtePath,
+          paths: options.jsonRtePath,
         })
       }
 
       if (editableTags) {
-        contentstack.Utils.addEditableTags(data, contentTypeUid, true, locale)
+        contentstack.Utils.addEditableTags(data, options.contentTypeUid, true, options.locale)
       }
 
-      return data
+      let finalData
+
+      if (options.replaceHtmlCslp) {
+        finalData = replaceCslp(data)
+      }
+      else {
+        finalData = data
+      }
+
+      return finalData
     }
   })
 
@@ -74,6 +106,5 @@ export const useGetEntryByUrl = async <T>(contentTypeUid: string, url: string, r
     }
   }
 
-  // @ts-expect-error not all properties are outputted as they arent required.
   return { data, status, refresh }
 }

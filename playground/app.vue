@@ -1,5 +1,8 @@
 <script lang="ts" setup>
-const { data: page } = await useGetEntryByUrl('page', '/')
+const { data: page } = await useGetEntryByUrl({
+  contentTypeUid: 'page',
+  url: '/',
+})
 </script>
 
 <template>
