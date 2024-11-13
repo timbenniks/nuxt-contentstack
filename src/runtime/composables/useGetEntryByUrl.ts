@@ -3,8 +3,30 @@ import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-prev
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
 import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
 import { toRaw } from 'vue'
-import { replaceCslp } from '../../utils'
 import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
+
+function replaceCslp(obj: Record<string, unknown> | unknown[]): Record<string, unknown> | unknown[] {
+  if (typeof obj !== 'object' || obj === null) {
+    return obj
+  }
+
+  if (Array.isArray(obj)) {
+    return obj.map(item => replaceCslp(item as Record<string, unknown> | unknown[]))
+  }
+
+  const newObj: Record<string, unknown> = {}
+  for (const key in obj) {
+    if (Object.prototype.hasOwnProperty.call(obj, key)) {
+      if (key === '$') {
+        newObj['cslp'] = replaceCslp(obj[key] as Record<string, unknown> | unknown[])
+      }
+      else {
+        newObj[key] = replaceCslp(obj[key] as Record<string, unknown> | unknown[])
+      }
+    }
+  }
+  return newObj
+}
 
 export const useGetEntryByUrl = async <T>(options: {
   contentTypeUid: string
