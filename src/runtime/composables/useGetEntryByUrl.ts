@@ -4,18 +4,16 @@ import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedde
 import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
 import { toRaw } from 'vue'
 import { replaceCslp } from '../../utils'
-import { useAsyncData, useNuxtApp, useRoute } from '#app'
+import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
 
-type Props = {
+export const useGetEntryByUrl = async <T>(options: {
   contentTypeUid: string
   url: string
   referenceFieldPath?: string[]
   jsonRtePath?: string[]
   locale?: string
   replaceHtmlCslp?: boolean
-}
-
-export async function useGetEntryByUrl(options: Props) {
+}): Promise<AsyncData<T | null, Error>> => {
   if (!options.locale) {
     options.locale = 'en-us'
   }
@@ -106,5 +104,6 @@ export async function useGetEntryByUrl(options: Props) {
     }
   }
 
+  // @ts-expect-error doesnt export all useAsyncData props
   return { data, status, refresh }
 }
