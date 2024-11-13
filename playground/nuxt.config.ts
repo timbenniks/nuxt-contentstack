@@ -19,6 +19,7 @@ export default defineNuxtConfig({
     },
     livePreviewSdkOptions: {
       editableTags: true,
+      mode: 'builder',
       editButton: {
         enable: true,
       },

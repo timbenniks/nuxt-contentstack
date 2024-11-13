@@ -8,6 +8,7 @@ export type LivePreviewSdkOptions = {
   runScriptsOnUpdate?: boolean
   cleanCslpOnProduction?: boolean
   enable?: boolean
+  mode: 'builder' | 'preview'
   debug?: boolean
   clientUrlParams?: {
     host?: string
