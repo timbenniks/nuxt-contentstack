@@ -68,15 +68,13 @@ export default defineNuxtModule<ModuleOptions>({
     // Add CommonJS packages to transpile to handle ESM import issues
     _nuxt.options.build = _nuxt.options.build || {}
     _nuxt.options.build.transpile = _nuxt.options.build.transpile || []
-    
+
     if (!_nuxt.options.build.transpile.includes('@contentstack/core')) {
       _nuxt.options.build.transpile.push('@contentstack/core')
     }
-    
     if (!_nuxt.options.build.transpile.includes('@contentstack/delivery-sdk')) {
       _nuxt.options.build.transpile.push('@contentstack/delivery-sdk')
     }
-
     _nuxt.options.runtimeConfig.public.contentstack = defu(_nuxt.options.runtimeConfig.public.contentstack, _options)
 
     if (!_options.deliverySdkOptions.apiKey) {
