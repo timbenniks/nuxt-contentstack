@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.21
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.20...v0.0.21)
+
+### 🏡 Chore
+
+- Update package version to 0.0.20 and add transpile configuration for CommonJS packages ([ad78dc4](https://github.com/timbenniks/nuxt-contentstack/commit/ad78dc4))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.20
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.19...v0.0.20)
