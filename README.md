@@ -39,7 +39,7 @@ modules: ['nuxt-contentstack'],
   deliverySdkOptions: {
     apiKey: 'blt34bdc2becb9eb935',
     deliveryToken: 'csd38b9b7f1076de03fc347531',
-    region: Region.EU,
+    region: 'eu',
     environment: 'preview',
     live_preview: {
       preview_token: 'csa2fe339f6713f8a52eff086c',
@@ -60,39 +60,46 @@ modules: ['nuxt-contentstack'],
 ```
 
 ## Options
+
 ### debug
+
 general debug dumping the complete settings object into the terminal. Also turns on debug mode in preview SDK.
 
 ### deliverySdkOptions
+
 This is the full Contentstack StackConfig. See: https://www.contentstack.com/docs/developers/sdks/content-delivery-sdk/typescript/reference
 
 ### livePreviewSdkOptions
+
 This is the full Contentstack configuration for Live Preview Utils.
 Learn more: https://www.contentstack.com/docs/developers/set-up-live-preview/get-started-with-live-preview-utils-sdk
 
 ### personalizeSdkOptions
+
 - `enable`: enable personalization
 - `projectUid`: your personalization peroject UID (to be found in Contentstack UI)
 
 ### Personalization examples
+
 ```ts
 // get Personalize SDK
-const { Personalize } = useNuxtApp().$contentstack
+const { Personalize } = useNuxtApp().$contentstack;
 
 // set attribute
 await Personalize.set({ age: 20 });
 
 // trigger impression
 // experienceShortId to be found on the experiences list page in contentstack
-experienceShortId = 0 
+experienceShortId = 0;
 await Personalize.triggerImpression(experienceShortId);
 
 // trigger conversion event
 // 'eventKey' can be found when creatign an event in Contentstack Personalize
-await Personalize.triggerEvent('eventKey');
+await Personalize.triggerEvent("eventKey");
 ```
 
 ## Provides
+
 This module provides a `$contentstack` object with:
 
 - `stack`: The Stack object from the Delivery SDK. Query all the things with this.
@@ -103,24 +110,32 @@ This module provides a `$contentstack` object with:
 - `variantAlias`: The variant manifest to pass to the Delivery SDK.
 
 ```ts
-const { 
-  editableTags, 
-  stack, 
-  livePreviewEnabled, 
-  ContentstackLivePreview, 
-  Personalize, 
-  variantAlias
-} = useNuxtApp().$contentstack
+const {
+  editableTags,
+  stack,
+  livePreviewEnabled,
+  ContentstackLivePreview,
+  Personalize,
+  variantAlias,
+} = useNuxtApp().$contentstack;
 ```
 
 ## Compoasables
+
 This module offers a composable `useGetEntryByUrl` which allows you to query any entry with a URL field. It also listens to live editing changes and will refresh your content based on entry changes in the CMS, and it understands personalization.
 
 ```ts
-const { data: page } = await useGetEntryByUrl('page', '/about', ['reference.fields'], ['jsonRtePath'], 'en-us')
+const { data: page } = await useGetEntryByUrl(
+  "page",
+  "/about",
+  ["reference.fields"],
+  ["jsonRtePath"],
+  "en-us"
+);
 ```
 
 ## TODO:
+
 - Live preview with SSR mode
 - Add all regions to the endpoint URL generator
 
@@ -155,16 +170,13 @@ const { data: page } = await useGetEntryByUrl('page', '/about', ['reference.fiel
 
 </details>
 
-
 <!-- Badges -->
+
 [npm-version-src]: https://img.shields.io/npm/v/nuxt-contentstack/latest.svg?style=flat&colorA=020420&colorB=00DC82
 [npm-version-href]: https://npmjs.com/package/nuxt-contentstack
-
 [npm-downloads-src]: https://img.shields.io/npm/dm/nuxt-contentstack.svg?style=flat&colorA=020420&colorB=00DC82
 [npm-downloads-href]: https://npmjs.com/package/nuxt-contentstack
-
 [license-src]: https://img.shields.io/npm/l/nuxt-contentstack.svg?style=flat&colorA=020420&colorB=00DC82
 [license-href]: https://npmjs.com/package/nuxt-contentstack
-
 [nuxt-src]: https://img.shields.io/badge/Nuxt-020420?logo=nuxt.js
 [nuxt-href]: https://nuxt.com

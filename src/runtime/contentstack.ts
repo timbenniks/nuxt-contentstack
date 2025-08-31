@@ -2,9 +2,19 @@ import contentstack from '@contentstack/delivery-sdk'
 import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-preview-utils'
 import type { Plugin } from 'nuxt/app'
 import Personalize from '@contentstack/personalize-edge-sdk'
-import type { LivePreviewSdkOptions, DeliverySdkOptions, PersonalizeSdkOptions } from '../utils'
-import { convertToStackConfig } from '../utils'
 import { defineNuxtPlugin, useState, useRequestEvent } from '#app'
+import { getRegionForString } from '@timbenniks/contentstack-endpoints'
+import type { StackConfig } from '@contentstack/delivery-sdk'
+import type { LivePreviewSdkOptions, DeliverySdkOptions, PersonalizeSdkOptions } from './utils'
+
+// Utility function
+function convertToStackConfig(options: DeliverySdkOptions): StackConfig {
+  const { region, ...rest } = options
+  return {
+    ...rest,
+    region: getRegionForString(region || 'eu'),
+  } as StackConfig
+}
 
 const contentstackPlugin: Plugin = (_nuxtApp) => {
   const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions }: {

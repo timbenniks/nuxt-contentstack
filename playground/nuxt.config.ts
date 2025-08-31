@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
-  'modules': ['../src/module'],
+  'compatibilityDate': '2025-08-31',
   'devtools': { enabled: false },
-  compatibilityDate: '2025-08-31',
+  'modules': ['../src/module'],
 
   'nuxt-contentstack': {
     debug: true,

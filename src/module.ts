@@ -2,7 +2,7 @@ import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, 
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
-import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions, convertToStackConfig } from './utils'
+import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions } from './runtime/utils'
 
 export interface ModuleOptions {
   debug: boolean
