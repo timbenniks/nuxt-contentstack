@@ -1,4 +1,4 @@
-import Personalize from '@contentstack/personalize-edge-sdk'
+import * as Personalize from '@contentstack/personalize-edge-sdk'
 import { toWebRequest, setCookie, defineEventHandler } from 'h3'
 import type { PersonalizeSdkOptions } from '../../utils'
 import { useRuntimeConfig } from '#imports'
