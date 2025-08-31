@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.0.18
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.17...v0.0.18)
+
+### 🏡 Chore
+
+- **release:** V0.0.17 ([e0a3945](https://github.com/timbenniks/nuxt-contentstack/commit/e0a3945))
+- Update dependencies and refactor module configuration ([7f449f3](https://github.com/timbenniks/nuxt-contentstack/commit/7f449f3))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.17
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.16...v0.0.17)
