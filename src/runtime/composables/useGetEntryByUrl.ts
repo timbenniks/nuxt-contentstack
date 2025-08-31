@@ -1,9 +1,8 @@
 import contentstack from '@contentstack/delivery-sdk'
 import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
-import type { LivePreviewQuery } from '@contentstack/delivery-sdk'
 import { toRaw } from 'vue'
-import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
+import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
 
 function replaceCslp(obj: Record<string, unknown> | unknown[]): Record<string, unknown> | unknown[] {
   if (typeof obj !== 'object' || obj === null) {
@@ -49,16 +48,10 @@ export const useGetEntryByUrl = async <T>(options: {
     editableTags: boolean
     stack: IStackSdk
     livePreviewEnabled: boolean
-    variantAlias: { value: string }
+    variantAlias?: { value: string }
   }
 
-  if (livePreviewEnabled) {
-    const route = useRoute()
-    const qs = toRaw(route.query)
-    stack.livePreviewQuery(qs as unknown as LivePreviewQuery)
-  }
-
-  const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${url}-${locale}-${variantAlias.value ? variantAlias.value : ''}`, async () => {
+  const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${url}-${locale}-${variantAlias?.value ? variantAlias.value : ''}`, async () => {
     let result: { entries: T[] } | null = null
 
     const entryQuery = stack.contentType(contentTypeUid)

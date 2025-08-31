@@ -1,9 +1,8 @@
 import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, addServerHandler } from '@nuxt/kit'
-import { Region } from '@contentstack/delivery-sdk'
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
-import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions } from './utils'
+import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions, convertToStackConfig } from './utils'
 
 export interface ModuleOptions {
   debug: boolean
@@ -21,8 +20,7 @@ export default defineNuxtModule<ModuleOptions>({
     version,
     configKey: CONFIG_KEY,
     compatibility: {
-      nuxt: '^3.12.0',
-      bridge: false,
+      nuxt: '^4',
     },
   },
 
@@ -32,7 +30,7 @@ export default defineNuxtModule<ModuleOptions>({
       apiKey: '',
       deliveryToken: '',
       environment: '',
-      region: Region.US,
+      region: 'eu',
       branch: 'main',
       locale: 'en-us',
       live_preview: {
@@ -89,7 +87,7 @@ export default defineNuxtModule<ModuleOptions>({
       _options.deliverySdkOptions.live_preview.host = getURLsforRegion(_options.deliverySdkOptions.region).preview
 
       if (_options.livePreviewSdkOptions.clientUrlParams) {
-        _options.livePreviewSdkOptions.clientUrlParams.host = getURLsforRegion(_options.deliverySdkOptions.region).app
+        _options.livePreviewSdkOptions.clientUrlParams.host = getURLsforRegion(_options.deliverySdkOptions.region).application
       }
 
       logger.box(`${chalk.bold('⚡️')} Contentstack Live preview enabled`)
@@ -100,7 +98,7 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     if (_options.personalizeSdkOptions.enable) {
-      _options.personalizeSdkOptions.host = getURLsforRegion(_options.deliverySdkOptions.region).personalize
+      _options.personalizeSdkOptions.host = getURLsforRegion(_options.deliverySdkOptions.region).personalizeEdge
     }
 
     if (_options.debug) {

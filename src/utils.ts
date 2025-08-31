@@ -1,6 +1,15 @@
-import { Region, type StackConfig } from '@contentstack/delivery-sdk'
+import { type StackConfig } from '@contentstack/delivery-sdk'
 
-export type DeliverySdkOptions = StackConfig
+import {
+  getRegionForString,
+  getContentstackEndpoints,
+} from "@timbenniks/contentstack-endpoints";
+
+export type Region = "us" | "eu" | "au" | "azure-na" | "azure-eu" | "gcp-na" | "gcp-eu";
+
+export type DeliverySdkOptions = Omit<StackConfig, 'region'> & {
+  region?: Region;
+}
 
 export type LivePreviewSdkOptions = {
   ssr?: boolean
@@ -27,36 +36,16 @@ export type PersonalizeSdkOptions = {
   host?: string
 }
 
-export type Urls = {
-  app?: string
-  preview?: string
-  personalize?: string
+export function getURLsforRegion(region?: Region) {
+  return getContentstackEndpoints(getRegionForString(region || "eu"));
 }
 
-export function getURLsforRegion(region: Region = Region.US) {
-  let urls: Urls = {}
-
-  switch (region) {
-    case Region.US:
-      urls = {
-        app: 'app.contentstack.com',
-        preview: 'rest-preview.contentstack.com',
-        personalize: 'personalize-edge.contentstack.com',
-      }
-
-      break
-
-    case Region.EU:
-      urls = {
-        app: 'eu-app.contentstack.com',
-        preview: 'eu-rest-preview.contentstack.com',
-        personalize: 'eu-personalize-edge.contentstack.com',
-      }
-
-      break
-  }
-
-  return urls
+export function convertToStackConfig(options: DeliverySdkOptions): StackConfig {
+  const { region, ...rest } = options;
+  return {
+    ...rest,
+    region: getRegionForString(region || "eu")
+  } as StackConfig;
 }
 
 export function replaceCslp(obj: Record<string, unknown> | unknown[]): Record<string, unknown> | unknown[] {

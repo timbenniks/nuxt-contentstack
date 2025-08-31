@@ -1,8 +1,8 @@
 <script lang="ts" setup>
 const { data: page } = await useGetEntryByUrl({
-  contentTypeUid: 'page',
-  url: '/',
-})
+  contentTypeUid: "page",
+  url: "/",
+});
 </script>
 
 <template>
@@ -32,12 +32,6 @@ const { data: page } = await useGetEntryByUrl({
         :src="page?.image.url"
         :alt="page?.image.title"
         v-bind="page?.image?.$ && page?.image?.$.url"
-      >
-
-      <div
-        v-if="page?.rich_text"
-        v-bind="page?.$ && page?.$.rich_text"
-        v-html="page?.rich_text"
       />
     </section>
   </main>

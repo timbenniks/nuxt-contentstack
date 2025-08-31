@@ -20,15 +20,13 @@ export default defineEventHandler(async (event) => {
 
   Personalize.setEdgeApiUrl(`https://${host}`)
   // Initialize Personalize with converted Request
-  if (projectUid) {
-    await Personalize.init(projectUid, { request })
-  }
+  projectUid && await Personalize.init(projectUid, { request });
 
   // figure out variants
-  const variantParam = Personalize.getVariantParam()
+  const variantParam = Personalize.getVariantParam();
 
   // create variant aliases that the SDK can understand
-  const variantAlias = Personalize.variantParamToVariantAliases(variantParam).join(',')
+  const variantAlias = Personalize.variantParamToVariantAliases(variantParam).join(",");
 
   // Save variant aliases in request context for later use
   // See ~/plugins/personalize.ts to learn how `variantAlias` is added to
@@ -37,14 +35,14 @@ export default defineEventHandler(async (event) => {
 
   // create an empty response so Personalize can add cookies to it
   // so we can remember the user and the Personalize Manifest.
-  const response = new Response()
-  await Personalize.addStateToResponse(response)
+  const response = new Response();
+  await Personalize.addStateToResponse(response);
 
   // Extract the cookies from the fake Request
   const cookies = response.headers.getSetCookie()
 
   // Loop over the cookies array and parse them
-  cookies.forEach((cookie) => {
+  cookies.forEach(cookie => {
     const [nameValue, ...options] = cookie.split('; ')
 
     if (nameValue) {
@@ -55,21 +53,21 @@ export default defineEventHandler(async (event) => {
       }
 
       const cookieOptions: Record<string, string | number | undefined> = {}
-      options.forEach((option) => {
+      options.forEach(option => {
         const [key, val] = option.split('=')
 
         if (!key || !val) {
           return false
         }
 
-        cookieOptions[key.toLowerCase()] = key === 'Max-Age' ? Number.parseInt(val) : val
+        cookieOptions[key.toLowerCase()] = key === 'Max-Age' ? parseInt(val) : val
       })
 
       // do not encodeURIComponent the cookie
-      cookieOptions.encode = ((v: string | number) => v) as unknown as string | number
+      cookieOptions.encode = ((v: string | number) => v) as unknown as string | number;
 
       // add the extracted cookies to the real Response in Nuxt
       setCookie(event, name, value, cookieOptions)
     }
   })
-})
+});

@@ -3,6 +3,7 @@ import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-prev
 import type { Plugin } from 'nuxt/app'
 import Personalize from '@contentstack/personalize-edge-sdk'
 import type { LivePreviewSdkOptions, DeliverySdkOptions, PersonalizeSdkOptions } from '../utils'
+import { convertToStackConfig } from '../utils'
 import { defineNuxtPlugin, useState, useRequestEvent } from '#app'
 
 const contentstackPlugin: Plugin = (_nuxtApp) => {
@@ -16,7 +17,7 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
     personalizeSdkOptions: PersonalizeSdkOptions
   }
 
-  const stack = contentstack.stack(deliverySdkOptions)
+  const stack = contentstack.stack(convertToStackConfig(deliverySdkOptions))
   const livePreviewEnabled = deliverySdkOptions?.live_preview?.enable
   const { editableTags } = livePreviewSdkOptions
   const { enable: personalizationEnabled, host: personalizationHost, projectUid: personalizationProjectUid } = personalizeSdkOptions

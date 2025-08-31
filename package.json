@@ -10,13 +10,10 @@
   "type": "module",
   "exports": {
     ".": {
-      "types": "./dist/types.d.ts",
-      "import": "./dist/module.mjs",
-      "require": "./dist/module.cjs"
+      "import": "./dist/module.mjs"
     }
   },
-  "main": "./dist/module.cjs",
-  "types": "./dist/types.d.ts",
+  "main": "./dist/module.mjs",
   "files": [
     "dist"
   ],
@@ -32,25 +29,26 @@
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
   },
   "dependencies": {
-    "@contentstack/delivery-sdk": "4.4.1",
-    "@contentstack/live-preview-utils": "^3.0.0",
-    "@contentstack/personalize-edge-sdk": "^1.0.3",
-    "@nuxt/kit": "^3.14.159",
-    "chalk": "^5.3.0",
+    "@contentstack/delivery-sdk": "4.9.0",
+    "@contentstack/live-preview-utils": "^4.0.1",
+    "@contentstack/personalize-edge-sdk": "^1.0.16",
+    "@nuxt/kit": "^4.0.3",
+    "@timbenniks/contentstack-endpoints": "^1.0.16",
+    "chalk": "^5.6.0",
     "defu": "^6.1.4"
   },
   "devDependencies": {
-    "@nuxt/devtools": "^1.6.0",
-    "@nuxt/eslint-config": "^0.5.7",
-    "@nuxt/module-builder": "^0.8.4",
-    "@nuxt/schema": "^3.13.2",
-    "@nuxt/test-utils": "^3.14.3",
+    "@nuxt/devtools": "^2.6.3",
+    "@nuxt/eslint-config": "^1.9.0",
+    "@nuxt/module-builder": "^1.0.2",
+    "@nuxt/schema": "^4.0.3",
+    "@nuxt/test-utils": "^3.19.2",
     "@types/node": "latest",
-    "changelogen": "^0.5.7",
-    "eslint": "^9.12.0",
-    "nuxt": "^3.13.2",
+    "changelogen": "^0.6.2",
+    "eslint": "^9.34.0",
+    "nuxt": "^4.0.3",
     "typescript": "latest",
-    "vitest": "^2.1.2",
-    "vue-tsc": "^2.1.6"
+    "vitest": "^3.2.4",
+    "vue-tsc": "^3.0.6"
   }
 }
