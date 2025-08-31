@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.19
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.18...v0.0.19)
+
+### 💅 Refactors
+
+- Update region format, improve code consistency, and reorganize utility functions ([da39096](https://github.com/timbenniks/nuxt-contentstack/commit/da39096))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.18
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.17...v0.0.18)
