@@ -17,17 +17,17 @@ describe('Simple Unit Tests', () => {
 
     it('should have valid file structure', async () => {
       // Test that key files exist and can be resolved
-      const { existsSync } = await import('fs')
-      const { resolve } = await import('path')
+      const { existsSync } = await import('node:fs')
+      const { resolve } = await import('node:path')
 
       const files = [
         'src/module.ts',
         'src/runtime/utils.ts',
         'src/runtime/contentstack.ts',
-        'src/runtime/composables/useGetEntryByUrl.ts'
+        'src/runtime/composables/useGetEntryByUrl.ts',
       ]
 
-      files.forEach(file => {
+      files.forEach((file) => {
         expect(existsSync(resolve(file))).toBe(true)
       })
     })
@@ -38,7 +38,7 @@ describe('Simple Unit Tests', () => {
       const validRegions = ['us', 'eu', 'au', 'azure-na', 'azure-eu', 'gcp-na', 'gcp-eu']
 
       // This test validates that we support the expected region types
-      validRegions.forEach(region => {
+      validRegions.forEach((region) => {
         expect(typeof region).toBe('string')
         expect(region.length).toBeGreaterThan(0)
       })
@@ -49,10 +49,10 @@ describe('Simple Unit Tests', () => {
       const configKeys = [
         'deliverySdkOptions',
         'livePreviewSdkOptions',
-        'personalizeSdkOptions'
+        'personalizeSdkOptions',
       ]
 
-      configKeys.forEach(key => {
+      configKeys.forEach((key) => {
         expect(typeof key).toBe('string')
         expect(key.includes('Options')).toBe(true)
       })
@@ -84,7 +84,7 @@ describe('Simple Unit Tests', () => {
     it('should validate environment variables structure', () => {
       const requiredEnvVars = ['apiKey', 'deliveryToken', 'environment']
 
-      requiredEnvVars.forEach(envVar => {
+      requiredEnvVars.forEach((envVar) => {
         expect(typeof envVar).toBe('string')
         expect(envVar.length).toBeGreaterThan(0)
       })
@@ -94,10 +94,10 @@ describe('Simple Unit Tests', () => {
       const configKeys = [
         'deliverySdkOptions',
         'livePreviewSdkOptions',
-        'personalizeSdkOptions'
+        'personalizeSdkOptions',
       ]
 
-      configKeys.forEach(key => {
+      configKeys.forEach((key) => {
         expect(typeof key).toBe('string')
         expect(key.includes('Options')).toBe(true)
       })
@@ -118,7 +118,7 @@ describe('Simple Unit Tests', () => {
       const testObj = {
         apiKey: 'test-key',
         environment: 'test-env',
-        region: 'eu'
+        region: 'eu',
       }
 
       expect(typeof testObj).toBe('object')

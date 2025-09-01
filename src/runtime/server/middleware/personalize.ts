@@ -21,7 +21,7 @@ export default defineEventHandler(async (event) => {
   Personalize.setEdgeApiUrl(`https://${host}`)
 
   // Initialize Personalize with converted Request
-  const personalizeSdk = await Personalize.init(projectUid, { request });
+  const personalizeSdk = await Personalize.init(projectUid, { request })
 
   // figure out variants
   const variantParam = personalizeSdk.getVariantParam()
