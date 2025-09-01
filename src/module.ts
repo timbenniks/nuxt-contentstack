@@ -8,7 +8,7 @@ export interface ModuleOptions {
   debug: boolean
   deliverySdkOptions: DeliverySdkOptions
   livePreviewSdkOptions: LivePreviewSdkOptions
-  personalizeSdkOptions: PersonalizeSdkOptions
+  personalizeSdkOptions?: PersonalizeSdkOptions
 }
 
 const logger = useLogger(name)
@@ -56,8 +56,8 @@ export default defineNuxtModule<ModuleOptions>({
       },
     },
     personalizeSdkOptions: {
-      projectUid: '',
       enable: false,
+      projectUid: '',
       host: '',
     },
   },
@@ -148,8 +148,11 @@ export default defineNuxtModule<ModuleOptions>({
       logger.error(`No Contentstack live preview token. Make sure you specify a ${chalk.bold('preview_token')} in your Contentstack live_preview config.`)
     }
 
-    if (_options.personalizeSdkOptions.enable) {
+    if (_options.personalizeSdkOptions && _options.personalizeSdkOptions.enable) {
       _options.personalizeSdkOptions.host = getURLsforRegion(_options.deliverySdkOptions.region).personalizeEdge
+    }
+    else {
+      delete _options.personalizeSdkOptions;
     }
 
     if (_options.debug) {
@@ -161,9 +164,10 @@ export default defineNuxtModule<ModuleOptions>({
     addPlugin(resolver.resolve('./runtime/contentstack'))
     addImportsDir(resolver.resolve('./runtime/composables'))
 
-    addServerHandler({
-      handler: resolver.resolve('./runtime/server/middleware/personalize'),
-      middleware: true,
-    })
-  },
-})
+    if (_options.personalizeSdkOptions && _options.personalizeSdkOptions.enable) {
+      addServerHandler({
+        handler: resolver.resolve('./runtime/server/middleware/personalize'),
+        middleware: true,
+      })
+    }
+  })
