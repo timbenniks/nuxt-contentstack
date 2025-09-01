@@ -1,6 +1,21 @@
 # Changelog
 
 
+## v0.0.25
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.24...v0.0.25)
+
+### 🩹 Fixes
+
+- Add '@contentstack/personalize-edge-sdk' to CommonJS dependencies for proper handling ([e6c915a](https://github.com/timbenniks/nuxt-contentstack/commit/e6c915a))
+- Make personalizeSdkOptions optional and handle its deletion when disabled ([ba7c4f7](https://github.com/timbenniks/nuxt-contentstack/commit/ba7c4f7))
+- Make personalizeSdkOptions required and simplify its handling ([b2b83de](https://github.com/timbenniks/nuxt-contentstack/commit/b2b83de))
+- Remove unnecessary blank line in module setup ([488b1c6](https://github.com/timbenniks/nuxt-contentstack/commit/488b1c6))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.24
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.23...v0.0.24)
