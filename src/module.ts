@@ -152,7 +152,6 @@ export default defineNuxtModule<ModuleOptions>({
       _options.personalizeSdkOptions.host = getURLsforRegion(_options.deliverySdkOptions.region).personalizeEdge
     }
 
-
     if (_options.debug) {
       _options.livePreviewSdkOptions.debug = true
 
@@ -168,5 +167,5 @@ export default defineNuxtModule<ModuleOptions>({
         middleware: true,
       })
     }
-  }
+  },
 })
