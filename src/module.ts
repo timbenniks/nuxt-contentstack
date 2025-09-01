@@ -75,15 +75,16 @@ export default defineNuxtModule<ModuleOptions>({
       '@contentstack/utils',
       '@contentstack/delivery-sdk',
       '@contentstack/live-preview-utils',
+      '@contentstack/personalize-edge-sdk',
       'classnames',
       'humps',
       'lodash',
       'qs',
       'lodash-es',
-      'lodash.merge'
+      'lodash.merge',
     ]
 
-    commonJSDeps.forEach(dep => {
+    commonJSDeps.forEach((dep) => {
       if (!_nuxt.options.build.transpile.includes(dep)) {
         _nuxt.options.build.transpile.push(dep)
       }
