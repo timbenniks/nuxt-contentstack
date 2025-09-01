@@ -1,6 +1,19 @@
 # Changelog
 
 
+## v0.0.22
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.21...v0.0.22)
+
+### 🩹 Fixes
+
+- Streamline transpile configuration for CommonJS packages ([e3bfefc](https://github.com/timbenniks/nuxt-contentstack/commit/e3bfefc))
+- Enhance Vite configuration for CommonJS package compatibility ([aab92bc](https://github.com/timbenniks/nuxt-contentstack/commit/aab92bc))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.21
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.20...v0.0.21)
