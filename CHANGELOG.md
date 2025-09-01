@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.26
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.25...v0.0.26)
+
+### 🩹 Fixes
+
+- Make personalizeSdkOptions optional and handle its deletion when disabled; update module metadata and add VB_EmptyBlockParentClass import ([90148f0](https://github.com/timbenniks/nuxt-contentstack/commit/90148f0))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.25
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.24...v0.0.25)
