@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.23
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.22...v0.0.23)
+
+### 🩹 Fixes
+
+- Streamline CommonJS dependency handling in Nuxt module ([5fc48e2](https://github.com/timbenniks/nuxt-contentstack/commit/5fc48e2))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.22
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.21...v0.0.22)
