@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.27
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.26...v0.0.27)
+
+### 🩹 Fixes
+
+- Enhance personalizeSdkOptions handling and improve variant alias processing ([42f9939](https://github.com/timbenniks/nuxt-contentstack/commit/42f9939))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.26
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.25...v0.0.26)
