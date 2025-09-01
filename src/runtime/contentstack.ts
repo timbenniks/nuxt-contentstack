@@ -6,6 +6,7 @@ import { defineNuxtPlugin, useState, useRequestEvent } from '#app'
 import { getRegionForString } from '@timbenniks/contentstack-endpoints'
 import type { StackConfig } from '@contentstack/delivery-sdk'
 import type { LivePreviewSdkOptions, DeliverySdkOptions, PersonalizeSdkOptions } from './utils'
+import { VB_EmptyBlockParentClass } from '@contentstack/live-preview-utils'
 
 // Utility function
 function convertToStackConfig(options: DeliverySdkOptions): StackConfig {
@@ -64,6 +65,7 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
         ContentstackLivePreview,
         Personalize,
         variantAlias,
+        VB_EmptyBlockParentClass,
       },
     },
   }

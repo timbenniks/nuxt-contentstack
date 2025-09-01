@@ -36,5 +36,5 @@ export type PersonalizeSdkOptions = {
 }
 
 export function getURLsforRegion(region?: Region) {
-  return getContentstackEndpoints(getRegionForString(region || 'eu'))
+  return getContentstackEndpoints(getRegionForString(region || 'eu'), true)
 }
