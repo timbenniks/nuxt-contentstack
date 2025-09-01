@@ -11,7 +11,7 @@ export default defineEventHandler(async (event) => {
 
   const { enable, host, projectUid } = personalizeSdkOptions
 
-  if (!enable) {
+  if (!enable || !projectUid) {
     return
   }
 
@@ -19,16 +19,15 @@ export default defineEventHandler(async (event) => {
   const request = toWebRequest(event)
 
   Personalize.setEdgeApiUrl(`https://${host}`)
+
   // Initialize Personalize with converted Request
-  if (projectUid) {
-    await Personalize.init(projectUid, { request })
-  }
+  const personalizeSdk = await Personalize.init(projectUid, { request });
 
   // figure out variants
-  const variantParam = Personalize.getVariantParam()
+  const variantParam = personalizeSdk.getVariantParam()
 
   // create variant aliases that the SDK can understand
-  const variantAlias = Personalize.variantParamToVariantAliases(variantParam).join(',')
+  const variantAlias = variantParam && Personalize.variantParamToVariantAliases(variantParam).join(',')
 
   // Save variant aliases in request context for later use
   // See ~/plugins/personalize.ts to learn how `variantAlias` is added to
@@ -38,7 +37,8 @@ export default defineEventHandler(async (event) => {
   // create an empty response so Personalize can add cookies to it
   // so we can remember the user and the Personalize Manifest.
   const response = new Response()
-  await Personalize.addStateToResponse(response)
+
+  await personalizeSdk.addStateToResponse(response)
 
   // Extract the cookies from the fake Request
   const cookies = response.headers.getSetCookie()

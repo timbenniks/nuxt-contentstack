@@ -117,6 +117,7 @@ const {
   ContentstackLivePreview,
   Personalize,
   variantAlias,
+  VB_EmptyBlockParentClass,
 } = useNuxtApp().$contentstack;
 ```
 
