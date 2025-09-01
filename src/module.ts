@@ -72,9 +72,38 @@ export default defineNuxtModule<ModuleOptions>({
     if (!_nuxt.options.build.transpile.includes('@contentstack/core')) {
       _nuxt.options.build.transpile.push('@contentstack/core')
     }
+
     if (!_nuxt.options.build.transpile.includes('@contentstack/delivery-sdk')) {
       _nuxt.options.build.transpile.push('@contentstack/delivery-sdk')
     }
+
+    // Configure Vite to properly handle CommonJS dependencies
+    _nuxt.options.vite = _nuxt.options.vite || {}
+    _nuxt.options.vite.optimizeDeps = _nuxt.options.vite.optimizeDeps || {}
+    _nuxt.options.vite.optimizeDeps.include = _nuxt.options.vite.optimizeDeps.include || []
+
+    const depsToInclude = ['@contentstack/core', '@contentstack/delivery-sdk']
+    depsToInclude.forEach((dep) => {
+      if (!_nuxt.options.vite.optimizeDeps!.include!.includes(dep)) {
+        _nuxt.options.vite.optimizeDeps!.include!.push(dep)
+      }
+    })
+
+    // Force ESM for these packages in SSR
+    _nuxt.options.vite.ssr = _nuxt.options.vite.ssr || {}
+    if (!_nuxt.options.vite.ssr.noExternal) {
+      _nuxt.options.vite.ssr.noExternal = []
+    }
+    if (_nuxt.options.vite.ssr && Array.isArray(_nuxt.options.vite.ssr.noExternal)) {
+      depsToInclude.forEach((dep) => {
+        if (_nuxt.options.vite.ssr && Array.isArray(_nuxt.options.vite.ssr.noExternal)) {
+          if (!(_nuxt.options.vite.ssr.noExternal as string[]).includes(dep)) {
+            (_nuxt.options.vite.ssr.noExternal as string[]).push(dep)
+          }
+        }
+      })
+    }
+
     _nuxt.options.runtimeConfig.public.contentstack = defu(_nuxt.options.runtimeConfig.public.contentstack, _options)
 
     if (!_options.deliverySdkOptions.apiKey) {
