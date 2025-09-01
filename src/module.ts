@@ -69,21 +69,32 @@ export default defineNuxtModule<ModuleOptions>({
     _nuxt.options.build = _nuxt.options.build || {}
     _nuxt.options.build.transpile = _nuxt.options.build.transpile || []
 
-    if (!_nuxt.options.build.transpile.includes('@contentstack/core')) {
-      _nuxt.options.build.transpile.push('@contentstack/core')
-    }
+    // All CommonJS dependencies that might cause issues
+    const commonJSDeps = [
+      '@contentstack/core',
+      '@contentstack/utils',
+      '@contentstack/delivery-sdk',
+      '@contentstack/live-preview-utils',
+      'classnames',
+      'humps',
+      'lodash',
+      'qs',
+      'lodash-es',
+      'lodash.merge'
+    ]
 
-    if (!_nuxt.options.build.transpile.includes('@contentstack/delivery-sdk')) {
-      _nuxt.options.build.transpile.push('@contentstack/delivery-sdk')
-    }
+    commonJSDeps.forEach(dep => {
+      if (!_nuxt.options.build.transpile.includes(dep)) {
+        _nuxt.options.build.transpile.push(dep)
+      }
+    })
 
     // Configure Vite to properly handle CommonJS dependencies
     _nuxt.options.vite = _nuxt.options.vite || {}
     _nuxt.options.vite.optimizeDeps = _nuxt.options.vite.optimizeDeps || {}
     _nuxt.options.vite.optimizeDeps.include = _nuxt.options.vite.optimizeDeps.include || []
 
-    const depsToInclude = ['@contentstack/core', '@contentstack/delivery-sdk']
-    depsToInclude.forEach((dep) => {
+    commonJSDeps.forEach((dep) => {
       if (!_nuxt.options.vite.optimizeDeps!.include!.includes(dep)) {
         _nuxt.options.vite.optimizeDeps!.include!.push(dep)
       }
@@ -95,7 +106,7 @@ export default defineNuxtModule<ModuleOptions>({
       _nuxt.options.vite.ssr.noExternal = []
     }
     if (_nuxt.options.vite.ssr && Array.isArray(_nuxt.options.vite.ssr.noExternal)) {
-      depsToInclude.forEach((dep) => {
+      commonJSDeps.forEach((dep) => {
         if (_nuxt.options.vite.ssr && Array.isArray(_nuxt.options.vite.ssr.noExternal)) {
           if (!(_nuxt.options.vite.ssr.noExternal as string[]).includes(dep)) {
             (_nuxt.options.vite.ssr.noExternal as string[]).push(dep)
