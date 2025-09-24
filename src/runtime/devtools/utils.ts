@@ -61,7 +61,7 @@ export const isDevToolsEnabled = () => {
 
     _devToolsEnabled = hasDevTools;
     return _devToolsEnabled;
-  } catch (error) {
+  } catch {
     // If any error occurs (e.g., sessionStorage not available), disable DevTools tracking
     _devToolsEnabled = false;
     return false;
@@ -127,7 +127,7 @@ export function trackDevToolsQuery(query: Partial<DevToolsQuery>): string | numb
           // Silently fail to avoid any impact on production builds
         });
       }
-    } catch (error) {
+    } catch {
       // Silently fail to avoid any impact on user experience
     }
   };
