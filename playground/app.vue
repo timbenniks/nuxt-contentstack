@@ -117,7 +117,7 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
           :src="responsiveImage"
           :alt="page?.image?.title || 'Page image'"
           v-bind="page?.image?.$ && page?.image?.$.url"
-        />
+        >
 
         <div
           v-if="page.rich_text"
@@ -176,7 +176,7 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
             :src="thumbnailImage"
             :alt="heroAsset.title"
             class="w-24 h-24 object-cover rounded"
-          />
+          >
           <div>
             <h4 class="font-semibold">{{ heroAsset.title }}</h4>
             <p class="text-sm text-gray-600">{{ heroAsset.filename }}</p>
@@ -208,7 +208,7 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
               :src="image.url + '?width=150&height=150&fit=crop&format=webp'"
               :alt="image.title"
               class="w-full h-24 object-cover rounded mb-2"
-            />
+            >
             <p class="text-xs font-medium truncate">{{ image.title }}</p>
             <p class="text-xs text-gray-500">{{ image.file_size }} bytes</p>
           </div>
@@ -232,7 +232,7 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
               :src="originalImageUrl + '?width=300&height=200&fit=crop'"
               alt="Original image"
               class="w-full rounded border"
-            />
+            >
           </div>
 
           <div>
@@ -242,7 +242,7 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
               :src="thumbnailImage"
               alt="Transformed image"
               class="w-full rounded border"
-            />
+            >
             <button
               class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
               @click="makeHighQuality"
@@ -285,7 +285,7 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
               height="112"
               class="w-full h-48 object-cover"
               v-bind="item.block.$ && item.block.$.image"
-            />
+            >
           </div>
           <div class="w-full md:w-1/2 p-6">
             <h3

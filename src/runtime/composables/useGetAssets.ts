@@ -31,7 +31,7 @@ export const useGetAssets = async <T = any>(options: {
 
   const { data, status, refresh } = await useAsyncData(cacheKey, async () => {
     try {
-      let assetsQuery = stack.asset()
+      const assetsQuery = stack.asset()
         .locale(locale)
         .includeFallback()
         .limit(limit)
@@ -68,18 +68,20 @@ export const useGetAssets = async <T = any>(options: {
               for (const [operator, operatorValue] of Object.entries(value)) {
                 switch (operator) {
                   case '$gt':
-                    if (!(parseFloat(asset[field]) > parseFloat(operatorValue as string))) return false
+                    if (!(Number.parseFloat(asset[field]) > Number.parseFloat(operatorValue as string))) return false
                     break
                   case '$lt':
-                    if (!(parseFloat(asset[field]) < parseFloat(operatorValue as string))) return false
+                    if (!(Number.parseFloat(asset[field]) < Number.parseFloat(operatorValue as string))) return false
                     break
                   case '$exists':
                     if (operatorValue && !asset[field]) return false
                     if (!operatorValue && asset[field]) return false
                     break
-                  case '$regex':
+                  case '$regex': {
                     const regex = new RegExp(operatorValue as string, 'i')
                     if (!regex.test(asset[field])) return false
+                    break;
+                  }
                     break
                   default:
                     if (asset[field] !== operatorValue) return false

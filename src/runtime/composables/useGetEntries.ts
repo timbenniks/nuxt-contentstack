@@ -43,7 +43,7 @@ export const useGetEntries = async <T>(options: {
   const cacheKey = `${contentTypeUid}-entries-${locale}-${limit}-${skip}-${JSON.stringify(where)}-${variantAlias?.value ? variantAlias.value : ''}`
 
   const { data, status, refresh } = await useAsyncData(cacheKey, async () => {
-    let entriesQuery = stack.contentType(contentTypeUid)
+    const entriesQuery = stack.contentType(contentTypeUid)
       .entry()
       .locale(locale)
       .includeFallback()
