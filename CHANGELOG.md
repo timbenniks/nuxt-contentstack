@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.29
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.28...v0.0.29)
+
+### 🚀 Enhancements
+
+- Implement @nuxt/image integration with Contentstack provider ([66c7c8f](https://github.com/timbenniks/nuxt-contentstack/commit/66c7c8f))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.28
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.27...v0.0.28)
