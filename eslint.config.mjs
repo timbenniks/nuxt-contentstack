@@ -1,5 +1,5 @@
 // @ts-check
-import { createConfigForNuxt } from '@nuxt/eslint-config/flat'
+import { createConfigForNuxt } from "@nuxt/eslint-config/flat";
 
 // Run `npx @eslint/config-inspector` to inspect the resolved config interactively
 export default createConfigForNuxt({
@@ -7,14 +7,22 @@ export default createConfigForNuxt({
     // Rules for module authors
     tooling: true,
     // Rules for formatting
-    stylistic: true,
+    stylistic: false,
   },
   dirs: {
-    src: [
-      './playground',
-    ],
+    src: ["./playground"],
   },
-})
-  .append(
-    // your custom flat config here...
-  )
+}).append(
+  // Custom rules to allow 'any' types
+  {
+    rules: {
+      "@typescript-eslint/no-explicit-any": "off",
+      "@typescript-eslint/no-unsafe-assignment": "off",
+      "@typescript-eslint/no-unsafe-member-access": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+      "@typescript-eslint/no-unsafe-return": "off",
+      "@typescript-eslint/no-unsafe-argument": "off",
+      "vue/no-v-html": "off",
+    },
+  }
+);

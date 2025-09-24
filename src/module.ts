@@ -2,16 +2,118 @@ import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, 
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
-import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions } from './runtime/utils'
+import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions, type Region } from './runtime/utils'
 
+// Simplified, developer-friendly configuration
 export interface ModuleOptions {
-  debug: boolean
-  deliverySdkOptions: DeliverySdkOptions
-  livePreviewSdkOptions: LivePreviewSdkOptions
-  personalizeSdkOptions?: PersonalizeSdkOptions
+  // Core Contentstack settings
+  apiKey: string
+  deliveryToken: string
+  environment: string
+  region?: Region
+  branch?: string
+  locale?: string
+
+  // Live Preview settings (simplified)
+  livePreview?: {
+    enable?: boolean
+    previewToken?: string
+    editableTags?: boolean
+    editButton?: boolean | {
+      enable?: boolean
+      position?: 'top' | 'bottom' | 'left' | 'right' | 'top-left' | 'top-right' | 'top-center' | 'bottom-left' | 'bottom-right' | 'bottom-center'
+      exclude?: ('insideLivePreviewPortal' | 'outsideLivePreviewPortal')[]
+      includeByQueryParameter?: boolean
+    }
+    mode?: 'builder' | 'preview'
+    ssr?: boolean
+  }
+
+  // Personalization settings (simplified)
+  personalization?: {
+    enable?: boolean
+    projectUid?: string
+  }
+
+  // General settings
+  debug?: boolean
 }
 
 const logger = useLogger(name)
+
+// Internal function to convert simplified config to SDK-specific configs
+function transformModuleOptions(options: ModuleOptions): {
+  deliverySdkOptions: DeliverySdkOptions
+  livePreviewSdkOptions: LivePreviewSdkOptions
+  personalizeSdkOptions?: PersonalizeSdkOptions
+  debug: boolean
+} {
+  const {
+    apiKey,
+    deliveryToken,
+    environment,
+    region = 'us',
+    branch = 'main',
+    locale = 'en-us',
+    livePreview = {},
+    personalization = {},
+    debug = false
+  } = options
+
+  // Build Delivery SDK options
+  const deliverySdkOptions: DeliverySdkOptions = {
+    apiKey,
+    deliveryToken,
+    environment,
+    region,
+    branch,
+    locale,
+    live_preview: {
+      enable: livePreview.enable || false,
+      host: '', // Will be set automatically based on region
+      preview_token: livePreview.previewToken || '',
+    }
+  }
+
+  // Build Live Preview SDK options
+  const editButtonConfig = typeof livePreview.editButton === 'boolean'
+    ? { enable: livePreview.editButton, exclude: [], includeByQueryParameter: false, position: 'top' as const }
+    : {
+      enable: livePreview.editButton?.enable ?? false,
+      exclude: livePreview.editButton?.exclude || [],
+      includeByQueryParameter: livePreview.editButton?.includeByQueryParameter || false,
+      position: livePreview.editButton?.position || 'top'
+    }
+
+  const livePreviewSdkOptions: LivePreviewSdkOptions = {
+    editableTags: livePreview.editableTags || false,
+    ssr: livePreview.ssr || false,
+    enable: livePreview.enable || false,
+    debug: debug,
+    mode: livePreview.mode || 'builder',
+    clientUrlParams: {
+      host: '', // Will be set automatically based on region
+    },
+    editButton: editButtonConfig,
+  }
+
+  // Build Personalization SDK options (optional)
+  let personalizeSdkOptions: PersonalizeSdkOptions | undefined
+  if (personalization.enable && personalization.projectUid) {
+    personalizeSdkOptions = {
+      enable: true,
+      projectUid: personalization.projectUid,
+      host: '', // Will be set automatically based on region
+    }
+  }
+
+  return {
+    deliverySdkOptions,
+    livePreviewSdkOptions,
+    personalizeSdkOptions,
+    debug
+  }
+}
 
 export default defineNuxtModule<ModuleOptions>({
   meta: {
@@ -25,45 +127,33 @@ export default defineNuxtModule<ModuleOptions>({
   },
 
   defaults: {
-    debug: false,
-    deliverySdkOptions: {
-      apiKey: '',
-      deliveryToken: '',
-      environment: '',
-      region: 'eu',
-      branch: 'main',
-      locale: 'en-us',
-      live_preview: {
-        enable: false,
-        host: '',
-        preview_token: '',
-      },
-    },
-    livePreviewSdkOptions: {
-      editableTags: false,
-      ssr: false,
+    apiKey: '',
+    deliveryToken: '',
+    environment: '',
+    region: 'us',
+    branch: 'main',
+    locale: 'en-us',
+    livePreview: {
       enable: false,
-      debug: false,
+      previewToken: '',
+      editableTags: false,
+      editButton: false,
       mode: 'builder',
-      clientUrlParams: {
-        host: '',
-      },
-      editButton: {
-        enable: false,
-        exclude: [],
-        includeByQueryParameter: false,
-        position: 'top',
-      },
+      ssr: false,
     },
-    personalizeSdkOptions: {
+    personalization: {
       enable: false,
       projectUid: '',
-      host: '',
     },
+    debug: false,
   },
 
-  setup(_options, _nuxt) {
+  setup(options, _nuxt) {
     const resolver = createResolver(import.meta.url)
+
+    // Transform simplified config to internal SDK configs
+    const transformedOptions = transformModuleOptions(options)
+    const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions, debug } = transformedOptions
 
     // Add CommonJS packages to transpile to handle ESM import issues
     _nuxt.options.build = _nuxt.options.build || {}
@@ -116,55 +206,64 @@ export default defineNuxtModule<ModuleOptions>({
       })
     }
 
-    _nuxt.options.runtimeConfig.public.contentstack = defu(_nuxt.options.runtimeConfig.public.contentstack, _options)
+    // Store the transformed SDK configs in runtime config
+    _nuxt.options.runtimeConfig.public.contentstack = defu(_nuxt.options.runtimeConfig.public.contentstack, {
+      deliverySdkOptions,
+      livePreviewSdkOptions,
+      personalizeSdkOptions,
+      debug
+    })
 
-    if (!_options.deliverySdkOptions.apiKey) {
-      logger.error(`No Contentstack apiKey. Make sure you specify an ${chalk.bold('apiKey')} in your Contentstack config.`)
+    // Validation with better error messages
+    if (!options.apiKey) {
+      logger.error(`Missing required ${chalk.bold('apiKey')} in your Contentstack configuration.`)
     }
 
-    if (!_options.deliverySdkOptions.environment) {
-      logger.error(`No Contentstack environment. Make sure you specify a ${chalk.bold('environment')} in your Contentstack config.`)
+    if (!options.environment) {
+      logger.error(`Missing required ${chalk.bold('environment')} in your Contentstack configuration.`)
     }
 
-    if (!_options.deliverySdkOptions.deliveryToken) {
-      logger.error(`No Contentstack apiKey. Make sure you specify a ${chalk.bold('deliveryToken')} in your Contentstack config.`)
+    if (!options.deliveryToken) {
+      logger.error(`Missing required ${chalk.bold('deliveryToken')} in your Contentstack configuration.`)
     }
 
-    logger.success(`Contentstack region: ${chalk.bold(_options.deliverySdkOptions.region)}`)
-    logger.success(`Contentstack branch: ${chalk.bold(_options.deliverySdkOptions.branch)}`)
+    logger.success(`Contentstack region: ${chalk.bold(options.region || 'us')}`)
+    logger.success(`Contentstack branch: ${chalk.bold(options.branch || 'main')}`)
 
-    if (_options.deliverySdkOptions?.live_preview?.enable) {
-      _options.livePreviewSdkOptions.enable = true
-      _options.deliverySdkOptions.live_preview.host = getURLsforRegion(_options.deliverySdkOptions.region).preview
-
-      if (_options.livePreviewSdkOptions.clientUrlParams) {
-        _options.livePreviewSdkOptions.clientUrlParams.host = getURLsforRegion(_options.deliverySdkOptions.region).application
+    // Handle live preview setup
+    if (options.livePreview?.enable) {
+      if (deliverySdkOptions.live_preview) {
+        deliverySdkOptions.live_preview.host = getURLsforRegion(options.region).preview
+      }
+      if (livePreviewSdkOptions.clientUrlParams) {
+        livePreviewSdkOptions.clientUrlParams.host = getURLsforRegion(options.region).application
       }
 
       logger.box(`${chalk.bold('⚡️')} Contentstack Live preview enabled`)
+
+      if (!options.livePreview.previewToken) {
+        logger.error(`Live preview is enabled but missing ${chalk.bold('livePreview.previewToken')} in your configuration.`)
+      }
     }
 
-    if (_options.deliverySdkOptions?.live_preview?.enable && !_options.deliverySdkOptions.live_preview.preview_token) {
-      logger.error(`No Contentstack live preview token. Make sure you specify a ${chalk.bold('preview_token')} in your Contentstack live_preview config.`)
+    // Handle personalization setup
+    if (options.personalization?.enable) {
+      if (!options.personalization.projectUid) {
+        logger.error(`Personalization is enabled but missing ${chalk.bold('personalization.projectUid')} in your configuration.`)
+      } else {
+        personalizeSdkOptions!.host = getURLsforRegion(options.region).personalizeEdge
+      }
     }
 
-    if (_options.personalizeSdkOptions && _options.personalizeSdkOptions.enable) {
-      _options.personalizeSdkOptions.host = getURLsforRegion(_options.deliverySdkOptions.region).personalizeEdge
-    }
-    else {
-      delete _options.personalizeSdkOptions
-    }
-
-    if (_options.debug) {
-      _options.livePreviewSdkOptions.debug = true
-
-      logger.box(`${chalk.bgYellow('DEBUG')} Contentstack options object\n\n${JSON.stringify(_options, null, 2)}`)
+    if (debug) {
+      logger.box(`${chalk.bgYellow('DEBUG')} Contentstack simplified options\n\n${JSON.stringify(options, null, 2)}`)
+      logger.box(`${chalk.bgBlue('DEBUG')} Transformed SDK options\n\n${JSON.stringify(transformedOptions, null, 2)}`)
     }
 
     addPlugin(resolver.resolve('./runtime/contentstack'))
     addImportsDir(resolver.resolve('./runtime/composables'))
 
-    if (_options.personalizeSdkOptions && _options.personalizeSdkOptions.enable) {
+    if (personalizeSdkOptions?.enable) {
       addServerHandler({
         handler: resolver.resolve('./runtime/server/middleware/personalize'),
         middleware: true,

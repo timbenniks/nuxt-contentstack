@@ -5,9 +5,12 @@ import { toRaw } from 'vue'
 import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
 import { replaceCslp } from '../utils'
 
-export const useGetEntryByUrl = async <T>(options: {
+/**
+ * Composable to fetch a single entry by its UID
+ */
+export const useGetEntry = async <T>(options: {
   contentTypeUid: string
-  url: string
+  entryUid: string
   referenceFieldPath?: string[]
   jsonRtePath?: string[]
   locale?: string
@@ -15,7 +18,7 @@ export const useGetEntryByUrl = async <T>(options: {
 }): Promise<AsyncData<T | null, Error>> => {
   const {
     contentTypeUid,
-    url,
+    entryUid,
     referenceFieldPath = [],
     jsonRtePath = [],
     locale = 'en-us',
@@ -29,57 +32,53 @@ export const useGetEntryByUrl = async <T>(options: {
     variantAlias?: { value: string }
   }
 
-  const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${url}-${locale}-${variantAlias?.value ? variantAlias.value : ''}`, async () => {
-    let result: { entries: T[] } | null = null
-
+  const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${entryUid}-${locale}-${variantAlias?.value ? variantAlias.value : ''}`, async () => {
     const entryQuery = stack.contentType(contentTypeUid)
-      .entry()
+      .entry(entryUid)
       .locale(locale)
       .includeFallback()
       .includeEmbeddedItems()
-      .includeReference(referenceFieldPath ?? [])
 
     if (variantAlias && variantAlias.value !== '') {
       const variants = toRaw(variantAlias.value)
-
       entryQuery.addParams({ include_applied_variants: true })
       entryQuery.addParams({ include_dimension: true })
       entryQuery.variants(variants)
     }
 
-    if (referenceFieldPath) {
+    if (referenceFieldPath && referenceFieldPath.length > 0) {
       for (const path of referenceFieldPath) {
         entryQuery.includeReference(path)
       }
     }
 
-    if (entryQuery) {
-      result = await entryQuery.query()
-        .equalTo('url', url)
-        .find() as { entries: T[] }
+    try {
+      const result = await entryQuery.fetch() as EmbeddedItem
 
-      const data = result?.entries?.[0] as EmbeddedItem
-
-      if (jsonRtePath && data) {
+      if (jsonRtePath && jsonRtePath.length > 0 && result) {
         contentstack.Utils.jsonToHTML({
-          entry: data,
+          entry: result,
           paths: jsonRtePath,
         })
       }
 
-      if (editableTags) {
-        contentstack.Utils.addEditableTags(data, contentTypeUid, true, locale)
+      if (editableTags && result) {
+        contentstack.Utils.addEditableTags(result, contentTypeUid, true, locale)
       }
 
       let finalData
-      if (replaceHtmlCslp) {
-        finalData = replaceCslp(data)
+      if (replaceHtmlCslp && result) {
+        finalData = replaceCslp(result)
       }
       else {
-        finalData = data
+        finalData = result
       }
 
-      return finalData
+      return finalData as T
+    }
+    catch (error) {
+      console.error('Error fetching entry:', error)
+      return null
     }
   })
 
