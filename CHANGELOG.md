@@ -1,6 +1,26 @@
 # Changelog
 
 
+## v0.0.30
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.29...v0.0.30)
+
+### 🚀 Enhancements
+
+- Add Nuxt DevTools integration for Contentstack ([306787e](https://github.com/timbenniks/nuxt-contentstack/commit/306787e))
+
+### 🩹 Fixes
+
+- Improve DevTools integration and error handling ([373da76](https://github.com/timbenniks/nuxt-contentstack/commit/373da76))
+
+### 📖 Documentation
+
+- Mark @nuxt/image integration as completed in roadmap ([a375009](https://github.com/timbenniks/nuxt-contentstack/commit/a375009))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.29
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.28...v0.0.29)
