@@ -5,9 +5,9 @@ export default defineNuxtConfig({
 
   'nuxt-contentstack': {
     // Required core settings
-    apiKey: 'blte766efb491f96715',
-    deliveryToken: 'cs472a3c0937285f8c943ce5f6',
-    environment: 'preview',
+    apiKey: process.env.NUXT_CONTENTSTACK_API_KEY as string,
+    deliveryToken: process.env.NUXT_CONTENTSTACK_DELIVERY_TOKEN as string,
+    environment: process.env.NUXT_CONTENTSTACK_ENVIRONMENT as string,
     region: 'eu',
 
     // Optional core settings
@@ -16,8 +16,8 @@ export default defineNuxtConfig({
 
     // Live Preview settings (simplified)
     livePreview: {
-      enable: true,
-      previewToken: 'csfe3a9b5ad7485d0baca60a45',
+      enable: process.env.NUXT_CONTENTSTACK_PREVIEW === 'true',
+      previewToken: process.env.NUXT_CONTENTSTACK_PREVIEW_TOKEN as string,
       editableTags: true,
       editButton: true,
       mode: 'builder'
