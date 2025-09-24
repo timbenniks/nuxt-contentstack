@@ -7,7 +7,7 @@ This directory contains the detailed roadmap for the Nuxt Contentstack module, o
 | Phase | Feature                         | Status         | Priority | Effort | Documentation                                     |
 | ----- | ------------------------------- | -------------- | -------- | ------ | ------------------------------------------------- |
 | 1     | @nuxt/image Integration         | ✅ Completed   | High     | Medium | [→ Details](./01-nuxt-image-integration.md)       |
-| 1     | Nuxt DevTools Integration       | 🔴 Not Started | High     | Medium | [→ Details](./02-nuxt-devtools-integration.md)    |
+| 1     | Nuxt DevTools Integration       | ✅ Completed   | High     | Medium | [→ Details](./02-nuxt-devtools-integration.md)    |
 | 1     | Route-based Content Fetching    | 🔴 Not Started | High     | Medium | [→ Details](./03-route-based-content-fetching.md) |
 | 1     | Auto-generated TypeScript Types | 🔴 Not Started | High     | Medium | [→ Details](./04-typescript-types.md)             |
 | 2     | Sitemap Integration             | 🔴 Not Started | Medium   | Low    | [→ Details](./05-sitemap-integration.md)          |
@@ -20,7 +20,7 @@ This directory contains the detailed roadmap for the Nuxt Contentstack module, o
 Focus on core developer experience improvements that provide immediate value:
 
 1. ✅ **@nuxt/image Integration** - Image optimization and transformation
-2. **Nuxt DevTools Integration** - Development debugging and monitoring
+2. ✅ **Nuxt DevTools Integration** - Development debugging and monitoring
 3. **Route-based Content Fetching Middleware** - Automatic content loading
 4. **Auto-generated TypeScript Types** - Type safety and developer experience
 

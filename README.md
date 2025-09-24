@@ -21,6 +21,7 @@ Contentstack integration for Nuxt.
 - ⚡️ Advanced filtering and pagination
 - ⚡️ Image transformations with reactive URLs
 - ⚡️ **@nuxt/image integration** with automatic optimization
+- ⚡️ **Nuxt DevTools integration** for debugging and monitoring
 - ⚡️ Live Preview & Visual builder
 - ⚡️ Personalization support
 - ⚡️ TypeScript support with full type safety
@@ -438,6 +439,43 @@ const { transformedUrl: advancedUrl } = useImageTransform(imageUrl, {
 - **Effects**: `blur`, `saturation`, `brightness`, `contrast`, `sharpen`
 - **Overlays**: Add watermarks or other images
 - **Advanced**: `orient`, `pad`, `bg-color`, `frame`, `resizeFilter`
+
+## Nuxt DevTools Integration
+
+This module includes a custom tab in Nuxt DevTools that provides powerful debugging and monitoring capabilities for your Contentstack integration.
+
+### Features
+
+The Contentstack DevTools tab offers four main panels:
+
+#### 🔍 **Content Inspector**
+
+- View all fetched content entries with metadata
+- Track entry status (published, draft, etc.)
+- Display content type, UID, locale, and version information
+- Show fetch timestamps for debugging cache behavior
+
+#### 📊 **Query Monitor**
+
+- Real-time monitoring of all Contentstack API calls
+- Display request parameters as formatted JSON
+- Show response summaries and performance metrics
+- Track query status (success, error, pending)
+- Monitor average query response times
+
+#### 💾 **Cache Status**
+
+- View cache hit rates and total requests
+- Monitor cache size and memory usage
+- Display all cached entries with timestamps
+- Manual cache invalidation and clearing capabilities
+
+#### ⚡ **Live Preview Status**
+
+- Monitor Live Preview connection status
+- Track real-time content update events
+- Display update counts and timestamps
+- Show current Live Preview mode (builder/preview)
 
 ## Contribution
 
