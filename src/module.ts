@@ -271,12 +271,16 @@ export default defineNuxtModule<ModuleOptions>({
     )
 
     if (imageModule) {
-      // Ensure image configuration exists
-      _nuxt.options.image = _nuxt.options.image || {}
-      _nuxt.options.image.providers = _nuxt.options.image.providers || {}
+      // Ensure image configuration exists (with type assertion)
+      if (!(_nuxt.options as any).image) {
+        (_nuxt.options as any).image = {}
+      }
+      if (!(_nuxt.options as any).image.providers) {
+        (_nuxt.options as any).image.providers = {}
+      }
 
       // Register our provider directly in the image config
-      _nuxt.options.image.providers.contentstack = {
+      (_nuxt.options as any).image.providers.contentstack = {
         name: 'contentstack',
         provider: resolver.resolve('./runtime/providers/contentstack'),
         options: {},
@@ -292,6 +296,97 @@ export default defineNuxtModule<ModuleOptions>({
         handler: resolver.resolve('./runtime/server/middleware/personalize'),
         middleware: true,
       })
+    }
+
+    // Register DevTools integration in development
+    if (_nuxt.options.dev) {
+      // Add DevTools custom tab (check if DevTools is available)
+      try {
+        // Try to register DevTools tab if DevTools module is present
+        const devtoolsHook = _nuxt.hook('devtools:customTabs' as any, (tabs: any[]) => {
+          tabs.push({
+            name: 'contentstack',
+            title: 'Contentstack',
+            icon: 'simple-icons:contentstack',
+            category: 'modules',
+            view: {
+              type: 'iframe',
+              src: '/__nuxt_devtools__/contentstack',
+            },
+          })
+        })
+
+        if (debug) {
+          logger.success('Contentstack DevTools tab registered')
+        }
+      } catch (error) {
+        // DevTools might not be available, continue silently
+        if (debug) {
+          logger.info('DevTools not available, skipping tab registration')
+        }
+      }
+
+      // Add DevTools server middleware - specific endpoints only
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack',
+        handler: resolver.resolve('./runtime/devtools/server'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/data',
+        handler: resolver.resolve('./runtime/devtools/server'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/cache/invalidate',
+        handler: resolver.resolve('./runtime/devtools/server'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/cache/clear',
+        handler: resolver.resolve('./runtime/devtools/server'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/preview/toggle',
+        handler: resolver.resolve('./runtime/devtools/server'),
+      })
+
+      // Add tracking endpoints
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/track/entry',
+        handler: resolver.resolve('./runtime/devtools/tracking'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/track/query',
+        handler: resolver.resolve('./runtime/devtools/tracking'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/track/query/update',
+        handler: resolver.resolve('./runtime/devtools/tracking'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/track/cache',
+        handler: resolver.resolve('./runtime/devtools/tracking'),
+      })
+
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/track/preview',
+        handler: resolver.resolve('./runtime/devtools/tracking'),
+      })
+
+      // Add client handler for the DevTools interface
+      addServerHandler({
+        route: '/__nuxt_devtools__/contentstack/client',
+        handler: resolver.resolve('./runtime/devtools/client-handler'),
+      })
+
+      if (debug) {
+        logger.success('Contentstack DevTools server handlers registered')
+      }
     }
   },
 })
