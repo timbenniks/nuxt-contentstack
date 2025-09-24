@@ -299,11 +299,11 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     // Register DevTools integration in development
-    if (_nuxt.options.dev) {
+    if (_nuxt.options.dev && _nuxt.options.devtools?.enabled !== false) {
       // Add DevTools custom tab (check if DevTools is available)
       try {
         // Try to register DevTools tab if DevTools module is present
-        const devtoolsHook = _nuxt.hook('devtools:customTabs' as any, (tabs: any[]) => {
+        const _devtoolsHook = _nuxt.hook('devtools:customTabs' as any, (tabs: any[]) => {
           tabs.push({
             name: 'contentstack',
             title: 'Contentstack',
@@ -319,7 +319,7 @@ export default defineNuxtModule<ModuleOptions>({
         if (debug) {
           logger.success('Contentstack DevTools tab registered')
         }
-      } catch (error) {
+      } catch {
         // DevTools might not be available, continue silently
         if (debug) {
           logger.info('DevTools not available, skipping tab registration')

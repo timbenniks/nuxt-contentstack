@@ -31,9 +31,41 @@ interface DevToolsCacheEntry {
   ttl?: number;
 }
 
+// Cache the DevTools enabled state to avoid repeated checks
+let _devToolsEnabled: boolean | null = null;
+
 // Global flag to check if we're in development with DevTools enabled
 export const isDevToolsEnabled = () => {
-  return process.dev;
+  // Return cached result if already computed
+  if (_devToolsEnabled !== null) return _devToolsEnabled;
+
+  // Only run in development
+  if (!import.meta.dev) {
+    _devToolsEnabled = false;
+    return false;
+  }
+
+  // Server-side: Check if process.env indicates DevTools is enabled
+  if (typeof window === 'undefined') {
+    // Only enable server-side tracking if we're explicitly in dev mode with DevTools
+    _devToolsEnabled = import.meta.dev && process.env.NODE_ENV === 'development';
+    return _devToolsEnabled;
+  }
+
+  // Client-side: Check if Nuxt DevTools is actually available/enabled
+  try {
+    // Check for DevTools global or any indication that DevTools is active
+    const hasDevTools = typeof window.__NUXT_DEVTOOLS__ !== 'undefined' ||
+      window.location.search.includes('devtools') ||
+      sessionStorage.getItem('nuxt:devtools:enabled') === 'true';
+
+    _devToolsEnabled = hasDevTools;
+    return _devToolsEnabled;
+  } catch (error) {
+    // If any error occurs (e.g., sessionStorage not available), disable DevTools tracking
+    _devToolsEnabled = false;
+    return false;
+  }
 };
 
 // Track entry fetches for DevTools
@@ -65,6 +97,7 @@ export async function trackDevToolsEntry(entry: DevToolsEntry) {
 
 // Track API queries for DevTools
 export function trackDevToolsQuery(query: Partial<DevToolsQuery>): string | number {
+  // Early return with minimal overhead if DevTools is disabled
   if (!isDevToolsEnabled()) return '';
 
   const queryId = query.id || Date.now() + Math.random();
@@ -79,22 +112,34 @@ export function trackDevToolsQuery(query: Partial<DevToolsQuery>): string | numb
     ...query
   };
 
-  try {
-    // Use universal fetch
-    const fetchFn = typeof globalThis.fetch !== 'undefined' ? globalThis.fetch :
-      typeof window !== 'undefined' && window.fetch ? window.fetch : null;
+  // Schedule tracking to not block main execution
+  const scheduleTracking = () => {
+    try {
+      const fetchFn = typeof globalThis.fetch !== 'undefined' ? globalThis.fetch :
+        typeof window !== 'undefined' && window.fetch ? window.fetch : null;
 
-    if (fetchFn) {
-      fetchFn('http://localhost:3000/__nuxt_devtools__/contentstack/track/query', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(fullQuery)
-      }).catch(err => {
-        console.debug('DevTools query tracking failed:', err);
-      });
+      if (fetchFn) {
+        fetchFn('http://localhost:3000/__nuxt_devtools__/contentstack/track/query', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(fullQuery)
+        }).catch(() => {
+          // Silently fail to avoid any impact on production builds
+        });
+      }
+    } catch (error) {
+      // Silently fail to avoid any impact on user experience
     }
-  } catch (error) {
-    console.debug('DevTools query tracking error:', error);
+  };
+
+  // Use non-blocking scheduling
+  if (typeof window !== 'undefined' && window.requestIdleCallback) {
+    window.requestIdleCallback(scheduleTracking);
+  } else if (typeof setTimeout !== 'undefined') {
+    setTimeout(scheduleTracking, 0);
+  } else {
+    // Fallback for environments without setTimeout (rare)
+    scheduleTracking();
   }
 
   return queryId;

@@ -1,6 +1,6 @@
 import { defineEventHandler } from "h3";
 
-export default defineEventHandler(async (event) => {
+export default defineEventHandler(async () => {
   // Return a simple HTML page that includes Vue and our component
   return `<!DOCTYPE html>
 <html>

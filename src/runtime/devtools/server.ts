@@ -1,4 +1,4 @@
-import { defineEventHandler, getQuery, readBody, createError } from "h3";
+import { defineEventHandler, readBody, createError } from "h3";
 
 // TypeScript interfaces
 interface DevToolsEntry {
