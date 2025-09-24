@@ -8,6 +8,7 @@
     "generate": "nuxi generate"
   },
   "dependencies": {
+    "@nuxt/image": "^1.11.0",
     "nuxt": "^4.0.3"
   }
 }

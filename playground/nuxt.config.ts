@@ -1,7 +1,7 @@
 export default defineNuxtConfig({
   'compatibilityDate': '2025-08-31',
   'devtools': { enabled: true },
-  'modules': ['../src/module'],
+  'modules': ['../src/module', '@nuxt/image'],
 
   'nuxt-contentstack': {
     // Required core settings
@@ -31,5 +31,10 @@ export default defineNuxtConfig({
 
     // General settings
     debug: true
+  },
+
+  // Configure @nuxt/image to use Contentstack provider by default
+  image: {
+    // provider: 'contentstack', // Will be registered by the module
   },
 })

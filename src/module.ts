@@ -263,6 +263,30 @@ export default defineNuxtModule<ModuleOptions>({
     addPlugin(resolver.resolve('./runtime/contentstack'))
     addImportsDir(resolver.resolve('./runtime/composables'))
 
+    // Register @nuxt/image provider if @nuxt/image is installed
+    const imageModule = _nuxt.options.modules.find((m: any) =>
+      (typeof m === 'string' && m === '@nuxt/image') ||
+      (Array.isArray(m) && m[0] === '@nuxt/image') ||
+      (typeof m === 'object' && m && 'name' in m && m.name === '@nuxt/image')
+    )
+
+    if (imageModule) {
+      // Ensure image configuration exists
+      _nuxt.options.image = _nuxt.options.image || {}
+      _nuxt.options.image.providers = _nuxt.options.image.providers || {}
+
+      // Register our provider directly in the image config
+      _nuxt.options.image.providers.contentstack = {
+        name: 'contentstack',
+        provider: resolver.resolve('./runtime/providers/contentstack'),
+        options: {},
+      }
+
+      if (debug) {
+        logger.success('Contentstack @nuxt/image provider registered')
+      }
+    }
+
     if (personalizeSdkOptions?.enable) {
       addServerHandler({
         handler: resolver.resolve('./runtime/server/middleware/personalize'),

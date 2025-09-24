@@ -20,6 +20,7 @@ Contentstack integration for Nuxt.
 - ⚡️ Query entries and assets with advanced filtering
 - ⚡️ Advanced filtering and pagination
 - ⚡️ Image transformations with reactive URLs
+- ⚡️ **@nuxt/image integration** with automatic optimization
 - ⚡️ Live Preview & Visual builder
 - ⚡️ Personalization support
 - ⚡️ TypeScript support with full type safety
@@ -40,9 +41,9 @@ modules: ['nuxt-contentstack'],
 
 'nuxt-contentstack': {
   // Required core settings
-  apiKey: 'blt34bdc2becb9eb935',
-  deliveryToken: 'csd38b9b7f1076de03fc347531',
-  environment: 'preview',
+  apiKey: 'your_contentstack_api_key',
+  deliveryToken: 'your_delivery_token',
+  environment: 'your_environment',
 
   // Optional settings with smart defaults
   region: 'us',
@@ -52,7 +53,7 @@ modules: ['nuxt-contentstack'],
   // Live Preview (simplified)
   livePreview: {
     enable: true,
-    previewToken: 'csa2fe339f6713f8a52eff086c',
+    previewToken: 'your_preview_token', // no need for preview token if you are not using live preview
     editableTags: true,
     editButton: true
   },
@@ -60,7 +61,7 @@ modules: ['nuxt-contentstack'],
   // Personalization (simplified)
   personalization: {
     enable: true,
-    projectUid: '67054a4e564522fcfa170c43'
+    projectUid: 'your_project_uid'
   },
 
   debug: true
@@ -71,8 +72,8 @@ modules: ['nuxt-contentstack'],
 
 ### Core Settings (Required)
 
-- `apiKey` - Your Contentstack API key
-- `deliveryToken` - Your Contentstack delivery token
+- `apiKey` - Your Contentstack stack API key (starts with "blt")
+- `deliveryToken` - Your Contentstack delivery token (starts with "cs")
 - `environment` - Target environment ('preview' | 'production')
 
 ### Core Settings (Optional)
@@ -86,7 +87,7 @@ modules: ['nuxt-contentstack'],
 Configure `livePreview` object with:
 
 - `enable` - Enable live preview mode
-- `previewToken` - Preview token (required if enabled)
+- `previewToken` - Preview token from Contentstack (starts with "cs", required if enabled)
 - `editableTags` - Add editable tags for visual building
 - `editButton` - Enable edit button (boolean or detailed config object)
 - `mode` - Live preview mode: 'builder' | 'preview' (default: 'builder')
@@ -171,7 +172,7 @@ Fetch a single entry by its UID.
 ```ts
 const { data: article } = await useGetEntry<Article>({
   contentTypeUid: "article",
-  entryUid: "blt123456789",
+  entryUid: "your_entry_uid",
   referenceFieldPath: ["author", "category"],
   jsonRtePath: ["content"],
   locale: "en-us",
@@ -209,7 +210,7 @@ Fetch a single asset by its UID.
 
 ```ts
 const { data: image } = await useGetAsset<Asset>({
-  assetUid: "blt987654321",
+  assetUid: "your_asset_uid",
   locale: "en-us",
 });
 ```
@@ -230,9 +231,160 @@ const { data: images } = await useGetAssets<Asset>({
 });
 ```
 
-### `useImageTransform`
+### Query Operators
 
-Transform Contentstack images with the Image Delivery API. Returns a reactive URL that updates when transform options change.
+Entry composables (`useGetEntries`, `useGetEntry`, `useGetEntryByUrl`) support advanced query operators in the `where` parameter:
+
+**Note**: Asset filtering has limited server-side support. The `useGetAssets` composable applies most filters client-side after fetching.
+
+```ts
+where: {
+  // Exact match
+  status: "published",
+
+  // Array contains
+  tags: ["tech", "news"],
+
+  // Comparison operators
+  view_count: { $gt: 1000 },
+  created_at: { $gte: "2024-01-01", $lt: "2024-12-31" },
+
+  // Existence checks
+  featured_image: { $exists: true },
+
+  // Pattern matching
+  title: { $regex: "nuxt.*contentstack" },
+
+  // Not equal
+  author: { $ne: "guest" }
+}
+```
+
+## @nuxt/image Integration
+
+This module includes a custom @nuxt/image provider for seamless integration with Contentstack's Image Delivery API.
+
+### Setup
+
+1. Install @nuxt/image:
+
+```bash
+npm install @nuxt/image
+```
+
+2. Add both modules to your `nuxt.config.ts`:
+
+```typescript
+export default defineNuxtConfig({
+  modules: ["nuxt-contentstack", "@nuxt/image"],
+
+  // Optional: Set Contentstack as default provider
+  image: {
+    provider: "contentstack",
+  },
+});
+```
+
+### Usage
+
+The Contentstack provider automatically registers when both modules are installed. You can use `<NuxtImg>` and `<NuxtPicture>` components directly with Contentstack asset URLs - no need to pass asset UIDs or version UIDs as modifiers:
+
+```vue
+<template>
+  <!-- Basic usage with Contentstack assets -->
+  <NuxtImg
+    :src="page.image.url"
+    :alt="page.image.title"
+    width="800"
+    height="400"
+    :modifiers="{
+      auto: 'webp,compress',
+      quality: 90,
+    }"
+    provider="contentstack"
+  />
+
+  <!-- Responsive image with automatic optimization -->
+  <NuxtImg
+    :src="hero.image.url"
+    :alt="hero.image.title"
+    sizes="100vw sm:50vw lg:33vw"
+    densities="1x 2x"
+    :modifiers="{
+      auto: 'webp,compress',
+      quality: 90,
+    }"
+    provider="contentstack"
+  />
+
+  <!-- Advanced transformations -->
+  <NuxtImg
+    :src="gallery.image.url"
+    width="600"
+    height="400"
+    fit="cover"
+    :modifiers="{
+      blur: 5,
+      brightness: 110,
+      contrast: 120,
+      saturation: 130,
+    }"
+    provider="contentstack"
+  />
+
+  <!-- Art direction for different devices -->
+  <NuxtPicture
+    :src="article.featured_image.url"
+    :imgAttrs="{ alt: article.title }"
+    sizes="100vw md:50vw"
+    :modifiers="{
+      auto: 'webp,compress',
+      quality: 85,
+    }"
+    provider="contentstack"
+  />
+</template>
+```
+
+### Benefits
+
+- ✅ **Automatic image optimization** with WebP and compression
+- ✅ **Responsive images** with sizes and densities
+- ✅ **Contentstack transformations** via Image Delivery API
+- ✅ **Lazy loading** and performance optimizations
+- ✅ **Art direction** support with NuxtPicture
+- ✅ **Developer experience** - familiar @nuxt/image API
+
+### Available Modifiers
+
+The Contentstack provider supports all standard @nuxt/image modifiers plus Contentstack-specific transformations:
+
+```typescript
+// Common modifiers
+:modifiers="{
+  // Image optimization
+  auto: 'webp,compress',
+  quality: 90,
+
+  // Dimensions and cropping
+  width: 800,
+  height: 400,
+  fit: 'cover', // crop, bounds, fill, scale
+
+  // Effects
+  blur: 5,
+  brightness: 110,
+  contrast: 120,
+  saturation: 130,
+
+  // Format
+  format: 'webp',
+}"
+```
+
+### `useImageTransform` Composable
+
+For advanced use cases where you need programmatic control over image transformations, you can use the `useImageTransform` composable. This is particularly useful when you need to apply transformations dynamically or when working with regular `<img>` tags instead of `<NuxtImg>`.
 
 ```ts
 const { transformedUrl, updateTransform, resetTransform } = useImageTransform(
@@ -273,6 +425,11 @@ const { transformedUrl: advancedUrl } = useImageTransform(imageUrl, {
 });
 ```
 
+**When to use `useImageTransform` vs `<NuxtImg>`:**
+
+- **Use `<NuxtImg>`** for most cases - it's optimized, supports responsive images, and handles lazy loading
+- **Use `useImageTransform`** when you need dynamic transformations, working with regular `<img>` tags, or building custom image components
+
 #### Supported Image Transforms
 
 - **Dimensions**: `width`, `height`, `dpr` (device pixel ratio)
@@ -281,39 +438,6 @@ const { transformedUrl: advancedUrl } = useImageTransform(imageUrl, {
 - **Effects**: `blur`, `saturation`, `brightness`, `contrast`, `sharpen`
 - **Overlays**: Add watermarks or other images
 - **Advanced**: `orient`, `pad`, `bg-color`, `frame`, `resizeFilter`
-
-### Query Operators
-
-Entry composables (`useGetEntries`, `useGetEntry`, `useGetEntryByUrl`) support advanced query operators in the `where` parameter:
-
-**Note**: Asset filtering has limited server-side support. The `useGetAssets` composable applies most filters client-side after fetching.
-
-```ts
-where: {
-  // Exact match
-  status: "published",
-
-  // Array contains
-  tags: ["tech", "news"],
-
-  // Comparison operators
-  view_count: { $gt: 1000 },
-  created_at: { $gte: "2024-01-01", $lt: "2024-12-31" },
-
-  // Existence checks
-  featured_image: { $exists: true },
-
-  // Pattern matching
-  title: { $regex: "nuxt.*contentstack" },
-
-  // Not equal
-  author: { $ne: "guest" }
-}
-```
-
-## TODO:
-
-- Live preview with SSR mode
 
 ## Contribution
 

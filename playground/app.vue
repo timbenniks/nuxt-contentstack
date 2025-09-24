@@ -108,16 +108,28 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
           {{ page.description }}
         </p>
 
-        <!-- Using transformed image -->
-        <img
-          v-if="responsiveImage"
+        <!-- Using @nuxt/image with Contentstack provider -->
+        <NuxtImg
+          v-if="page?.image"
+          class="mb-4 rounded-lg"
+          :src="page.image.url"
+          :alt="page.image.title || 'Page image'"
+          width="768"
+          height="414"
+          v-bind="page?.image?.$ && page?.image?.$.url"
+        />
+
+        <!-- Fallback to transformed image if no asset structure -->
+        <NuxtImg
+          v-else-if="responsiveImage"
           class="mb-4 rounded-lg"
           width="768"
           height="414"
           :src="responsiveImage"
           :alt="page?.image?.title || 'Page image'"
+          provider="contentstack"
           v-bind="page?.image?.$ && page?.image?.$.url"
-        >
+        />
 
         <div
           v-if="page.rich_text"
@@ -172,11 +184,20 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
           Asset UID: {{ heroAsset.uid }}
         </p>
         <div class="flex items-center space-x-4">
-          <img
-            :src="thumbnailImage"
+          <NuxtImg
+            v-if="heroAsset"
+            :src="heroAsset.url"
             :alt="heroAsset.title"
+            width="96"
+            height="96"
+            fit="cover"
+            :modifiers="{
+              auto: 'webp,compress',
+              quality: 85,
+            }"
+            provider="contentstack"
             class="w-24 h-24 object-cover rounded"
-          >
+          />
           <div>
             <h4 class="font-semibold">{{ heroAsset.title }}</h4>
             <p class="text-sm text-gray-600">{{ heroAsset.filename }}</p>
@@ -204,11 +225,19 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
             :key="image.uid"
             class="bg-white p-2 rounded border"
           >
-            <img
-              :src="image.url + '?width=150&height=150&fit=crop&format=webp'"
+            <NuxtImg
+              :src="image.url"
               :alt="image.title"
+              width="150"
+              height="96"
+              fit="cover"
+              :modifiers="{
+                auto: 'webp,compress',
+                quality: 80,
+              }"
+              provider="contentstack"
               class="w-full h-24 object-cover rounded mb-2"
-            >
+            />
             <p class="text-xs font-medium truncate">{{ image.title }}</p>
             <p class="text-xs text-gray-500">{{ image.file_size }} bytes</p>
           </div>
@@ -216,7 +245,610 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
       </div>
     </section>
 
-    <!-- Example 6: useImageTransform -->
+    <!-- Example 6: @nuxt/image Integration -->
+    <section class="border-b pb-8">
+      <h2 class="text-2xl font-bold mb-4">
+        🖼️ @nuxt/image + Contentstack Integration
+      </h2>
+      <div class="bg-cyan-50 p-4 rounded-lg">
+        <p class="text-sm text-cyan-600 mb-4">
+          Demonstrating automatic optimization with @nuxt/image and Contentstack
+          provider
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-6">
+          <!-- Basic responsive image -->
+          <div>
+            <h4 class="font-semibold mb-2">Responsive Image</h4>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              sizes="100vw sm:50vw lg:33vw"
+              width="400"
+              height="300"
+              :modifiers="{
+                auto: 'webp,compress',
+                quality: 85,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- High quality with effects -->
+          <div>
+            <h4 class="font-semibold mb-2">Enhanced with Effects</h4>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="400"
+              height="300"
+              fit="cover"
+              :modifiers="{
+                brightness: 110,
+                contrast: 120,
+                saturation: 130,
+                quality: 95,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Art direction -->
+          <div>
+            <h4 class="font-semibold mb-2">Art Direction</h4>
+            <NuxtPicture
+              v-if="page?.image"
+              :src="page.image.url"
+              :img-attrs="{ alt: page.image.title }"
+              sizes="100vw md:50vw lg:33vw"
+              :modifiers="{
+                auto: 'webp,compress',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+        </div>
+
+        <div class="mt-4 p-3 bg-white rounded text-sm">
+          <p class="font-medium mb-2">
+            Generated URLs (check browser DevTools):
+          </p>
+          <ul class="text-xs text-gray-600 space-y-1">
+            <li>• Automatic WebP conversion</li>
+            <li>• Responsive breakpoints</li>
+            <li>• Lazy loading enabled</li>
+            <li>• Contentstack Image Delivery API</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- Example 6.5: Image Crops & Fit Modes -->
+    <section class="border-b pb-8">
+      <h2 class="text-2xl font-bold mb-4">✂️ Image Crops & Fit Modes</h2>
+      <div class="bg-emerald-50 p-4 rounded-lg">
+        <p class="text-sm text-emerald-600 mb-4">
+          Different cropping and fitting modes using Contentstack's Image
+          Delivery API
+        </p>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+          <!-- Crop (default) -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Crop (Default)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="200"
+              :modifiers="{
+                resize: 'crop',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">200*200 cropped</p>
+          </div>
+
+          <!-- Bounds (fit inside) -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Bounds (Fit)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="200"
+              :modifiers="{
+                resize: 'bounds',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border bg-gray-100"
+            />
+            <p class="text-xs text-gray-600 mt-1">200*200 fit inside</p>
+          </div>
+
+          <!-- Fill (stretch) -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Fill (Stretch)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="200"
+              :modifiers="{
+                resize: 'fill',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">200*200 stretched</p>
+          </div>
+
+          <!-- Scale (proportional) -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Scale</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="200"
+              :modifiers="{
+                resize: 'scale',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border bg-gray-100"
+            />
+            <p class="text-xs text-gray-600 mt-1">200*200 scaled</p>
+          </div>
+        </div>
+
+        <!-- Aspect Ratio Examples -->
+        <h4 class="text-lg font-semibold mb-3">Different Aspect Ratios</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <!-- Square -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Square (1:1)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="300"
+              height="300"
+              :modifiers="{
+                resize: 'crop',
+                quality: 85,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Wide -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Wide (16:9)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="300"
+              height="169"
+              :modifiers="{
+                resize: 'crop',
+                quality: 85,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Tall -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Tall (9:16)</h5>
+            <div class="flex justify-center">
+              <NuxtImg
+                v-if="page?.image"
+                :src="page.image.url"
+                :alt="page.image.title"
+                width="169"
+                height="300"
+                :modifiers="{
+                  resize: 'crop',
+                  quality: 85,
+                }"
+                provider="contentstack"
+                class="rounded border"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Example 6.6: Image Quality Comparison -->
+    <section class="border-b pb-8">
+      <h2 class="text-2xl font-bold mb-4">🎚️ Image Quality Comparison</h2>
+      <div class="bg-amber-50 p-4 rounded-lg">
+        <p class="text-sm text-amber-600 mb-4">
+          Compare different quality settings and their file sizes
+        </p>
+
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+          <!-- Quality 100 -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Quality 100</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="250"
+              height="167"
+              :modifiers="{
+                quality: 100,
+                format: 'jpeg',
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Highest quality</p>
+          </div>
+
+          <!-- Quality 80 -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Quality 80</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="250"
+              height="167"
+              :modifiers="{
+                quality: 80,
+                format: 'jpeg',
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Good balance</p>
+          </div>
+
+          <!-- Quality 50 -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Quality 50</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="250"
+              height="167"
+              :modifiers="{
+                quality: 50,
+                format: 'jpeg',
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Medium quality</p>
+          </div>
+
+          <!-- Quality 20 -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Quality 20</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="250"
+              height="167"
+              :modifiers="{
+                quality: 20,
+                format: 'jpeg',
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Low quality</p>
+          </div>
+        </div>
+
+        <!-- Format Comparison -->
+        <h4 class="text-lg font-semibold mb-3">Format Comparison</h4>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+          <!-- JPEG -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">JPEG</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="300"
+              height="200"
+              :modifiers="{
+                format: 'jpeg',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Standard format</p>
+          </div>
+
+          <!-- WebP -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">WebP</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="300"
+              height="200"
+              :modifiers="{
+                format: 'webp',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Modern format</p>
+          </div>
+
+          <!-- Auto (WebP with fallback) -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Auto</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="300"
+              height="200"
+              :modifiers="{
+                auto: 'webp,compress',
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Auto-optimized</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Example 6.7: Image Effects & Filters -->
+    <section class="border-b pb-8">
+      <h2 class="text-2xl font-bold mb-4">🎨 Image Effects & Filters</h2>
+      <div class="bg-purple-50 p-4 rounded-lg">
+        <p class="text-sm text-purple-600 mb-4">
+          Various image effects and filters available through Contentstack
+        </p>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-6">
+          <!-- Original -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Original</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Brightness -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Bright (+30)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                brightness: 130,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Contrast -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">High Contrast</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                contrast: 150,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Saturation -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Vibrant</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                saturation: 150,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Blur -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Blur</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                blur: 5,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Desaturated -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Desaturated</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                saturation: 50,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Dark -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Dark (-30)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                brightness: 70,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+
+          <!-- Combined Effects -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Combined</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="200"
+              height="133"
+              :modifiers="{
+                brightness: 110,
+                contrast: 120,
+                saturation: 90,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+          </div>
+        </div>
+
+        <!-- Advanced Effects -->
+        <h4 class="text-lg font-semibold mb-3">Advanced Effects</h4>
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+          <!-- Sharpen -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Sharpened</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="250"
+              height="167"
+              :modifiers="{
+                sharpen: 5,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Sharpen: 5</p>
+          </div>
+
+          <!-- High DPR -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">High DPR (2x)</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="250"
+              height="167"
+              :modifiers="{
+                dpr: 2,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+              style="width: 125px; height: 83px"
+            />
+            <p class="text-xs text-gray-600 mt-1">Retina ready</p>
+          </div>
+
+          <!-- Film Effect -->
+          <div class="text-center">
+            <h5 class="text-sm font-semibold mb-2">Film Effect</h5>
+            <NuxtImg
+              v-if="page?.image"
+              :src="page.image.url"
+              :alt="page.image.title"
+              width="250"
+              height="167"
+              :modifiers="{
+                brightness: 105,
+                contrast: 110,
+                saturation: 85,
+                quality: 80,
+              }"
+              provider="contentstack"
+              class="w-full rounded border"
+            />
+            <p class="text-xs text-gray-600 mt-1">Vintage look</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Example 7: useImageTransform -->
     <section class="border-b pb-8">
       <h2 class="text-2xl font-bold mb-4">🎨 useImageTransform Example</h2>
       <div class="bg-indigo-50 p-4 rounded-lg">
@@ -227,22 +859,27 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div>
             <h4 class="font-semibold mb-2">Original Image</h4>
-            <img
+            <NuxtImg
               v-if="originalImageUrl"
-              :src="originalImageUrl + '?width=300&height=200&fit=crop'"
+              :src="originalImageUrl"
               alt="Original image"
+              width="300"
+              height="200"
+              fit="crop"
+              provider="contentstack"
               class="w-full rounded border"
-            >
+            />
           </div>
 
           <div>
             <h4 class="font-semibold mb-2">Transformed Image</h4>
-            <img
+            <NuxtImg
               v-if="thumbnailImage"
               :src="thumbnailImage"
               alt="Transformed image"
+              provider="contentstack"
               class="w-full rounded border"
-            >
+            />
             <button
               class="mt-2 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm"
               @click="makeHighQuality"
@@ -277,15 +914,21 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
           ]"
         >
           <div class="w-full md:w-1/2">
-            <img
+            <NuxtImg
               v-if="item.block.image"
               :src="item.block.image.url"
               :alt="item.block.image.title"
-              width="200"
-              height="112"
+              width="400"
+              height="300"
+              fit="cover"
+              :modifiers="{
+                auto: 'webp,compress',
+                quality: 80,
+              }"
+              provider="contentstack"
               class="w-full h-48 object-cover"
               v-bind="item.block.$ && item.block.$.image"
-            >
+            />
           </div>
           <div class="w-full md:w-1/2 p-6">
             <h3
