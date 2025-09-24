@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.28
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.27...v0.0.28)
+
+### 🚀 Enhancements
+
+- Better config, more composables, enhanced README with new features, and add roadmap documentation for upcoming integrations ([e3530f9](https://github.com/timbenniks/nuxt-contentstack/commit/e3530f9))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.27
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.26...v0.0.27)
