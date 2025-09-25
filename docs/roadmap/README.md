@@ -11,7 +11,6 @@ This directory contains the detailed roadmap for the Nuxt Contentstack module, o
 | 1     | Route-based Content Fetching    | 🔴 Not Started | High     | Medium | [→ Details](./03-route-based-content-fetching.md) |
 | 1     | Auto-generated TypeScript Types | 🔴 Not Started | High     | Medium | [→ Details](./04-typescript-types.md)             |
 | 2     | Sitemap Integration             | 🔴 Not Started | Medium   | Low    | [→ Details](./05-sitemap-integration.md)          |
-| 2     | Content Preview Modes           | 🔴 Not Started | Medium   | Medium | [→ Details](./06-content-preview-modes.md)        |
 
 ## 🚀 Implementation Phases
 
@@ -29,7 +28,6 @@ Focus on core developer experience improvements that provide immediate value:
 Add production-focused features for SEO and content management:
 
 5. **Sitemap Integration** - SEO optimization with multilingual support
-6. **Content Preview Modes** - Draft and scheduled content preview
 
 ## 🧪 Testing Strategy
 
@@ -62,7 +60,6 @@ docs/roadmap/
 ├── 03-route-based-content-fetching.md  # Automatic content middleware
 ├── 04-typescript-types.md              # Type generation with CLI
 ├── 05-sitemap-integration.md           # SEO sitemap generation
-└── 06-content-preview-modes.md         # Preview system implementation
 ```
 
 ## 🎯 Progress Tracking
@@ -79,7 +76,6 @@ docs/roadmap/
 **Phase 2 Progress**: 0/2 features completed (0%)
 
 - [ ] Sitemap Integration
-- [ ] Content Preview Modes
 
 ---
 
