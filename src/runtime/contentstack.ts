@@ -57,7 +57,8 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
     if (typeof ContentstackLivePreview.onEntryChange === 'function') {
       const originalOnEntryChange = ContentstackLivePreview.onEntryChange
       ContentstackLivePreview.onEntryChange = (callback: any) => {
-        const wrappedCallback = (data: any) => {
+        const wrappedCallback = (...args: any[]) => {
+          const data = args[0]
           // Track the Live Preview update
           trackDevToolsLivePreview({
             type: 'entry_updated',
@@ -67,8 +68,8 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
             timestamp: new Date().toISOString()
           })
 
-          // Call the original callback
-          return callback(data)
+          // Call the original callback with all arguments
+          return callback(...args)
         }
         return originalOnEntryChange(wrappedCallback)
       }
