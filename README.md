@@ -1,4 +1,4 @@
-> Notice: This is an OSS project by @timbenniks and not an officially maintained package by the Contentstack team. Support requests can come through Github issues and via direct channels to @timbenniks.
+![Nuxt Contentstack](https://res.cloudinary.com/dwfcofnrd/image/upload/q_auto,f_auto/cs_ajyrsk.png)
 
 # Nuxt Contentstack
 
@@ -11,7 +11,9 @@ Contentstack integration for Nuxt.
 
 - [✨ &nbsp;Release Notes](/CHANGELOG.md)
 - [🏀 Online playground](https://stackblitz.com/github/timbenniks/nuxt-contentstack?file=playground%2Fapp.vue)
-<!-- - [📖 &nbsp;Documentation](https://example.com) -->
+- [📖 Documentation](https://nuxt-contentstack-docs.eu-contentstackapps.com/)
+
+> Notice: This is an OSS project by @timbenniks and _not_ an officially maintained package by the Contentstack team. Support requests can come through Github issues and via direct channels to @timbenniks.
 
 ## Features
 
@@ -47,11 +49,11 @@ modules: ['nuxt-contentstack'],
   environment: 'your_environment',
 
   // Optional settings with smart defaults
-  region: 'us',
+  region: 'eu',
   branch: 'main',
   locale: 'en-us',
 
-  // Live Preview (simplified)
+  // Live Preview
   livePreview: {
     enable: true,
     previewToken: 'your_preview_token', // no need for preview token if you are not using live preview
@@ -59,7 +61,7 @@ modules: ['nuxt-contentstack'],
     editButton: true
   },
 
-  // Personalization (simplified)
+  // Personalization
   personalization: {
     enable: true,
     projectUid: 'your_project_uid'
