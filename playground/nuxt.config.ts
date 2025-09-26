@@ -1,6 +1,11 @@
 export default defineNuxtConfig({
   'compatibilityDate': '2025-08-31',
-  'devtools': { enabled: true },
+  'devtools': {
+    enabled: true,
+    timeline: {
+      enabled: true
+    }
+  },
   'modules': ['../src/module', '@nuxt/image', '@nuxt/devtools'],
 
   'nuxt-contentstack': {

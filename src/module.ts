@@ -256,8 +256,7 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     if (debug) {
-      logger.box(`${chalk.bgYellow('DEBUG')} Contentstack simplified options\n\n${JSON.stringify(options, null, 2)}`)
-      logger.box(`${chalk.bgBlue('DEBUG')} Transformed SDK options\n\n${JSON.stringify(transformedOptions, null, 2)}`)
+      logger.box(`${chalk.bgBlue('DEBUG')} SDK options\n\n${JSON.stringify(transformedOptions, null, 2)}`)
     }
 
     addPlugin(resolver.resolve('./runtime/contentstack'))
