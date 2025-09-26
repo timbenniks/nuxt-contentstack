@@ -4,6 +4,14 @@ import type { Page, File } from "./types";
 const pageUid = "blte55cf3411ecaee0e";
 const imageUid = "bltef1ad5f7d7008800";
 
+// NEW: Example of auto-fetched content (replaces manual useGetEntryByUrl call)
+const {
+  content: autoPage,
+  isLoaded: autoPageLoaded,
+  meta: autoPageMeta,
+  refresh: refreshAutoPage,
+} = useAutoFetchedContent<Page>();
+
 // Example 1: useGetEntryByUrl - Get a page by URL
 const { data: page } = await useGetEntryByUrl<Page>({
   contentTypeUid: "page",
@@ -88,6 +96,62 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
 
 <template>
   <main class="max-w-screen-lg mx-auto p-4 space-y-8">
+    <!-- NEW: Auto-fetched content example -->
+    <section class="border-b pb-8">
+      <h2 class="text-2xl font-bold mb-4">
+        🚀 useAutoFetchedContent Example (NEW)
+      </h2>
+      <div class="bg-gradient-to-r from-blue-50 to-cyan-50 p-6 rounded-lg">
+        <p class="text-sm text-blue-600 mb-4">
+          This content is automatically fetched based on the current route using
+          the new auto-fetch middleware. No manual composable calls needed in
+          the component!
+        </p>
+
+        <div v-if="autoPageLoaded && autoPage" class="space-y-4">
+          <div class="flex items-center justify-between">
+            <h3 class="text-xl font-semibold text-gray-800">
+              {{ autoPage.title }}
+            </h3>
+            <button
+              class="px-3 py-1 bg-blue-600 text-white text-sm rounded hover:bg-blue-700"
+              @click="refreshAutoPage"
+            >
+              Refresh
+            </button>
+          </div>
+
+          <p class="text-gray-600">{{ autoPage.description }}</p>
+
+          <div
+            v-if="autoPageMeta"
+            class="text-xs text-gray-500 bg-gray-100 p-3 rounded"
+          >
+            <p><strong>Content Type:</strong> {{ autoPageMeta.contentType }}</p>
+            <p><strong>UID:</strong> {{ autoPageMeta.uid }}</p>
+            <p><strong>URL:</strong> {{ autoPageMeta.url }}</p>
+            <p><strong>Fetched At:</strong> {{ autoPageMeta.fetchedAt }}</p>
+          </div>
+
+          <div class="text-xs text-blue-600 bg-blue-50 p-3 rounded">
+            <p>
+              <strong>How it works:</strong> The middleware automatically
+              detected this route ("/") and fetched the corresponding "page"
+              content type. The content is now available via the
+              useAutoFetchedContent() composable without any manual setup!
+            </p>
+          </div>
+        </div>
+
+        <div v-else class="text-gray-500">
+          <p>Auto-fetch is enabled but no content was found for this route.</p>
+          <p class="text-xs mt-2">
+            Make sure you have a page entry with url="/" in your Contentstack
+            space.
+          </p>
+        </div>
+      </div>
+    </section>
     <!-- Example 1: useGetEntryByUrl -->
     <section class="border-b pb-8">
       <h2 class="text-2xl font-bold mb-4">🔗 useGetEntryByUrl Example</h2>

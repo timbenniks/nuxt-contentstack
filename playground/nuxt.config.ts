@@ -34,12 +34,43 @@ export default defineNuxtConfig({
       // projectUid: 'your-project-uid'
     },
 
+    // Route-based content fetching (new feature)
+    autoFetch: {
+      enabled: true,
+
+      // Include specific routes for auto-fetching
+      include: [
+        '/',
+      ],
+
+      // Exclude admin and API routes
+      exclude: [
+        '/admin/**',
+        '/api/**',
+        '/_nuxt/**'
+      ],
+
+      // Map routes to content types
+      contentTypeMapping: {
+        '/': 'page',
+      },
+
+      // Additional options
+      options: {
+        locale: 'en-us',
+        includeReferences: [],
+        includeFallback: true,
+        cacheKey: 'auto-fetch',
+        errorHandling: 'log'
+      }
+    },
+
     // General settings
     debug: true
   },
 
   // Configure @nuxt/image to use Contentstack provider by default
   image: {
-    // provider: 'contentstack', // Will be registered by the module
+    provider: 'contentstack', // Will be registered by the module
   },
 })

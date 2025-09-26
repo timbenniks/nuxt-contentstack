@@ -1,8 +1,23 @@
-import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, addServerHandler } from '@nuxt/kit'
+import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, addServerHandler, addRouteMiddleware } from '@nuxt/kit'
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
 import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions, type Region } from './runtime/utils'
+
+// Auto-fetch configuration interface
+export interface AutoFetchConfig {
+  enabled: boolean
+  include: string[]
+  exclude: string[]
+  contentTypeMapping: Record<string, string>
+  options: {
+    locale: string
+    includeReferences: string[]
+    includeFallback: boolean
+    cacheKey: string
+    errorHandling: 'silent' | 'throw' | 'log'
+  }
+}
 
 // Simplified, developer-friendly configuration
 export interface ModuleOptions {
@@ -34,6 +49,9 @@ export interface ModuleOptions {
     enable?: boolean
     projectUid?: string
   }
+
+  // Route-based content fetching (new)
+  autoFetch?: Partial<AutoFetchConfig>
 
   // General settings
   debug?: boolean
@@ -145,6 +163,9 @@ export default defineNuxtModule<ModuleOptions>({
       enable: false,
       projectUid: '',
     },
+    autoFetch: {
+      enabled: false,
+    },
     debug: false,
   },
 
@@ -154,6 +175,29 @@ export default defineNuxtModule<ModuleOptions>({
     // Transform simplified config to internal SDK configs
     const transformedOptions = transformModuleOptions(options)
     const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions, debug } = transformedOptions
+
+    // Process auto-fetch configuration
+    const autoFetchDefaults = {
+      enabled: false,
+      include: [],
+      exclude: ['/admin/**', '/api/**', '/_nuxt/**'],
+      contentTypeMapping: { default: 'page' },
+      options: {
+        locale: options.locale || 'en-us',
+        includeReferences: [],
+        includeFallback: true,
+        cacheKey: 'auto-fetch',
+        errorHandling: 'silent' as const,
+      },
+    }
+
+    const autoFetchConfig: AutoFetchConfig = {
+      enabled: options.autoFetch?.enabled ?? autoFetchDefaults.enabled,
+      include: options.autoFetch?.include ?? autoFetchDefaults.include,
+      exclude: options.autoFetch?.exclude ?? autoFetchDefaults.exclude,
+      contentTypeMapping: { ...autoFetchDefaults.contentTypeMapping, ...options.autoFetch?.contentTypeMapping },
+      options: { ...autoFetchDefaults.options, ...options.autoFetch?.options },
+    }
 
     // Add CommonJS packages to transpile to handle ESM import issues
     _nuxt.options.build = _nuxt.options.build || {}
@@ -211,6 +255,7 @@ export default defineNuxtModule<ModuleOptions>({
       deliverySdkOptions,
       livePreviewSdkOptions,
       personalizeSdkOptions,
+      autoFetch: autoFetchConfig,
       debug
     })
 
@@ -256,11 +301,34 @@ export default defineNuxtModule<ModuleOptions>({
     }
 
     if (debug) {
-      logger.box(`${chalk.bgBlue('DEBUG')} SDK options\n\n${JSON.stringify(transformedOptions, null, 2)}`)
+      const debugInfo = {
+        ...transformedOptions,
+        autoFetch: autoFetchConfig
+      }
+      logger.box(`${chalk.bgBlue('DEBUG')} SDK options\n\n${JSON.stringify(debugInfo, null, 2)}`)
     }
 
     addPlugin(resolver.resolve('./runtime/contentstack'))
     addImportsDir(resolver.resolve('./runtime/composables'))
+
+    // Register auto-fetch middleware if enabled
+    if (autoFetchConfig.enabled) {
+      addRouteMiddleware({
+        name: 'contentstack-auto-fetch',
+        path: resolver.resolve('./runtime/middleware/contentstack-auto-fetch.global.ts'),
+        global: true,
+      })
+
+      // Add server API endpoint for auto-fetching
+      addServerHandler({
+        route: '/api/contentstack/auto-fetch',
+        handler: resolver.resolve('./runtime/server/api/contentstack/auto-fetch.ts'),
+      })
+
+      if (debug) {
+        logger.success('Contentstack auto-fetch middleware registered')
+      }
+    }
 
     // Register @nuxt/image provider if @nuxt/image is installed
     const imageModule = _nuxt.options.modules.find((m: any) =>
@@ -270,33 +338,30 @@ export default defineNuxtModule<ModuleOptions>({
     )
 
     if (imageModule) {
-      // Use a hook to register the provider after modules are loaded
-      _nuxt.hook('modules:done', () => {
-        try {
-          // Ensure image configuration exists (with type assertion)
-          if (!(_nuxt.options as any).image) {
-            (_nuxt.options as any).image = {}
-          }
-          if (!(_nuxt.options as any).image.providers) {
-            (_nuxt.options as any).image.providers = {}
-          }
-
-          // Register our provider directly in the image config
-          (_nuxt.options as any).image.providers.contentstack = {
-            name: 'contentstack',
-            provider: resolver.resolve('./runtime/providers/contentstack'),
-            options: {},
-          }
-
-          if (debug) {
-            logger.success('Contentstack @nuxt/image provider registered')
-          }
-        } catch (error) {
-          if (debug) {
-            logger.warn('Could not register @nuxt/image provider:', error)
-          }
+      try {
+        // Ensure image configuration exists (with type assertion)
+        if (!(_nuxt.options as any).image) {
+          (_nuxt.options as any).image = {}
         }
-      })
+        if (!(_nuxt.options as any).image.providers) {
+          (_nuxt.options as any).image.providers = {}
+        }
+
+        // Register our provider directly in the image config
+        (_nuxt.options as any).image.providers.contentstack = {
+          name: 'contentstack',
+          provider: resolver.resolve('./runtime/providers/contentstack'),
+          options: {},
+        }
+
+        if (debug) {
+          logger.success('Contentstack @nuxt/image provider registered')
+        }
+      } catch (error) {
+        if (debug) {
+          logger.warn('Could not register @nuxt/image provider:', error)
+        }
+      }
     }
 
     if (personalizeSdkOptions?.enable) {

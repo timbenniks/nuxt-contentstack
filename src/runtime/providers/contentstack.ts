@@ -44,7 +44,7 @@ function buildParams(modifiers: Record<string, any>): string {
   return params.toString();
 }
 
-export const getImage = (
+const getImage = (
   src: string,
   { modifiers = {}, baseURL = "/" }: { modifiers?: Record<string, any>; baseURL?: string } = {}
 ) => {
@@ -91,7 +91,5 @@ export const getImage = (
   };
 };
 
-// Default export for @nuxt/image
-export default {
-  getImage,
-};
+// Named export is required for @nuxt/image
+export { getImage }

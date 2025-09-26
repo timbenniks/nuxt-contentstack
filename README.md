@@ -19,11 +19,12 @@ Contentstack integration for Nuxt.
 
 - ⚡️ Easy setup
 - ⚡️ Complete set of Vue composables for Contentstack
+- ⚡️ Route-based content fetching with automatic middleware
 - ⚡️ Query entries and assets with advanced filtering
 - ⚡️ Advanced filtering and pagination
 - ⚡️ Image transformations with reactive URLs
-- ⚡️ **@nuxt/image integration** with automatic optimization
-- ⚡️ **Nuxt DevTools integration** for debugging and monitoring
+- ⚡️ @nuxt/image integration with automatic optimization
+- ⚡️ Nuxt DevTools integration for debugging and monitoring
 - ⚡️ Live Preview & Visual builder
 - ⚡️ Personalization support
 - ⚡️ TypeScript support with full type safety
@@ -126,6 +127,129 @@ await Personalize.triggerImpression(experienceShortId);
 await Personalize.triggerEvent("eventKey");
 ```
 
+## Route-based Content Fetching
+
+Automatically fetch page content based on the current route without manual composable calls.
+
+> **Zero-config content fetching** - Just enable the middleware and content becomes available via `useAutoFetchedContent()` based on your URL patterns. Perfect for pages, blog posts, products, and any URL-based content.
+
+### Setup
+
+Enable auto-fetch in your `nuxt.config.ts`:
+
+```typescript
+export default defineNuxtConfig({
+  modules: ["nuxt-contentstack"],
+
+  "nuxt-contentstack": {
+    // ... other configuration
+
+    // Route-based content fetching
+    autoFetch: {
+      enabled: true, // Enable the middleware
+
+      // Routes to include (optional - if empty, all routes are processed)
+      include: [
+        "/", // Homepage
+        "/about", // Specific routes
+        "/blog/*", // Wildcard patterns
+        "/products/**", // Deep wildcard patterns
+      ],
+
+      // Routes to exclude
+      exclude: ["/admin/**", "/api/**", "/_nuxt/**"],
+
+      // Map routes to content types
+      contentTypeMapping: {
+        "/": "page", // Homepage uses 'page' content type
+        "/blog/*": "article", // Blog routes use 'article' content type
+        "/products/*": "product", // Product routes use 'product' content type
+        default: "page", // Fallback content type
+      },
+
+      // Additional options
+      options: {
+        locale: "en-us",
+        includeReferences: ["author", "category"], // References to include
+        includeFallback: true,
+        cacheKey: "auto-fetch",
+        errorHandling: "silent", // 'silent' | 'throw' | 'log'
+      },
+    },
+  },
+});
+```
+
+### Usage
+
+Access auto-fetched content in your pages without manual fetching:
+
+```vue
+<script setup>
+// No manual composable calls needed!
+const { content, isLoaded, meta, refresh } = useAutoFetchedContent<Page>();
+</script>
+
+<template>
+  <div v-if="isLoaded && content">
+    <h1>{{ content.title }}</h1>
+    <p>{{ content.description }}</p>
+
+    <!-- Content is automatically available based on current route -->
+    <div v-html="content.rich_text" />
+
+    <!-- Metadata about the fetched content -->
+    <div class="meta">
+      <p>Content Type: {{ meta.contentType }}</p>
+      <p>UID: {{ meta.uid }}</p>
+      <p>Fetched: {{ meta.fetchedAt }}</p>
+    </div>
+
+    <!-- Manual refresh if needed -->
+    <button @click="refresh">Refresh Content</button>
+  </div>
+</template>
+```
+
+### Advanced Usage
+
+#### Get content for specific routes:
+
+```vue
+<script setup>
+const { getContentFor } = useAutoFetchedContent();
+
+// Get content for other routes
+const aboutContent = getContentFor("/about");
+const blogContent = getContentFor("/blog/my-post", "article");
+</script>
+```
+
+#### Route patterns:
+
+- **Exact matches**: `/about` matches only `/about`
+- **Single wildcard**: `/blog/*` matches `/blog/post-1` but not `/blog/category/post-1`
+- **Deep wildcard**: `/blog/**` matches all nested routes under `/blog/`
+
+### Benefits
+
+- ✅ **Zero boilerplate** - Content automatically available based on URL
+- ✅ **Smart caching** - Efficient content deduplication and storage
+- ✅ **Flexible routing** - Support for complex route patterns
+- ✅ **Error handling** - Configurable error modes (silent, log, throw)
+- ✅ **TypeScript support** - Full type safety with generics
+- ✅ **Backward compatible** - Works alongside existing manual fetching
+
+### How It Works
+
+1. **Middleware runs** on every route change
+2. **URL is matched** against your include/exclude patterns
+3. **Content type is determined** from your mapping configuration
+4. **Content is fetched** from Contentstack using the URL field
+5. **Data becomes available** via `useAutoFetchedContent()` in your components
+
+This eliminates the need for manual `useGetEntryByUrl()` calls in every page component!
+
 ## Provides
 
 This module provides a `$contentstack` object with:
@@ -152,6 +276,29 @@ const {
 ## Composables
 
 This module provides several composables for working with Contentstack content. All composables support live preview, personalization, and use Nuxt's caching system.
+
+### `useAutoFetchedContent` (NEW)
+
+Access content that was automatically fetched by the route-based middleware.
+
+```ts
+const { content, isLoaded, meta, refresh, getContentFor } =
+  useAutoFetchedContent<Page>({
+    contentType: "page", // Optional: filter by content type
+    fallbackToManual: false, // Optional: fallback to manual fetching
+  });
+
+// Content is automatically available based on current route
+if (isLoaded.value && content.value) {
+  console.log(content.value.title);
+}
+
+// Get content for other routes
+const aboutContent = getContentFor("/about", "page");
+
+// Manual refresh if needed
+await refresh();
+```
 
 ### `useGetEntryByUrl`
 
