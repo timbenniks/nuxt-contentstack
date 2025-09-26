@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.32
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.31...v0.0.32)
+
+### 🩹 Fixes
+
+- Defer @nuxt/image provider registration until after modules are loaded ([1bef49c](https://github.com/timbenniks/nuxt-contentstack/commit/1bef49c))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.31
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.30...v0.0.31)
