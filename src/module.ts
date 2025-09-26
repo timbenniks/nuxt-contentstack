@@ -270,24 +270,33 @@ export default defineNuxtModule<ModuleOptions>({
     )
 
     if (imageModule) {
-      // Ensure image configuration exists (with type assertion)
-      if (!(_nuxt.options as any).image) {
-        (_nuxt.options as any).image = {}
-      }
-      if (!(_nuxt.options as any).image.providers) {
-        (_nuxt.options as any).image.providers = {}
-      }
+      // Use a hook to register the provider after modules are loaded
+      _nuxt.hook('modules:done', () => {
+        try {
+          // Ensure image configuration exists (with type assertion)
+          if (!(_nuxt.options as any).image) {
+            (_nuxt.options as any).image = {}
+          }
+          if (!(_nuxt.options as any).image.providers) {
+            (_nuxt.options as any).image.providers = {}
+          }
 
-      // Register our provider directly in the image config
-      (_nuxt.options as any).image.providers.contentstack = {
-        name: 'contentstack',
-        provider: resolver.resolve('./runtime/providers/contentstack'),
-        options: {},
-      }
+          // Register our provider directly in the image config
+          (_nuxt.options as any).image.providers.contentstack = {
+            name: 'contentstack',
+            provider: resolver.resolve('./runtime/providers/contentstack'),
+            options: {},
+          }
 
-      if (debug) {
-        logger.success('Contentstack @nuxt/image provider registered')
-      }
+          if (debug) {
+            logger.success('Contentstack @nuxt/image provider registered')
+          }
+        } catch (error) {
+          if (debug) {
+            logger.warn('Could not register @nuxt/image provider:', error)
+          }
+        }
+      })
     }
 
     if (personalizeSdkOptions?.enable) {
