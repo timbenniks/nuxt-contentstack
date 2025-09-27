@@ -140,7 +140,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: name,
     docs: 'https://github.com/timbenniks/nuxt-contentstack',
     compatibility: {
-      nuxt: '>=3.16.0',
+      nuxt: '>=4',
     },
   },
 
@@ -205,7 +205,6 @@ export default defineNuxtModule<ModuleOptions>({
 
     // All CommonJS dependencies that might cause issues
     const commonJSDeps = [
-      '@contentstack/core',
       '@contentstack/utils',
       '@contentstack/delivery-sdk',
       '@contentstack/live-preview-utils',
@@ -315,14 +314,14 @@ export default defineNuxtModule<ModuleOptions>({
     if (autoFetchConfig.enabled) {
       addRouteMiddleware({
         name: 'contentstack-auto-fetch',
-        path: resolver.resolve('./runtime/middleware/contentstack-auto-fetch.global.ts'),
+        path: resolver.resolve('./runtime/middleware/contentstack-auto-fetch.global'),
         global: true,
       })
 
       // Add server API endpoint for auto-fetching
       addServerHandler({
         route: '/api/contentstack/auto-fetch',
-        handler: resolver.resolve('./runtime/server/api/contentstack/auto-fetch.ts'),
+        handler: resolver.resolve('./runtime/server/api/contentstack/auto-fetch'),
       })
 
       if (debug) {
