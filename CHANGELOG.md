@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.37
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.36...v0.0.37)
+
+### 🚀 Enhancements
+
+- Add Contentstack modular blocks and fallback component with enhanced README documentation ([3e5b90a](https://github.com/timbenniks/nuxt-contentstack/commit/3e5b90a))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.36
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.35...v0.0.36)
