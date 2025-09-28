@@ -427,15 +427,16 @@ const componentMapping = {
 
 **Auto-fetch Props (NEW):**
 
-| Prop                 | Type       | Default        | Description                               |
-| -------------------- | ---------- | -------------- | ----------------------------------------- |
-| `contentTypeUid`     | `string`   | `undefined`    | Content type UID for fetching entry       |
-| `url`                | `string`   | `undefined`    | URL to fetch entry by                     |
-| `referenceFieldPath` | `string[]` | `[]`           | Reference field paths to include          |
-| `jsonRtePath`        | `string[]` | `[]`           | JSON RTE field paths                      |
-| `locale`             | `string`   | `'en-us'`      | Locale for the entry                      |
-| `replaceHtmlCslp`    | `boolean`  | `false`        | Replace HTML CSLP tags                    |
-| `blocksFieldPath`    | `string`   | `'components'` | Field path to extract modular blocks from |
+| Prop                 | Type           | Default        | Description                                         |
+| -------------------- | -------------- | -------------- | --------------------------------------------------- |
+| `contentTypeUid`     | `string`       | `undefined`    | Content type UID for fetching entry                 |
+| `url`                | `string`       | `undefined`    | URL to fetch entry by                               |
+| `referenceFieldPath` | `string[]`     | `[]`           | Reference field paths to include                    |
+| `jsonRtePath`        | `string[]`     | `[]`           | JSON RTE field paths                                |
+| `locale`             | `string`       | `'en-us'`      | Locale for the entry                                |
+| `replaceHtmlCslp`    | `boolean`      | `false`        | Replace HTML CSLP tags                              |
+| `blocksFieldPath`    | `string`       | `'components'` | Field path to extract modular blocks from           |
+| `seoMeta`            | `SeoMetaInput` | `undefined`    | SEO metadata object (passed directly to useSeoMeta) |
 
 **Styling Props:**
 
@@ -455,6 +456,75 @@ const componentMapping = {
 | `keyField`             | `string`  | `'_metadata.uid'` | Custom key field for blocks              |
 | `autoExtractBlockName` | `boolean` | `true`            | Auto-extract block name from object keys |
 | `blockNamePrefix`      | `string`  | `''`              | Prefix to remove from block names        |
+
+#### SEO Metadata Support (NEW)
+
+The component can automatically set SEO metadata when using the auto-fetch pattern, using Nuxt's native [`useSeoMeta`](https://nuxt.com/docs/4.x/api/composables/use-seo-meta) types and functionality.
+
+**Simple Usage:**
+
+```vue
+<template>
+  <!-- Pass SEO metadata directly using useSeoMeta format -->
+  <ContentstackModularBlocks
+    content-type-uid="page"
+    :url="$route.path"
+    :seo-meta="{
+      title: 'My Page Title',
+      description: 'My page description',
+      ogTitle: 'My Social Title',
+      ogDescription: 'My social description',
+      ogImage: 'https://example.com/image.jpg',
+      twitterCard: 'summary_large_image',
+    }"
+    :component-map="componentMapping"
+  />
+</template>
+```
+
+**Dynamic SEO from Entry Data:**
+
+```vue
+<script setup>
+// Get entry data first, then use it for SEO
+const { data: page } = await useGetEntryByUrl({
+  contentTypeUid: "page",
+  url: useRoute().path,
+});
+
+// Create SEO object from entry data
+const seoMeta = computed(() => ({
+  title: page.value?.seo_title || page.value?.title,
+  description: page.value?.seo_description || page.value?.description,
+  ogTitle: page.value?.social_title || page.value?.title,
+  ogDescription: page.value?.social_description || page.value?.description,
+  ogImage: page.value?.featured_image?.url,
+  canonical: `https://example.com${page.value?.url}`,
+  robots: page.value?.no_index ? "noindex,nofollow" : "index,follow",
+}));
+</script>
+
+<template>
+  <!-- Use computed SEO metadata -->
+  <ContentstackModularBlocks
+    :blocks="page?.components"
+    :seo-meta="seoMeta"
+    :component-map="componentMapping"
+  />
+</template>
+```
+
+**All useSeoMeta Options Supported:**
+
+Since we pass the `seoMeta` prop directly to Nuxt's `useSeoMeta`, you can use any of the 100+ supported meta tags:
+
+**Benefits:**
+
+- ✅ **XSS Safe**: Uses Nuxt's built-in `useSeoMeta` for secure meta tag handling
+- ✅ **TypeScript Support**: Full type safety with 100+ meta tag types
+- ✅ **SSR First**: SEO metadata is set during server-side rendering for optimal SEO
+- ✅ **Search Engine Ready**: Meta tags are available when crawlers visit your pages
+- ✅ **Flexible**: Choose from auto-detection, custom mapping, or function-based logic
 
 #### Data Structure Support
 

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref } from "#imports";
+import { computed, ref, useSeoMeta } from "#imports";
 // @ts-expect-error - Vue SFC import without explicit default export
 import ContentstackFallbackBlock from "./ContentstackFallbackBlock.vue";
 import { useGetEntryByUrl } from "../composables/useGetEntryByUrl";
@@ -23,6 +23,9 @@ interface ProcessedBlock {
 interface ComponentMapping {
   [blockType: string]: any;
 }
+
+// SEO Meta types - use Nuxt's native useSeoMeta types
+type SeoMetaInput = Parameters<typeof useSeoMeta>[0];
 
 // Props
 interface Props {
@@ -66,6 +69,8 @@ interface Props {
   replaceHtmlCslp?: boolean;
   /** Field path to extract modular blocks from (e.g., 'modular_blocks' or 'page_components') */
   blocksFieldPath?: string;
+  /** SEO metadata object - passed directly to useSeoMeta */
+  seoMeta?: SeoMetaInput;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -86,26 +91,33 @@ const props = withDefaults(defineProps<Props>(), {
   locale: "en-us",
   replaceHtmlCslp: false,
   blocksFieldPath: "components",
-  contentTypeUid: "page",
-  url: "/",
+  seoMeta: undefined,
 });
 
-// Entry fetching logic - SSR compatible
-const shouldFetchEntry = computed(() => {
-  return !!(props.contentTypeUid && props.url);
-});
+// Helper function to extract blocks from nested object path
+function extractBlocksFromPath(data: any, path: string): ContentstackBlock[] {
+  const fieldPath = path.split(".");
+  let blocks = data;
 
-// Initialize refs for entry data
+  for (const field of fieldPath) {
+    blocks = blocks?.[field];
+  }
+
+  return Array.isArray(blocks) ? blocks : [];
+}
+
+// Main logic
+const shouldFetchEntry = computed(() => !!(props.contentTypeUid && props.url));
+
+// Initialize entry data
 const entryData = ref(null);
 const entryStatus = ref("success");
 let refreshEntry = () => {};
 
-// Expose refresh function for external use (must be before await)
-defineExpose({
-  refreshEntry: () => refreshEntry(),
-});
+// Expose refresh function
+defineExpose({ refreshEntry: () => refreshEntry() });
 
-// Conditionally fetch entry data using SSR-aware composable
+// Fetch entry data if needed
 if (shouldFetchEntry.value) {
   const entryResult = await useGetEntryByUrl({
     contentTypeUid: props.contentTypeUid!,
@@ -119,22 +131,18 @@ if (shouldFetchEntry.value) {
   entryData.value = entryResult.data.value as any;
   entryStatus.value = entryResult.status.value;
   refreshEntry = entryResult.refresh;
+
+  // Handle SEO metadata - just pass through to useSeoMeta
+  if (props.seoMeta) {
+    useSeoMeta(props.seoMeta);
+  }
 }
 
-// Extract blocks from entry data or use provided blocks
+// Get blocks from either fetched entry or props
 const extractedBlocks = computed((): ContentstackBlock[] => {
   if (shouldFetchEntry.value && entryData.value) {
-    // Extract blocks from the specified field path
-    const fieldPath = props.blocksFieldPath!.split(".");
-    let blocks: any = entryData.value;
-
-    for (const path of fieldPath) {
-      blocks = blocks?.[path];
-    }
-
-    return Array.isArray(blocks) ? blocks : [];
+    return extractBlocksFromPath(entryData.value, props.blocksFieldPath!);
   }
-
   return props.blocks || [];
 });
 
