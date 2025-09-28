@@ -1,4 +1,6 @@
 <script setup lang="ts">
+import { useAttrs, computed } from "#imports";
+
 // Get all attributes passed to the component
 const attrs = useAttrs();
 

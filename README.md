@@ -284,6 +284,7 @@ A flexible, generic component for rendering Contentstack modular blocks as Vue c
 #### Features
 
 - ✅ **Auto-component mapping** - Automatically maps Contentstack block types to Vue components
+- ✅ **Auto-fetch capability** - Can fetch entry data and extract blocks automatically (NEW)
 - ✅ **Flexible data structure** - Works with various Contentstack modular block formats
 - ✅ **Live Preview ready** - Full support for Contentstack Live Preview with `data-cslp` attributes
 - ✅ **Visual Builder support** - Includes empty state classes for visual building
@@ -291,9 +292,58 @@ A flexible, generic component for rendering Contentstack modular blocks as Vue c
 - ✅ **SSR compatible** - Renders perfectly on server and hydrates seamlessly
 - ✅ **Customizable styling** - Configurable CSS classes and container props
 - ✅ **Error handling** - Graceful fallbacks for unmapped components
-- ✅ **Slot support** - Custom empty state content via slots
+- ✅ **Slot support** - Custom loading, error, and empty state content via slots
+- ✅ **Backward compatible** - Existing usage patterns continue to work unchanged
 
-#### Basic Usage
+#### Usage Patterns
+
+The component supports two usage patterns for maximum flexibility:
+
+**Pattern 1: Auto-fetch Entry + Render Blocks (NEW)**
+
+Perfect for simple page rendering - just provide entry details and let the component handle everything:
+
+```vue
+<script setup>
+import Hero from "./components/Hero.vue";
+import Grid from "./components/Grid.vue";
+import TextBlock from "./components/TextBlock.vue";
+
+// Map Contentstack block types to Vue components
+const componentMapping = {
+  hero: Hero,
+  grid: Grid,
+  text_block: TextBlock,
+};
+</script>
+
+<template>
+  <!-- Component fetches entry and renders blocks automatically -->
+  <ContentstackModularBlocks
+    content-type-uid="page"
+    :url="$route.path"
+    blocks-field-path="components"
+    :reference-field-path="['blocks.block.image']"
+    :json-rte-path="['rich_text', 'blocks.block.copy']"
+    locale="en-us"
+    :component-map="componentMapping"
+  >
+    <!-- Custom loading state -->
+    <template #loading>
+      <div class="loading-spinner">Loading page content...</div>
+    </template>
+
+    <!-- Custom error state -->
+    <template #error>
+      <div class="error-message">Failed to load content</div>
+    </template>
+  </ContentstackModularBlocks>
+</template>
+```
+
+**Pattern 2: Traditional with Pre-fetched Blocks**
+
+For when you need more control over data fetching:
 
 ```vue
 <script setup>
@@ -308,7 +358,7 @@ const componentMapping = {
   text_block: TextBlock,
 };
 
-// Fetch your page data
+// Fetch your page data manually
 const { data: page } = await useGetEntryByUrl({
   contentTypeUid: "page",
   url: useRoute().path,
@@ -316,6 +366,7 @@ const { data: page } = await useGetEntryByUrl({
 </script>
 
 <template>
+  <!-- Pass pre-fetched blocks -->
   <ContentstackModularBlocks
     :blocks="page.components"
     :component-map="componentMapping"
@@ -366,20 +417,44 @@ const componentMapping = {
 
 #### Props
 
-| Prop                   | Type                  | Default                                | Description                                  |
-| ---------------------- | --------------------- | -------------------------------------- | -------------------------------------------- |
-| `blocks`               | `ContentstackBlock[]` | `[]`                                   | Array of Contentstack modular blocks         |
-| `componentMap`         | `ComponentMapping`    | `{}`                                   | Object mapping block types to Vue components |
-| `fallbackComponent`    | `Component \| string` | `ContentstackFallbackBlock`            | Fallback component for unmapped block types  |
-| `containerClass`       | `string`              | `'contentstack-modular-blocks'`        | CSS class for the container                  |
-| `emptyBlockClass`      | `string`              | `'visual-builder__empty-block-parent'` | CSS class for empty blocks (Visual Builder)  |
-| `containerProps`       | `Record<string, any>` | `{}`                                   | Additional props to bind to the container    |
-| `showEmptyState`       | `boolean`             | `true`                                 | Show empty state when no blocks              |
-| `emptyStateClass`      | `string`              | `'contentstack-empty-state'`           | CSS class for empty state                    |
-| `emptyStateMessage`    | `string`              | `'No content blocks available'`        | Message to show in empty state               |
-| `keyField`             | `string`              | `'_metadata.uid'`                      | Custom key field for blocks                  |
-| `autoExtractBlockName` | `boolean`             | `true`                                 | Auto-extract block name from object keys     |
-| `blockNamePrefix`      | `string`              | `''`                                   | Prefix to remove from block names            |
+**Core Props:**
+
+| Prop                | Type                  | Default                     | Description                                  |
+| ------------------- | --------------------- | --------------------------- | -------------------------------------------- |
+| `blocks`            | `ContentstackBlock[]` | `[]`                        | Array of Contentstack modular blocks         |
+| `componentMap`      | `ComponentMapping`    | `{}`                        | Object mapping block types to Vue components |
+| `fallbackComponent` | `Component \| string` | `ContentstackFallbackBlock` | Fallback component for unmapped block types  |
+
+**Auto-fetch Props (NEW):**
+
+| Prop                 | Type       | Default        | Description                               |
+| -------------------- | ---------- | -------------- | ----------------------------------------- |
+| `contentTypeUid`     | `string`   | `undefined`    | Content type UID for fetching entry       |
+| `url`                | `string`   | `undefined`    | URL to fetch entry by                     |
+| `referenceFieldPath` | `string[]` | `[]`           | Reference field paths to include          |
+| `jsonRtePath`        | `string[]` | `[]`           | JSON RTE field paths                      |
+| `locale`             | `string`   | `'en-us'`      | Locale for the entry                      |
+| `replaceHtmlCslp`    | `boolean`  | `false`        | Replace HTML CSLP tags                    |
+| `blocksFieldPath`    | `string`   | `'components'` | Field path to extract modular blocks from |
+
+**Styling Props:**
+
+| Prop                | Type                  | Default                                | Description                                 |
+| ------------------- | --------------------- | -------------------------------------- | ------------------------------------------- |
+| `containerClass`    | `string`              | `'contentstack-modular-blocks'`        | CSS class for the container                 |
+| `emptyBlockClass`   | `string`              | `'visual-builder__empty-block-parent'` | CSS class for empty blocks (Visual Builder) |
+| `containerProps`    | `Record<string, any>` | `{}`                                   | Additional props to bind to the container   |
+| `showEmptyState`    | `boolean`             | `true`                                 | Show empty state when no blocks             |
+| `emptyStateClass`   | `string`              | `'contentstack-empty-state'`           | CSS class for empty state                   |
+| `emptyStateMessage` | `string`              | `'No content blocks available'`        | Message to show in empty state              |
+
+**Advanced Props:**
+
+| Prop                   | Type      | Default           | Description                              |
+| ---------------------- | --------- | ----------------- | ---------------------------------------- |
+| `keyField`             | `string`  | `'_metadata.uid'` | Custom key field for blocks              |
+| `autoExtractBlockName` | `boolean` | `true`            | Auto-extract block name from object keys |
+| `blockNamePrefix`      | `string`  | `''`              | Prefix to remove from block names        |
 
 #### Data Structure Support
 
@@ -462,12 +537,62 @@ The component automatically adds Live Preview attributes:
 </section>
 ```
 
+#### Slots
+
+The component provides several slots for customizing different states:
+
+| Slot      | Description                  | Available When                            |
+| --------- | ---------------------------- | ----------------------------------------- |
+| `loading` | Custom loading state content | Auto-fetch is enabled and data is loading |
+| `error`   | Custom error state content   | Auto-fetch fails or encounters an error   |
+| `empty`   | Custom empty state content   | No blocks are available to render         |
+
+```vue
+<template>
+  <ContentstackModularBlocks
+    content-type-uid="page"
+    :url="$route.path"
+    :component-map="componentMapping"
+  >
+    <!-- Custom loading spinner -->
+    <template #loading>
+      <div class="flex items-center justify-center py-12">
+        <div
+          class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"
+        ></div>
+        <span class="ml-3">Loading page content...</span>
+      </div>
+    </template>
+
+    <!-- Custom error message -->
+    <template #error>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <h3 class="text-red-800 font-semibold">Content Unavailable</h3>
+        <p class="text-red-600 mt-2">
+          Unable to load page content. Please try again later.
+        </p>
+      </div>
+    </template>
+
+    <!-- Custom empty state -->
+    <template #empty>
+      <div class="text-center py-12 text-gray-500">
+        <h3 class="text-lg font-medium">No Content Available</h3>
+        <p class="mt-2">This page doesn't have any content blocks yet.</p>
+      </div>
+    </template>
+  </ContentstackModularBlocks>
+</template>
+```
+
 #### Error Handling
 
 - **Missing components**: Falls back to `fallbackComponent`
-- **Empty blocks**: Shows configurable empty state
+- **Empty blocks**: Shows configurable empty state (customizable via `#empty` slot)
 - **Invalid data**: Gracefully handles malformed block data
 - **Missing keys**: Uses index-based keys as fallback
+- **Auto-fetch errors**: Shows error state (customizable via `#error` slot)
+- **Loading states**: Shows loading state during auto-fetch (customizable via `#loading` slot)
 
 #### `ContentstackFallbackBlock`
 

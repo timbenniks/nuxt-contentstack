@@ -962,9 +962,111 @@ const totalImagesCount = computed(() => images.value?.assets?.length || 0);
       </div>
     </section>
 
+    <!-- NEW: Enhanced ContentstackModularBlocks Component Examples -->
+    <section class="border-b pb-8">
+      <h2 class="text-2xl font-bold mb-4">
+        🧩 Enhanced ContentstackModularBlocks Component
+      </h2>
+      <div
+        class="bg-gradient-to-r from-green-50 to-emerald-50 p-6 rounded-lg space-y-6"
+      >
+        <p class="text-sm text-green-600 mb-4">
+          The ContentstackModularBlocks component now supports two usage
+          patterns:
+        </p>
+
+        <!-- Pattern 1: Auto-fetch with entry props -->
+        <div class="bg-white p-4 rounded border">
+          <h3 class="text-lg font-semibold mb-3 text-green-700">
+            Pattern 1: Auto-fetch Entry + Render Blocks
+          </h3>
+          <p class="text-sm text-gray-600 mb-3">
+            Pass entry props to automatically fetch and render modular blocks:
+          </p>
+          <ContentstackModularBlocks
+            content-type-uid="page"
+            url="/"
+            :reference-field-path="['blocks.block.image']"
+            :json-rte-path="['rich_text', 'blocks.block.copy']"
+            locale="en-us"
+            :replace-html-cslp="true"
+            blocks-field-path="blocks"
+            :component-map="{
+              // Add your component mappings here
+            }"
+          >
+            <template #loading>
+              <div class="text-center py-8">
+                <div
+                  class="animate-spin rounded-full h-8 w-8 border-b-2 border-green-600 mx-auto"
+                ></div>
+                <p class="mt-2 text-sm text-gray-600">
+                  Loading page content...
+                </p>
+              </div>
+            </template>
+            <template #error>
+              <div class="text-center py-8 text-red-600">
+                <p>❌ Failed to load page content</p>
+              </div>
+            </template>
+            <template #empty>
+              <div class="text-center py-8 text-gray-500">
+                <p>📄 No modular blocks found for this page</p>
+              </div>
+            </template>
+          </ContentstackModularBlocks>
+        </div>
+
+        <!-- Pattern 2: Traditional with pre-fetched blocks -->
+        <div class="bg-white p-4 rounded border">
+          <h3 class="text-lg font-semibold mb-3 text-blue-700">
+            Pattern 2: Traditional with Pre-fetched Blocks
+          </h3>
+          <p class="text-sm text-gray-600 mb-3">
+            Pass blocks directly (backward compatible):
+          </p>
+          <ContentstackModularBlocks
+            v-if="page?.blocks"
+            :blocks="page.blocks"
+            :component-map="{
+              // Add your component mappings here
+            }"
+          />
+        </div>
+
+        <!-- Code Examples -->
+        <div class="bg-gray-50 p-4 rounded">
+          <h4 class="font-semibold mb-2">Usage Examples:</h4>
+          <div class="space-y-4 text-sm">
+            <div>
+              <p class="font-medium text-green-700">Auto-fetch Pattern:</p>
+              <pre
+                class="bg-white p-2 rounded text-xs overflow-x-auto"
+              ><code>&lt;ContentstackModularBlocks
+  content-type-uid="page"
+  url="/about"
+  blocks-field-path="modular_blocks"
+  :component-map="componentMap"
+/&gt;</code></pre>
+            </div>
+            <div>
+              <p class="font-medium text-blue-700">Traditional Pattern:</p>
+              <pre
+                class="bg-white p-2 rounded text-xs overflow-x-auto"
+              ><code>&lt;ContentstackModularBlocks
+  :blocks="entry.modular_blocks"
+  :component-map="componentMap"
+/&gt;</code></pre>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
     <!-- Original blocks content -->
     <section v-if="page?.blocks">
-      <h2 class="text-2xl font-bold mb-4">📝 Page Blocks</h2>
+      <h2 class="text-2xl font-bold mb-4">📝 Page Blocks (Manual Rendering)</h2>
       <div class="space-y-8" v-bind="page?.$ && page?.$.blocks">
         <div
           v-for="(item, index) in page.blocks"

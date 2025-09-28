@@ -1,5 +1,8 @@
 <script setup lang="ts">
+import { computed, ref } from "#imports";
+// @ts-expect-error - Vue SFC import without explicit default export
 import ContentstackFallbackBlock from "./ContentstackFallbackBlock.vue";
+import { useGetEntryByUrl } from "../composables/useGetEntryByUrl";
 
 // Types
 interface ContentstackBlock {
@@ -47,6 +50,22 @@ interface Props {
   autoExtractBlockName?: boolean;
   /** Prefix to remove from block names when mapping components */
   blockNamePrefix?: string;
+
+  // Entry fetching props (from useGetEntryByUrl)
+  /** Content type UID for fetching entry */
+  contentTypeUid?: string;
+  /** URL to fetch entry by */
+  url?: string;
+  /** Reference field paths to include */
+  referenceFieldPath?: string[];
+  /** JSON RTE field paths */
+  jsonRtePath?: string[];
+  /** Locale for the entry */
+  locale?: string;
+  /** Replace HTML CSLP tags */
+  replaceHtmlCslp?: boolean;
+  /** Field path to extract modular blocks from (e.g., 'modular_blocks' or 'page_components') */
+  blocksFieldPath?: string;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -62,13 +81,69 @@ const props = withDefaults(defineProps<Props>(), {
   keyField: "_metadata.uid",
   autoExtractBlockName: true,
   blockNamePrefix: "",
+  referenceFieldPath: () => [],
+  jsonRtePath: () => [],
+  locale: "en-us",
+  replaceHtmlCslp: false,
+  blocksFieldPath: "components",
+  contentTypeUid: "page",
+  url: "/",
+});
+
+// Entry fetching logic - SSR compatible
+const shouldFetchEntry = computed(() => {
+  return !!(props.contentTypeUid && props.url);
+});
+
+// Initialize refs for entry data
+const entryData = ref(null);
+const entryStatus = ref("success");
+let refreshEntry = () => {};
+
+// Expose refresh function for external use (must be before await)
+defineExpose({
+  refreshEntry: () => refreshEntry(),
+});
+
+// Conditionally fetch entry data using SSR-aware composable
+if (shouldFetchEntry.value) {
+  const entryResult = await useGetEntryByUrl({
+    contentTypeUid: props.contentTypeUid!,
+    url: props.url!,
+    referenceFieldPath: props.referenceFieldPath,
+    jsonRtePath: props.jsonRtePath,
+    locale: props.locale,
+    replaceHtmlCslp: props.replaceHtmlCslp,
+  });
+
+  entryData.value = entryResult.data.value as any;
+  entryStatus.value = entryResult.status.value;
+  refreshEntry = entryResult.refresh;
+}
+
+// Extract blocks from entry data or use provided blocks
+const extractedBlocks = computed((): ContentstackBlock[] => {
+  if (shouldFetchEntry.value && entryData.value) {
+    // Extract blocks from the specified field path
+    const fieldPath = props.blocksFieldPath!.split(".");
+    let blocks: any = entryData.value;
+
+    for (const path of fieldPath) {
+      blocks = blocks?.[path];
+    }
+
+    return Array.isArray(blocks) ? blocks : [];
+  }
+
+  return props.blocks || [];
 });
 
 // Computed
 const processedBlocks = computed((): ProcessedBlock[] => {
-  if (!props.blocks || props.blocks.length === 0) return [];
+  const blocksToProcess = extractedBlocks.value;
+  if (!blocksToProcess || blocksToProcess.length === 0) return [];
 
-  return props.blocks.map((block: ContentstackBlock) => {
+  return blocksToProcess.map((block: ContentstackBlock) => {
     let name = "";
     let blockProps = {};
 
@@ -136,9 +211,33 @@ function getCslpData(block: ProcessedBlock, index: number): string | undefined {
 </script>
 
 <template>
+  <!-- Loading state when fetching entry -->
+  <div
+    v-if="shouldFetchEntry && entryStatus === 'pending'"
+    :class="emptyStateClass"
+  >
+    <slot name="loading">
+      <p>Loading content...</p>
+    </slot>
+  </div>
+
+  <!-- Error state when entry fetch fails -->
+  <div
+    v-else-if="shouldFetchEntry && entryStatus === 'error'"
+    :class="emptyStateClass"
+  >
+    <slot name="error">
+      <p>Failed to load content. Please try again.</p>
+    </slot>
+  </div>
+
+  <!-- Main content when blocks are available -->
   <section
-    v-if="blocks && blocks.length > 0"
-    :class="[containerClass, blocks.length === 0 ? emptyBlockClass : '']"
+    v-else-if="extractedBlocks && extractedBlocks.length > 0"
+    :class="[
+      containerClass,
+      extractedBlocks.length === 0 ? emptyBlockClass : '',
+    ]"
     v-bind="containerProps"
   >
     <component
