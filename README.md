@@ -293,7 +293,6 @@ A flexible, generic component for rendering Contentstack modular blocks as Vue c
 - ✅ **Customizable styling** - Configurable CSS classes and container props
 - ✅ **Error handling** - Graceful fallbacks for unmapped components
 - ✅ **Slot support** - Custom loading, error, and empty state content via slots
-- ✅ **Backward compatible** - Existing usage patterns continue to work unchanged
 
 #### Usage Patterns
 
@@ -427,16 +426,17 @@ const componentMapping = {
 
 **Auto-fetch Props (NEW):**
 
-| Prop                 | Type           | Default        | Description                                         |
-| -------------------- | -------------- | -------------- | --------------------------------------------------- |
-| `contentTypeUid`     | `string`       | `undefined`    | Content type UID for fetching entry                 |
-| `url`                | `string`       | `undefined`    | URL to fetch entry by                               |
-| `referenceFieldPath` | `string[]`     | `[]`           | Reference field paths to include                    |
-| `jsonRtePath`        | `string[]`     | `[]`           | JSON RTE field paths                                |
-| `locale`             | `string`       | `'en-us'`      | Locale for the entry                                |
-| `replaceHtmlCslp`    | `boolean`      | `false`        | Replace HTML CSLP tags                              |
-| `blocksFieldPath`    | `string`       | `'components'` | Field path to extract modular blocks from           |
-| `seoMeta`            | `SeoMetaInput` | `undefined`    | SEO metadata object (passed directly to useSeoMeta) |
+| Prop                 | Type                                | Default        | Description                                         |
+| -------------------- | ----------------------------------- | -------------- | --------------------------------------------------- |
+| `contentTypeUid`     | `string`                            | `undefined`    | Content type UID for fetching entry                 |
+| `url`                | `string`                            | `undefined`    | URL to fetch entry by                               |
+| `referenceFieldPath` | `string[]`                          | `[]`           | Reference field paths to include                    |
+| `jsonRtePath`        | `string[]`                          | `[]`           | JSON RTE field paths                                |
+| `locale`             | `string`                            | `'en-us'`      | Locale for the entry                                |
+| `replaceHtmlCslp`    | `boolean`                           | `false`        | Replace HTML CSLP tags                              |
+| `blocksFieldPath`    | `string`                            | `'components'` | Field path to extract modular blocks from           |
+| `seoMeta`            | `SeoMetaInput`                      | `undefined`    | SEO metadata object (passed directly to useSeoMeta) |
+| `autoSeoMeta`        | `boolean \| Record<string, string>` | `false`        | Auto-generate SEO from entry data                   |
 
 **Styling Props:**
 
@@ -514,6 +514,73 @@ const seoMeta = computed(() => ({
 </template>
 ```
 
+**Auto-Generate SEO from Entry Data:**
+
+When using the auto-fetch pattern, you can automatically generate SEO metadata from the fetched entry data:
+
+```vue
+<template>
+  <!-- Auto-generate SEO using default field mapping -->
+  <ContentstackModularBlocks
+    content-type-uid="page"
+    :url="$route.path"
+    :auto-seo-meta="true"
+    :component-map="componentMapping"
+  />
+</template>
+```
+
+**Custom Field Mapping:**
+
+```vue
+<template>
+  <!-- Custom field mapping for SEO generation -->
+  <ContentstackModularBlocks
+    content-type-uid="page"
+    :url="$route.path"
+    :auto-seo-meta="{
+      title: 'page_title|title',
+      description: 'meta_description|description',
+      ogTitle: 'social_title|page_title|title',
+      ogImage: 'featured_image.url',
+      canonical: 'canonical_url',
+      twitterCard: 'summary_large_image',
+    }"
+    :component-map="componentMapping"
+  />
+</template>
+```
+
+**Default Auto-SEO Field Mapping:**
+
+When `autoSeoMeta: true`, these fields are automatically mapped:
+
+| SEO Meta Tag    | Entry Fields (fallback order)                       |
+| --------------- | --------------------------------------------------- |
+| `title`         | `seo_title` → `title` → `name`                      |
+| `description`   | `seo_description` → `description` → `summary`       |
+| `ogTitle`       | `seo_title` → `title` → `name`                      |
+| `ogDescription` | `seo_description` → `description` → `summary`       |
+| `ogImage`       | `featured_image.url` → `og_image.url` → `image.url` |
+
+**Combining Manual and Auto SEO:**
+
+```vue
+<template>
+  <!-- Auto-generate base SEO, override specific fields -->
+  <ContentstackModularBlocks
+    content-type-uid="page"
+    :url="$route.path"
+    :auto-seo-meta="true"
+    :seo-meta="{
+      canonical: 'https://example.com' + $route.path,
+      robots: 'index,follow',
+    }"
+    :component-map="componentMapping"
+  />
+</template>
+```
+
 **All useSeoMeta Options Supported:**
 
 Since we pass the `seoMeta` prop directly to Nuxt's `useSeoMeta`, you can use any of the 100+ supported meta tags:
@@ -522,6 +589,9 @@ Since we pass the `seoMeta` prop directly to Nuxt's `useSeoMeta`, you can use an
 
 - ✅ **XSS Safe**: Uses Nuxt's built-in `useSeoMeta` for secure meta tag handling
 - ✅ **TypeScript Support**: Full type safety with 100+ meta tag types
+- ✅ **Auto-Generation**: Automatically extract SEO from fetched entry data
+- ✅ **Flexible Mapping**: Custom field mapping with fallback support
+- ✅ **Priority System**: Manual `seoMeta` overrides auto-generated values
 - ✅ **SSR First**: SEO metadata is set during server-side rendering for optimal SEO
 - ✅ **Search Engine Ready**: Meta tags are available when crawlers visit your pages
 - ✅ **Flexible**: Choose from auto-detection, custom mapping, or function-based logic
