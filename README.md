@@ -273,6 +273,248 @@ const {
 } = useNuxtApp().$contentstack;
 ```
 
+## Components
+
+This module provides Vue components for common Contentstack use cases.
+
+### `ContentstackModularBlocks`
+
+A flexible, generic component for rendering Contentstack modular blocks as Vue components. Perfect for dynamic page layouts, component libraries, and content-driven UIs.
+
+#### Features
+
+- ✅ **Auto-component mapping** - Automatically maps Contentstack block types to Vue components
+- ✅ **Flexible data structure** - Works with various Contentstack modular block formats
+- ✅ **Live Preview ready** - Full support for Contentstack Live Preview with `data-cslp` attributes
+- ✅ **Visual Builder support** - Includes empty state classes for visual building
+- ✅ **TypeScript support** - Comprehensive type definitions with generics
+- ✅ **SSR compatible** - Renders perfectly on server and hydrates seamlessly
+- ✅ **Customizable styling** - Configurable CSS classes and container props
+- ✅ **Error handling** - Graceful fallbacks for unmapped components
+- ✅ **Slot support** - Custom empty state content via slots
+
+#### Basic Usage
+
+```vue
+<script setup>
+import Hero from "./components/Hero.vue";
+import Grid from "./components/Grid.vue";
+import TextBlock from "./components/TextBlock.vue";
+
+// Map Contentstack block types to Vue components
+const componentMapping = {
+  hero: Hero,
+  grid: Grid,
+  text_block: TextBlock,
+};
+
+// Fetch your page data
+const { data: page } = await useGetEntryByUrl({
+  contentTypeUid: "page",
+  url: useRoute().path,
+});
+</script>
+
+<template>
+  <ContentstackModularBlocks
+    :blocks="page.components"
+    :component-map="componentMapping"
+  />
+</template>
+```
+
+#### Advanced Usage
+
+```vue
+<script setup>
+import Hero from "./blocks/Hero.vue";
+import Grid from "./blocks/Grid.vue";
+import DefaultBlock from "./blocks/DefaultBlock.vue";
+
+const componentMapping = {
+  hero: Hero,
+  grid: Grid,
+  text_section: TextSection,
+  image_gallery: ImageGallery,
+};
+</script>
+
+<template>
+  <ContentstackModularBlocks
+    :blocks="page.modular_blocks"
+    :component-map="componentMapping"
+    :fallback-component="DefaultBlock"
+    :auto-extract-block-name="true"
+    :show-empty-state="true"
+    container-class="page-blocks"
+    empty-block-class="visual-builder__empty-block-parent"
+    empty-state-message="No content blocks available"
+    key-field="_metadata.uid"
+    block-name-prefix="block_"
+    :container-props="{ 'data-page-id': page.uid }"
+  >
+    <!-- Custom empty state -->
+    <template #empty>
+      <div class="custom-empty-state">
+        <h3>No content blocks found</h3>
+        <p>Please add some content in Contentstack</p>
+      </div>
+    </template>
+  </ContentstackModularBlocks>
+</template>
+```
+
+#### Props
+
+| Prop                   | Type                  | Default                                | Description                                  |
+| ---------------------- | --------------------- | -------------------------------------- | -------------------------------------------- |
+| `blocks`               | `ContentstackBlock[]` | `[]`                                   | Array of Contentstack modular blocks         |
+| `componentMap`         | `ComponentMapping`    | `{}`                                   | Object mapping block types to Vue components |
+| `fallbackComponent`    | `Component \| string` | `ContentstackFallbackBlock`            | Fallback component for unmapped block types  |
+| `containerClass`       | `string`              | `'contentstack-modular-blocks'`        | CSS class for the container                  |
+| `emptyBlockClass`      | `string`              | `'visual-builder__empty-block-parent'` | CSS class for empty blocks (Visual Builder)  |
+| `containerProps`       | `Record<string, any>` | `{}`                                   | Additional props to bind to the container    |
+| `showEmptyState`       | `boolean`             | `true`                                 | Show empty state when no blocks              |
+| `emptyStateClass`      | `string`              | `'contentstack-empty-state'`           | CSS class for empty state                    |
+| `emptyStateMessage`    | `string`              | `'No content blocks available'`        | Message to show in empty state               |
+| `keyField`             | `string`              | `'_metadata.uid'`                      | Custom key field for blocks                  |
+| `autoExtractBlockName` | `boolean`             | `true`                                 | Auto-extract block name from object keys     |
+| `blockNamePrefix`      | `string`              | `''`                                   | Prefix to remove from block names            |
+
+#### Data Structure Support
+
+The component supports two common Contentstack modular block structures:
+
+**Auto-extraction (default):**
+
+```json
+{
+  "components": [
+    {
+      "hero": {
+        "title": "Welcome",
+        "subtitle": "To our site"
+      },
+      "_metadata": { "uid": "hero_123" }
+    },
+    {
+      "grid": {
+        "columns": 3,
+        "items": [...]
+      },
+      "_metadata": { "uid": "grid_456" }
+    }
+  ]
+}
+```
+
+**Content type based:**
+
+```json
+{
+  "modular_blocks": [
+    {
+      "_content_type_uid": "hero_block",
+      "title": "Welcome",
+      "subtitle": "To our site",
+      "_metadata": { "uid": "hero_123" }
+    },
+    {
+      "_content_type_uid": "grid_block",
+      "columns": 3,
+      "items": [...],
+      "_metadata": { "uid": "grid_456" }
+    }
+  ]
+}
+```
+
+#### Component Props
+
+Each rendered component receives:
+
+```typescript
+// Original block props
+{
+  title: "Welcome",
+  subtitle: "To our site",
+  // ... other block fields
+
+  // Additional meta props
+  blockType: "hero",
+  blockMetadata: { uid: "hero_123", ... }
+}
+```
+
+#### Live Preview Integration
+
+The component automatically adds Live Preview attributes:
+
+```html
+<section class="contentstack-modular-blocks">
+  <component
+    :is="Hero"
+    :title="Welcome"
+    data-block-type="hero"
+    data-block-index="0"
+    data-cslp="hero.title"
+  />
+</section>
+```
+
+#### Error Handling
+
+- **Missing components**: Falls back to `fallbackComponent`
+- **Empty blocks**: Shows configurable empty state
+- **Invalid data**: Gracefully handles malformed block data
+- **Missing keys**: Uses index-based keys as fallback
+
+#### `ContentstackFallbackBlock`
+
+The module includes a built-in fallback component that provides a developer-friendly display for unmapped block types. This component automatically:
+
+- **Displays the block title** (from `title`, `name`, `heading`, or `blockType` fields)
+- **Shows the block type** in a styled badge
+- **Renders all props as formatted JSON** in an expandable details section
+- **Provides helpful guidance** on how to map the component properly
+- **Supports dark mode** for better developer experience
+
+**Features:**
+
+- 🎨 **Styled interface** with clear visual hierarchy
+- 📱 **Responsive design** that works on all screen sizes
+- 🌙 **Dark mode support** with `prefers-color-scheme`
+- 🔍 **Collapsible JSON** to avoid cluttering the UI
+- 🛠️ **Developer hints** showing how to fix unmapped components
+
+**Example output:**
+
+```
+┌─────────────────────────────────────┐
+│ Welcome Hero                Type: hero │
+├─────────────────────────────────────┤
+│ ▶ View Props                        │
+│   {                                 │
+│     "title": "Welcome Hero",        │
+│     "subtitle": "Get started now",  │
+│     "cta_text": "Learn More"       │
+│   }                                 │
+├─────────────────────────────────────┤
+│ This is a fallback component.       │
+│ Map "hero" to a proper Vue component│
+└─────────────────────────────────────┘
+```
+
+You can override this by providing your own `fallbackComponent`:
+
+```vue
+<ContentstackModularBlocks
+  :blocks="page.components"
+  :component-map="componentMapping"
+  :fallback-component="MyCustomFallback"
+/>
+```
+
 ## Composables
 
 This module provides several composables for working with Contentstack content. All composables support live preview, personalization, and use Nuxt's caching system.

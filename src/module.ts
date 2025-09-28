@@ -1,4 +1,4 @@
-import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, addServerHandler, addRouteMiddleware } from '@nuxt/kit'
+import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, addServerHandler, addRouteMiddleware, addComponent } from '@nuxt/kit'
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
@@ -309,6 +309,17 @@ export default defineNuxtModule<ModuleOptions>({
 
     addPlugin(resolver.resolve('./runtime/contentstack'))
     addImportsDir(resolver.resolve('./runtime/composables'))
+
+    // Register components
+    addComponent({
+      name: 'ContentstackModularBlocks',
+      filePath: resolver.resolve('./runtime/components/ContentstackModularBlocks.vue'),
+    })
+
+    addComponent({
+      name: 'ContentstackFallbackBlock',
+      filePath: resolver.resolve('./runtime/components/ContentstackFallbackBlock.vue'),
+    })
 
     // Register auto-fetch middleware if enabled
     if (autoFetchConfig.enabled) {
