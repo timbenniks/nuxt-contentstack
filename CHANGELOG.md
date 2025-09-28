@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.41
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.40...v0.0.41)
+
+### 🚀 Enhancements
+
+- Add SEO metadata support to ContentstackModularBlocks and update README with usage examples ([75fb3ae](https://github.com/timbenniks/nuxt-contentstack/commit/75fb3ae))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.40
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.39...v0.0.40)
