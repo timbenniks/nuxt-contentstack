@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.40
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.39...v0.0.40)
+
+### 🚀 Enhancements
+
+- Enhance ContentstackModularBlocks with auto-fetch capability and detailed usage patterns in README ([ec940fd](https://github.com/timbenniks/nuxt-contentstack/commit/ec940fd))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.39
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.38...v0.0.39)
