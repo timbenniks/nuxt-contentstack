@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.42
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.41...v0.0.42)
+
+### 🚀 Enhancements
+
+- Introduce auto-SEO generation in ContentstackModularBlocks with customizable field mapping and update README for new features ([8f5f69d](https://github.com/timbenniks/nuxt-contentstack/commit/8f5f69d))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.41
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.40...v0.0.41)
