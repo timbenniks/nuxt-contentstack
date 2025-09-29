@@ -1,6 +1,18 @@
 # Changelog
 
 
+## v0.0.43
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.42...v0.0.43)
+
+### 🚀 Enhancements
+
+- Add support for @nuxt/image provider in Contentstack module and improve image handling ([e98285c](https://github.com/timbenniks/nuxt-contentstack/commit/e98285c))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.42
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.41...v0.0.42)
