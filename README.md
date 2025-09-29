@@ -935,8 +935,17 @@ npm install @nuxt/image
 export default defineNuxtConfig({
   modules: ["nuxt-contentstack", "@nuxt/image"],
 
-  // Optional: Set Contentstack as default provider
+  // Configure @nuxt/image to use Contentstack provider
   image: {
+    providers: {
+      contentstack: {
+        name: "contentstack",
+        provider:
+          "~/node_modules/nuxt-contentstack/dist/runtime/providers/contentstack",
+        options: {},
+      },
+    },
+    // Optional: Set Contentstack as default provider
     provider: "contentstack",
   },
 });
@@ -944,7 +953,7 @@ export default defineNuxtConfig({
 
 ### Usage
 
-The Contentstack provider automatically registers when both modules are installed. You can use `<NuxtImg>` and `<NuxtPicture>` components directly with Contentstack asset URLs - no need to pass asset UIDs or version UIDs as modifiers:
+Once configured, you can use `<NuxtImg>` and `<NuxtPicture>` components directly with Contentstack asset URLs - no need to pass asset UIDs or version UIDs as modifiers:
 
 ```vue
 <template>
