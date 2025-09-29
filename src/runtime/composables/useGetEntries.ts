@@ -25,7 +25,7 @@ export const useGetEntries = async <T>(options: {
     referenceFieldPath = [],
     jsonRtePath = [],
     locale = 'en-us',
-    replaceHtmlCslp = false,
+    replaceHtmlCslp,
     limit = 10,
     skip = 0,
     orderBy,
@@ -39,6 +39,9 @@ export const useGetEntries = async <T>(options: {
     livePreviewEnabled: boolean
     variantAlias?: { value: string }
   }
+
+  // Only replace CSLP when editableTags is enabled, otherwise use user preference or default to false
+  const shouldReplaceCslp = replaceHtmlCslp ?? editableTags
 
   const cacheKey = `${contentTypeUid}-entries-${locale}-${limit}-${skip}-${JSON.stringify(where)}-${variantAlias?.value ? variantAlias.value : ''}`
 
@@ -136,7 +139,7 @@ export const useGetEntries = async <T>(options: {
       }
 
       let finalEntries: T[] = []
-      if (replaceHtmlCslp && result?.entries) {
+      if (shouldReplaceCslp && result?.entries) {
         finalEntries = result.entries.map(entry => replaceCslp(entry) as T)
       }
       else {

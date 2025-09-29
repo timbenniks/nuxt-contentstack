@@ -92,7 +92,7 @@ Configure `livePreview` object with:
 
 - `enable` - Enable live preview mode
 - `previewToken` - Preview token from Contentstack (starts with "cs", required if enabled)
-- `editableTags` - Add editable tags for visual building
+- `editableTags` - Add editable tags for visual building (also controls automatic CSLP property cleaning)
 - `editButton` - Enable edit button (boolean or detailed config object)
 - `mode` - Live preview mode: 'builder' | 'preview' (default: 'builder')
 - `ssr` - Enable SSR mode (experimental, default: false)

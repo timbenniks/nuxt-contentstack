@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { computed, ref, useSeoMeta } from "#imports";
+import { computed, ref, useSeoMeta, useNuxtApp } from "#imports";
 // @ts-expect-error - Vue SFC import without explicit default export
 import ContentstackFallbackBlock from "./ContentstackFallbackBlock.vue";
 import { useGetEntryByUrl } from "../composables/useGetEntryByUrl";
+import { replaceCslp } from "../utils";
 
 // Types
 interface ContentstackBlock {
@@ -91,7 +92,7 @@ const props = withDefaults(defineProps<Props>(), {
   referenceFieldPath: () => [],
   jsonRtePath: () => [],
   locale: "en-us",
-  replaceHtmlCslp: false,
+  replaceHtmlCslp: undefined,
   blocksFieldPath: "components",
   seoMeta: undefined,
   autoSeoMeta: false,
@@ -168,6 +169,14 @@ function generateSeoFromEntry(
 // Main logic
 const shouldFetchEntry = computed(() => !!(props.contentTypeUid && props.url));
 
+// Get editableTags setting from Contentstack context
+const { editableTags } = useNuxtApp().$contentstack as {
+  editableTags: boolean;
+};
+
+// Only replace CSLP when editableTags is enabled, otherwise use user preference or default to false
+const shouldReplaceCslp = props.replaceHtmlCslp ?? editableTags;
+
 // Initialize entry data
 const entryData = ref(null);
 const entryStatus = ref("success");
@@ -184,7 +193,7 @@ if (shouldFetchEntry.value) {
     referenceFieldPath: props.referenceFieldPath,
     jsonRtePath: props.jsonRtePath,
     locale: props.locale,
-    replaceHtmlCslp: props.replaceHtmlCslp,
+    replaceHtmlCslp: shouldReplaceCslp,
   });
 
   entryData.value = entryResult.data.value as any;
@@ -239,12 +248,18 @@ const processedBlocks = computed((): ProcessedBlock[] => {
 
       if (blockEntry) {
         name = blockEntry[0];
-        blockProps = blockEntry[1] || {};
+        // Only clean CSLP when editableTags is enabled
+        blockProps = editableTags
+          ? (replaceCslp(blockEntry[1] || {}) as Record<string, any>)
+          : blockEntry[1] || {};
       }
     } else {
       // Use _content_type_uid or provided name
       name = block._content_type_uid || "unknown";
-      blockProps = { ...block };
+      // Only clean CSLP when editableTags is enabled
+      blockProps = editableTags
+        ? (replaceCslp({ ...block }) as Record<string, any>)
+        : { ...block };
     }
 
     // Remove prefix if specified

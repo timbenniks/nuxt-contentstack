@@ -22,7 +22,7 @@ export const useGetEntry = async <T>(options: {
     referenceFieldPath = [],
     jsonRtePath = [],
     locale = 'en-us',
-    replaceHtmlCslp = false,
+    replaceHtmlCslp,
   } = options
 
   const { editableTags, stack, livePreviewEnabled, variantAlias } = useNuxtApp().$contentstack as {
@@ -31,6 +31,9 @@ export const useGetEntry = async <T>(options: {
     livePreviewEnabled: boolean
     variantAlias?: { value: string }
   }
+
+  // Only replace CSLP when editableTags is enabled, otherwise use user preference or default to false
+  const shouldReplaceCslp = replaceHtmlCslp ?? editableTags
 
   const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${entryUid}-${locale}-${variantAlias?.value ? variantAlias.value : ''}`, async () => {
     const entryQuery = stack.contentType(contentTypeUid)
@@ -67,7 +70,7 @@ export const useGetEntry = async <T>(options: {
       }
 
       let finalData
-      if (replaceHtmlCslp && result) {
+      if (shouldReplaceCslp && result) {
         finalData = replaceCslp(result)
       }
       else {
