@@ -309,6 +309,7 @@ export default defineNuxtModule<ModuleOptions>({
 
     addPlugin(resolver.resolve('./runtime/contentstack'))
     addImportsDir(resolver.resolve('./runtime/composables'))
+    addImportsDir(resolver.resolve('./runtime/providers'))
 
     // Register components
     addComponent({
@@ -337,40 +338,6 @@ export default defineNuxtModule<ModuleOptions>({
 
       if (debug) {
         logger.success('Contentstack auto-fetch middleware registered')
-      }
-    }
-
-    // Register @nuxt/image provider if @nuxt/image is installed
-    const imageModule = _nuxt.options.modules.find((m: any) =>
-      (typeof m === 'string' && m === '@nuxt/image') ||
-      (Array.isArray(m) && m[0] === '@nuxt/image') ||
-      (typeof m === 'object' && m && 'name' in m && m.name === '@nuxt/image')
-    )
-
-    if (imageModule) {
-      try {
-        // Ensure image configuration exists (with type assertion)
-        if (!(_nuxt.options as any).image) {
-          (_nuxt.options as any).image = {}
-        }
-        if (!(_nuxt.options as any).image.providers) {
-          (_nuxt.options as any).image.providers = {}
-        }
-
-        // Register our provider directly in the image config
-        (_nuxt.options as any).image.providers.contentstack = {
-          name: 'contentstack',
-          provider: resolver.resolve('./runtime/providers/contentstack'),
-          options: {},
-        }
-
-        if (debug) {
-          logger.success('Contentstack @nuxt/image provider registered')
-        }
-      } catch (error) {
-        if (debug) {
-          logger.warn('Could not register @nuxt/image provider:', error)
-        }
       }
     }
 

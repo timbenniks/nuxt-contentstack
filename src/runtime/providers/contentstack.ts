@@ -1,4 +1,5 @@
 import { joinURL } from "ufo";
+import type { ProviderGetImage } from '@nuxt/image'
 
 // Create a simple URL builder that works without @nuxt/image dependencies
 function buildParams(modifiers: Record<string, any>): string {
@@ -44,9 +45,9 @@ function buildParams(modifiers: Record<string, any>): string {
   return params.toString();
 }
 
-const getImage = (
+const getImage: ProviderGetImage = (
   src: string,
-  { modifiers = {}, baseURL = "/" }: { modifiers?: Record<string, any>; baseURL?: string } = {}
+  { modifiers = {}, baseURL = "/" } = {}
 ) => {
   // Ensure src is a string
   if (typeof src !== 'string') {
@@ -91,5 +92,8 @@ const getImage = (
   };
 };
 
-// Named export is required for @nuxt/image
+// Default export is required for @nuxt/image providers in Nuxt 4
+export default getImage
+
+// Also export named for backwards compatibility
 export { getImage }
