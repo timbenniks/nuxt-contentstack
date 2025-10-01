@@ -941,7 +941,7 @@ export default defineNuxtConfig({
       contentstack: {
         name: "contentstack",
         provider:
-          "~/node_modules/nuxt-contentstack/dist/runtime/providers/contentstack",
+          "node_modules/nuxt-contentstack/dist/runtime/providers/contentstack",
         options: {},
       },
     },
