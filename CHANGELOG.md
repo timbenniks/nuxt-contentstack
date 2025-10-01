@@ -1,5 +1,26 @@
 # Changelog
 
+## v0.0.44
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.43...v0.0.44)
+
+### 🚀 Enhancements
+
+- Enhance CSLP handling in Contentstack module by integrating editableTags logic and update README for clarity ([9aec2b9](https://github.com/timbenniks/nuxt-contentstack/commit/9aec2b9))
+- Update README to clarify configuration of @nuxt/image with Contentstack provider and usage instructions ([1de1ef3](https://github.com/timbenniks/nuxt-contentstack/commit/1de1ef3))
+
+### 💅 Refactors
+
+- Remove route-based content fetching section and Nuxt DevTools integration details from README for clarity and conciseness ([46dda6f](https://github.com/timbenniks/nuxt-contentstack/commit/46dda6f))
+
+### 🏡 Chore
+
+- Update CHANGELOG and version to v0.0.43, disable Nuxt DevTools integration, and remove auto-fetch feature from the Contentstack module ([62a9d88](https://github.com/timbenniks/nuxt-contentstack/commit/62a9d88))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.43
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.42...v0.0.43)
