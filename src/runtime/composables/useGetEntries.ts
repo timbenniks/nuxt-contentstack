@@ -1,8 +1,8 @@
-import contentstack from '@contentstack/delivery-sdk'
+import contentstack, { type LivePreviewQuery } from '@contentstack/delivery-sdk'
 import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
 import { toRaw } from 'vue'
-import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
+import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
 import { replaceCslp } from '../utils'
 
 /**
@@ -46,6 +46,13 @@ export const useGetEntries = async <T>(options: {
   const cacheKey = `${contentTypeUid}-entries-${locale}-${limit}-${skip}-${JSON.stringify(where)}-${variantAlias?.value ? variantAlias.value : ''}`
 
   const { data, status, refresh } = await useAsyncData(cacheKey, async () => {
+    const route = useRoute()
+    const qs = { ...toRaw(route.query) }
+
+    if (livePreviewEnabled && qs?.live_preview) {
+      stack.livePreviewQuery(qs as unknown as LivePreviewQuery)
+    }
+
     const entriesQuery = stack.contentType(contentTypeUid)
       .entry()
       .locale(locale)

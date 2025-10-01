@@ -7,7 +7,7 @@ import { getRegionForString } from '@timbenniks/contentstack-endpoints'
 import type { StackConfig } from '@contentstack/delivery-sdk'
 import type { LivePreviewSdkOptions, DeliverySdkOptions, PersonalizeSdkOptions } from './utils'
 import { VB_EmptyBlockParentClass } from '@contentstack/live-preview-utils'
-import { trackDevToolsLivePreview } from './devtools/utils'
+import { toRaw } from 'vue'
 
 // Utility function
 function convertToStackConfig(options: DeliverySdkOptions): StackConfig {
@@ -29,7 +29,7 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
     personalizeSdkOptions: PersonalizeSdkOptions
   }
 
-  const stack = contentstack.stack(convertToStackConfig(deliverySdkOptions))
+  const stack = contentstack.stack(convertToStackConfig(toRaw(deliverySdkOptions)))
   const livePreviewEnabled = deliverySdkOptions?.live_preview?.enable
   const { editableTags } = livePreviewSdkOptions
   const { enable: personalizationEnabled, host: personalizationHost, projectUid: personalizationProjectUid } = personalizeSdkOptions
@@ -42,55 +42,6 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
         apiKey: deliverySdkOptions.apiKey,
         environment: deliverySdkOptions.environment,
       },
-    })
-
-    // Track Live Preview initialization for DevTools
-    trackDevToolsLivePreview({
-      type: 'initialization',
-      connected: true,
-      enabled: true,
-      mode: livePreviewSdkOptions.mode || 'builder',
-      timestamp: new Date().toISOString()
-    })
-
-    // Listen for Live Preview events
-    if (typeof ContentstackLivePreview.onEntryChange === 'function') {
-      const originalOnEntryChange = ContentstackLivePreview.onEntryChange
-      ContentstackLivePreview.onEntryChange = (callback: any) => {
-        const wrappedCallback = (...args: any[]) => {
-          const data = args[0]
-          // Track the Live Preview update
-          trackDevToolsLivePreview({
-            type: 'entry_updated',
-            uid: data?.uid || 'unknown',
-            content_type: data?.content_type_uid || 'unknown',
-            action: 'updated',
-            timestamp: new Date().toISOString()
-          })
-
-          // Call the original callback with all arguments
-          return callback(...args)
-        }
-        return originalOnEntryChange(wrappedCallback)
-      }
-    }
-  } else if (livePreviewEnabled) {
-    // Live Preview is enabled but we're on server side
-    trackDevToolsLivePreview({
-      type: 'status',
-      connected: false,
-      enabled: true,
-      mode: livePreviewSdkOptions.mode || 'builder',
-      timestamp: new Date().toISOString()
-    })
-  } else {
-    // Live Preview is disabled
-    trackDevToolsLivePreview({
-      type: 'status',
-      connected: false,
-      enabled: false,
-      mode: 'preview',
-      timestamp: new Date().toISOString()
     })
   }
 

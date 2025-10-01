@@ -23,6 +23,7 @@ export default createConfigForNuxt({
       "@typescript-eslint/no-unsafe-return": "off",
       "@typescript-eslint/no-unsafe-argument": "off",
       "vue/no-v-html": "off",
+      "vue/multi-word-component-names": "off",
     },
   }
 );

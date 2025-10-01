@@ -1,12 +1,9 @@
 export default defineNuxtConfig({
   'compatibilityDate': '2025-08-31',
   'devtools': {
-    enabled: true,
-    timeline: {
-      enabled: true
-    }
+    enabled: false,
   },
-  'modules': ['../src/module', '@nuxt/image', '@nuxt/devtools'],
+  'modules': ['@nuxt/image', '../src/module', '@nuxt/devtools'],
 
   'nuxt-contentstack': {
     // Required core settings
@@ -25,52 +22,19 @@ export default defineNuxtConfig({
       previewToken: process.env.NUXT_CONTENTSTACK_PREVIEW_TOKEN as string,
       editableTags: true,
       editButton: true,
-      mode: 'builder'
+      mode: 'builder',
+      ssr: false
     },
 
-    // Personalization settings (simplified)
-    personalization: {
-      enable: false,
-      // projectUid: 'your-project-uid'
-    },
-
-    // Route-based content fetching (new feature)
-    autoFetch: {
-      enabled: true,
-
-      // Include specific routes for auto-fetching
-      include: [
-        '/',
-      ],
-
-      // Exclude admin and API routes
-      exclude: [
-        '/admin/**',
-        '/api/**',
-        '/_nuxt/**'
-      ],
-
-      // Map routes to content types
-      contentTypeMapping: {
-        '/': 'page',
-      },
-
-      // Additional options
-      options: {
-        locale: 'en-us',
-        includeReferences: [],
-        includeFallback: true,
-        cacheKey: 'auto-fetch',
-        errorHandling: 'log'
-      }
-    },
-
-    // General settings
     debug: true
   },
 
-  // Configure @nuxt/image to use Contentstack provider by default
   image: {
-    provider: 'contentstack', // Will be registered by the module
-  },
+    providers: {
+      contentstack: {
+        name: 'contentstack',
+        provider: '../dist/runtime/providers/contentstack.ts'
+      }
+    }
+  }
 })

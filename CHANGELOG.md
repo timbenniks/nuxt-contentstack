@@ -1,6 +1,5 @@
 # Changelog
 
-
 ## v0.0.43
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.42...v0.0.43)
@@ -104,14 +103,6 @@
 ## v0.0.30
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.29...v0.0.30)
-
-### 🚀 Enhancements
-
-- Add Nuxt DevTools integration for Contentstack ([306787e](https://github.com/timbenniks/nuxt-contentstack/commit/306787e))
-
-### 🩹 Fixes
-
-- Improve DevTools integration and error handling ([373da76](https://github.com/timbenniks/nuxt-contentstack/commit/373da76))
 
 ### 📖 Documentation
 
@@ -356,4 +347,3 @@
 [compare changes](https://github.com/timbenniks/contentstack/compare/v0.0.3...v0.0.4)
 
 ## v0.0.3
-

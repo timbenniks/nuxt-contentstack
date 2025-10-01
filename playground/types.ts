@@ -27,14 +27,14 @@ export interface File {
   title: string
   _metadata?: object
   publish_details: PublishDetails
-  $: any
+  cslp: any
 }
 
 // Block object - Represents a modular block in Contentstack
 export interface Block {
   _version?: number
   _metadata: any
-  $: any
+  cslp: any
   title?: string
   copy?: string
   image?: File | null
