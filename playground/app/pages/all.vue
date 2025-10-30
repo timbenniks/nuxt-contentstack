@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import type { Page, File } from "./types";
+import type { Page, File } from "../../types";
 
 const pageUid = "blte55cf3411ecaee0e";
 const imageUid = "bltef1ad5f7d7008800";

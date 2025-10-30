@@ -1,6 +1,5 @@
 <script lang="ts" setup>
-// @ts-expect-error - Vue SFC import without explicit default export
-import blockItem from "../components/BlockItem.vue";
+import blockItem from "./BlockItem.vue";
 
 const componentMap = {
   block: blockItem,
