@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.0.46
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.44...v0.0.46)
+
+### 📖 Documentation
+
+- Update README and ContentstackModularBlocks component to clarify default auto-fetch settings for contentTypeUid and url ([5381931](https://github.com/timbenniks/nuxt-contentstack/commit/5381931))
+
+### 🏡 Chore
+
+- **release:** V0.0.45 - Update dependencies and improve README for clarity ([8396849](https://github.com/timbenniks/nuxt-contentstack/commit/8396849))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.44
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.43...v0.0.44)
