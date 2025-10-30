@@ -280,7 +280,7 @@ updateTransform({ width: 1200, quality: 90 });
 
 ### `ContentstackModularBlocks`
 
-Renders Contentstack modular blocks as Vue components with auto-fetch capability.
+Renders Contentstack modular blocks as Vue components with auto-fetch capability. By default, auto-fetch is enabled with `contentTypeUid: 'page'` and `url: '/'`. To disable auto-fetch when using pre-fetched blocks, set these props to `undefined`.
 
 **Pattern 1: Auto-fetch Entry**
 
@@ -340,8 +340,8 @@ const componentMapping = {
 | `blocks`               | `ContentstackBlock[]`               | `[]`                                   | Array of modular blocks               |
 | `componentMap`         | `ComponentMapping`                  | `{}`                                   | Block type → Vue component mapping    |
 | `fallbackComponent`    | `Component`                         | `ContentstackFallbackBlock`            | Component for unmapped blocks         |
-| `contentTypeUid`       | `string`                            | -                                      | Content type for auto-fetch           |
-| `url`                  | `string`                            | -                                      | URL for auto-fetch                    |
+| `contentTypeUid`       | `string`                            | `'page'`                               | Content type for auto-fetch           |
+| `url`                  | `string`                            | `'/'`                                  | URL for auto-fetch                    |
 | `blocksFieldPath`      | `string`                            | `'components'`                         | Field path to extract blocks          |
 | `referenceFieldPath`   | `string[]`                          | `[]`                                   | Reference fields to include           |
 | `jsonRtePath`          | `string[]`                          | `[]`                                   | JSON RTE field paths                  |

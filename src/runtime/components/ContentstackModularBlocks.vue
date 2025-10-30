@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, useSeoMeta, useNuxtApp } from "#imports";
-// @ts-expect-error - Vue SFC import without explicit default export
 import ContentstackFallbackBlock from "./ContentstackFallbackBlock.vue";
 import { useGetEntryByUrl } from "../composables/useGetEntryByUrl";
 import { replaceCslp } from "../utils";
@@ -89,6 +88,8 @@ const props = withDefaults(defineProps<Props>(), {
   keyField: "_metadata.uid",
   autoExtractBlockName: true,
   blockNamePrefix: "",
+  contentTypeUid: "page",
+  url: "/",
   referenceFieldPath: () => [],
   jsonRtePath: () => [],
   locale: "en-us",
