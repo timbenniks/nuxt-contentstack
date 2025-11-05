@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.0.47
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.46...v0.0.47)
+
+### 📖 Documentation
+
+- Update README and ContentstackModularBlocks component to reflect changes in auto-fetch default settings and prop requirements ([f7a2217](https://github.com/timbenniks/nuxt-contentstack/commit/f7a2217))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.46
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.44...v0.0.46)
