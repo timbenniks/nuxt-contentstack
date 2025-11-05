@@ -88,8 +88,6 @@ const props = withDefaults(defineProps<Props>(), {
   keyField: "_metadata.uid",
   autoExtractBlockName: true,
   blockNamePrefix: "",
-  contentTypeUid: "page",
-  url: "/",
   referenceFieldPath: () => [],
   jsonRtePath: () => [],
   locale: "en-us",

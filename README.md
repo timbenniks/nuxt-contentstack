@@ -280,7 +280,7 @@ updateTransform({ width: 1200, quality: 90 });
 
 ### `ContentstackModularBlocks`
 
-Renders Contentstack modular blocks as Vue components with auto-fetch capability. By default, auto-fetch is enabled with `contentTypeUid: 'page'` and `url: '/'`. To disable auto-fetch when using pre-fetched blocks, set these props to `undefined`.
+Renders Contentstack modular blocks as Vue components with optional auto-fetch capability. Auto-fetch is disabled by default. To enable auto-fetch, provide both `contentTypeUid` and `url` props. When using pre-fetched blocks, pass blocks via the `blocks` prop without providing `contentTypeUid` or `url`.
 
 **Pattern 1: Auto-fetch Entry**
 
@@ -340,8 +340,8 @@ const componentMapping = {
 | `blocks`               | `ContentstackBlock[]`               | `[]`                                   | Array of modular blocks               |
 | `componentMap`         | `ComponentMapping`                  | `{}`                                   | Block type → Vue component mapping    |
 | `fallbackComponent`    | `Component`                         | `ContentstackFallbackBlock`            | Component for unmapped blocks         |
-| `contentTypeUid`       | `string`                            | `'page'`                               | Content type for auto-fetch           |
-| `url`                  | `string`                            | `'/'`                                  | URL for auto-fetch                    |
+| `contentTypeUid`       | `string`                            | `undefined`                            | Content type for auto-fetch (required if using auto-fetch) |
+| `url`                  | `string`                            | `undefined`                            | URL for auto-fetch (required if using auto-fetch) |
 | `blocksFieldPath`      | `string`                            | `'components'`                         | Field path to extract blocks          |
 | `referenceFieldPath`   | `string[]`                          | `[]`                                   | Reference fields to include           |
 | `jsonRtePath`          | `string[]`                          | `[]`                                   | JSON RTE field paths                  |
