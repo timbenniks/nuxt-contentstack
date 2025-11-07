@@ -196,6 +196,27 @@ export default defineNuxtModule<ModuleOptions>({
       }
     })
 
+    // Configure Vite resolve to prefer ESM over CommonJS
+    _nuxt.options.vite.resolve = _nuxt.options.vite.resolve || {}
+    _nuxt.options.vite.resolve.conditions = _nuxt.options.vite.resolve.conditions || []
+    if (!_nuxt.options.vite.resolve.conditions.includes('import')) {
+      _nuxt.options.vite.resolve.conditions.unshift('import', 'module')
+    }
+
+    // Ensure proper resolution of Contentstack packages
+    _nuxt.options.vite.resolve.mainFields = _nuxt.options.vite.resolve.mainFields || ['module', 'main']
+    if (!_nuxt.options.vite.resolve.mainFields.includes('module')) {
+      _nuxt.options.vite.resolve.mainFields.unshift('module')
+    }
+
+    // Configure esbuild options for better CommonJS handling
+    _nuxt.options.vite.optimizeDeps.esbuildOptions = _nuxt.options.vite.optimizeDeps.esbuildOptions || {}
+    _nuxt.options.vite.optimizeDeps.esbuildOptions.platform = 'browser'
+    _nuxt.options.vite.optimizeDeps.esbuildOptions.format = 'esm'
+
+    // Ensure proper package resolution by configuring Vite to handle @contentstack/core
+    // The resolve.conditions and mainFields above should handle ESM preference
+
     // Force ESM for these packages in SSR
     _nuxt.options.vite.ssr = _nuxt.options.vite.ssr || {}
     if (!_nuxt.options.vite.ssr.noExternal) {
