@@ -1,5 +1,5 @@
-import contentstack, { type LivePreviewQuery } from '@contentstack/delivery-sdk'
-import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-preview-utils'
+import contentstack, { type LivePreviewQuery, type Stack } from '@contentstack/delivery-sdk'
+import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
 import { toRaw } from 'vue'
 import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
@@ -34,15 +34,14 @@ export const useGetEntries = async <T>(options: {
   } = options
 
   const { editableTags, stack, livePreviewEnabled, variantAlias } = useNuxtApp().$contentstack as {
-    editableTags: boolean
-    stack: IStackSdk
+    stack: Stack
     livePreviewEnabled: boolean
+    editableTags: boolean
     variantAlias?: { value: string }
   }
 
   // Only replace CSLP when editableTags is enabled, otherwise use user preference or default to false
   const shouldReplaceCslp = replaceHtmlCslp ?? editableTags
-
   const cacheKey = `${contentTypeUid}-entries-${locale}-${limit}-${skip}-${JSON.stringify(where)}-${variantAlias?.value ? variantAlias.value : ''}`
 
   const { data, status, refresh } = await useAsyncData(cacheKey, async () => {
@@ -53,82 +52,88 @@ export const useGetEntries = async <T>(options: {
       stack.livePreviewQuery(qs as unknown as LivePreviewQuery)
     }
 
-    const entriesQuery = stack.contentType(contentTypeUid)
+    // Build Entries object with configuration methods
+    const entriesBuilder = stack.contentType(contentTypeUid)
       .entry()
       .locale(locale)
       .includeFallback()
       .includeEmbeddedItems()
-      .limit(limit)
-      .skip(skip)
 
     if (variantAlias && variantAlias.value !== '') {
       const variants = toRaw(variantAlias.value)
-      entriesQuery.addParams({ include_applied_variants: true })
-      entriesQuery.addParams({ include_dimension: true })
-      entriesQuery.variants(variants)
+      entriesBuilder.addParams({ include_applied_variants: true })
+      entriesBuilder.addParams({ include_dimension: true })
+      entriesBuilder.variants(variants)
     }
 
     if (referenceFieldPath && referenceFieldPath.length > 0) {
       for (const path of referenceFieldPath) {
-        entriesQuery.includeReference(path)
+        entriesBuilder.includeReference(path)
       }
     }
 
+    // Get Query object for query operations
+    const query = entriesBuilder.query()
+
+    // Apply pagination and ordering on Query object
+    query.limit(limit)
+    query.skip(skip)
+
     if (orderBy) {
-      entriesQuery.orderByAscending(orderBy)
+      query.orderByAscending(orderBy)
     }
 
     if (includeCount) {
-      entriesQuery.includeCount()
+      query.includeCount()
     }
 
-    // Apply where conditions
+    // Apply where conditions on Query object
     for (const [field, value] of Object.entries(where)) {
       if (Array.isArray(value)) {
-        entriesQuery.containedIn(field, value)
+        query.containedIn(field, value)
       }
       else if (typeof value === 'object' && value !== null) {
         // Handle complex queries like { $gt: 5 }, { $exists: true }, etc.
         for (const [operator, operatorValue] of Object.entries(value)) {
           switch (operator) {
             case '$gt':
-              entriesQuery.greaterThan(field, operatorValue)
+              query.greaterThan(field, operatorValue as string | number)
               break
             case '$gte':
-              entriesQuery.greaterThanOrEqualTo(field, operatorValue)
+              query.greaterThanOrEqualTo(field, operatorValue as string | number)
               break
             case '$lt':
-              entriesQuery.lessThan(field, operatorValue)
+              query.lessThan(field, operatorValue as string | number)
               break
             case '$lte':
-              entriesQuery.lessThanOrEqualTo(field, operatorValue)
+              query.lessThanOrEqualTo(field, operatorValue as string | number)
               break
             case '$ne':
-              entriesQuery.notEqualTo(field, operatorValue)
+              query.notEqualTo(field, operatorValue as string | number | boolean)
               break
             case '$exists':
               if (operatorValue) {
-                entriesQuery.exists(field)
+                query.exists(field)
               }
               else {
-                entriesQuery.notExists(field)
+                query.notExists(field)
               }
               break
             case '$regex':
-              entriesQuery.regex(field, operatorValue)
+              query.regex(field, operatorValue as string)
               break
             default:
-              entriesQuery.equalTo(field, operatorValue)
+              query.equalTo(field, operatorValue as string | number | boolean)
           }
         }
       }
       else {
-        entriesQuery.equalTo(field, value)
+        query.equalTo(field, value)
       }
     }
 
     try {
-      const result = await entriesQuery.find() as { entries: EmbeddedItem[]; count?: number }
+      const result = await query.find() as { entries: EmbeddedItem[]; count?: number }
 
       if (jsonRtePath && jsonRtePath.length > 0 && result?.entries) {
         result.entries.forEach((entry) => {

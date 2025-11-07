@@ -1,6 +1,6 @@
-import type { IStackSdk } from '@contentstack/live-preview-utils'
 import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
+import type { Stack } from '@contentstack/delivery-sdk'
 
 /**
  * Composable to fetch multiple assets with optional filtering
@@ -23,7 +23,7 @@ export const useGetAssets = async <T = any>(options: {
   } = options
 
   const { stack, livePreviewEnabled } = useNuxtApp().$contentstack as {
-    stack: IStackSdk
+    stack: Stack
     livePreviewEnabled: boolean
   }
 

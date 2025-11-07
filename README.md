@@ -15,6 +15,23 @@ Contentstack integration for Nuxt.
 
 > Notice: This is an OSS project by @timbenniks and _not_ an officially maintained package by the Contentstack team. Support requests can come through Github issues and via direct channels to @timbenniks.
 
+## Requirements
+
+This module requires:
+
+- **Nuxt** `3.20.1` or higher (including Nuxt 4.x)
+- **@nuxt/image** `^2.0.0` (required for image provider functionality)
+
+Make sure to install these dependencies in your project:
+
+```bash
+npm install nuxt@^3.20.1 @nuxt/image@^2.0.0
+# or
+pnpm add nuxt@^3.20.1 @nuxt/image@^2.0.0
+# or
+yarn add nuxt@^3.20.1 @nuxt/image@^2.0.0
+```
+
 ## Features
 
 - Complete set of Vue composables (entries, assets, by URL)
@@ -335,25 +352,25 @@ const componentMapping = {
 
 ### Props
 
-| Prop                   | Type                                | Default                                | Description                           |
-| ---------------------- | ----------------------------------- | -------------------------------------- | ------------------------------------- |
-| `blocks`               | `ContentstackBlock[]`               | `[]`                                   | Array of modular blocks               |
-| `componentMap`         | `ComponentMapping`                  | `{}`                                   | Block type → Vue component mapping    |
-| `fallbackComponent`    | `Component`                         | `ContentstackFallbackBlock`            | Component for unmapped blocks         |
+| Prop                   | Type                                | Default                                | Description                                                |
+| ---------------------- | ----------------------------------- | -------------------------------------- | ---------------------------------------------------------- |
+| `blocks`               | `ContentstackBlock[]`               | `[]`                                   | Array of modular blocks                                    |
+| `componentMap`         | `ComponentMapping`                  | `{}`                                   | Block type → Vue component mapping                         |
+| `fallbackComponent`    | `Component`                         | `ContentstackFallbackBlock`            | Component for unmapped blocks                              |
 | `contentTypeUid`       | `string`                            | `undefined`                            | Content type for auto-fetch (required if using auto-fetch) |
-| `url`                  | `string`                            | `undefined`                            | URL for auto-fetch (required if using auto-fetch) |
-| `blocksFieldPath`      | `string`                            | `'components'`                         | Field path to extract blocks          |
-| `referenceFieldPath`   | `string[]`                          | `[]`                                   | Reference fields to include           |
-| `jsonRtePath`          | `string[]`                          | `[]`                                   | JSON RTE field paths                  |
-| `locale`               | `string`                            | `'en-us'`                              | Locale                                |
-| `replaceHtmlCslp`      | `boolean`                           | `editableTags`                         | Replace HTML CSLP tags                |
-| `seoMeta`              | `SeoMetaInput`                      | -                                      | SEO metadata (passed to `useSeoMeta`) |
-| `autoSeoMeta`          | `boolean \| Record<string, string>` | `false`                                | Auto-generate SEO from entry          |
-| `containerClass`       | `string`                            | `'contentstack-modular-blocks'`        | Container CSS class                   |
-| `emptyBlockClass`      | `string`                            | `'visual-builder__empty-block-parent'` | Empty block CSS class                 |
-| `showEmptyState`       | `boolean`                           | `true`                                 | Show empty state                      |
-| `keyField`             | `string`                            | `'_metadata.uid'`                      | Key field for blocks                  |
-| `autoExtractBlockName` | `boolean`                           | `true`                                 | Auto-extract block name               |
+| `url`                  | `string`                            | `undefined`                            | URL for auto-fetch (required if using auto-fetch)          |
+| `blocksFieldPath`      | `string`                            | `'components'`                         | Field path to extract blocks                               |
+| `referenceFieldPath`   | `string[]`                          | `[]`                                   | Reference fields to include                                |
+| `jsonRtePath`          | `string[]`                          | `[]`                                   | JSON RTE field paths                                       |
+| `locale`               | `string`                            | `'en-us'`                              | Locale                                                     |
+| `replaceHtmlCslp`      | `boolean`                           | `editableTags`                         | Replace HTML CSLP tags                                     |
+| `seoMeta`              | `SeoMetaInput`                      | -                                      | SEO metadata (passed to `useSeoMeta`)                      |
+| `autoSeoMeta`          | `boolean \| Record<string, string>` | `false`                                | Auto-generate SEO from entry                               |
+| `containerClass`       | `string`                            | `'contentstack-modular-blocks'`        | Container CSS class                                        |
+| `emptyBlockClass`      | `string`                            | `'visual-builder__empty-block-parent'` | Empty block CSS class                                      |
+| `showEmptyState`       | `boolean`                           | `true`                                 | Show empty state                                           |
+| `keyField`             | `string`                            | `'_metadata.uid'`                      | Key field for blocks                                       |
+| `autoExtractBlockName` | `boolean`                           | `true`                                 | Auto-extract block name                                    |
 
 ### SEO Metadata
 
@@ -403,10 +420,14 @@ Built-in fallback component for unmapped block types. Displays block title, type
 
 ## @nuxt/image Integration
 
+> **Note:** This module requires `@nuxt/image` version 2.0.0 or higher. Make sure you have it installed before using the Contentstack image provider.
+
 ### Setup
 
+The `@nuxt/image` module should already be installed as a peer dependency. If not, install it:
+
 ```bash
-npm install @nuxt/image
+npm install @nuxt/image@^2.0.0
 ```
 
 ```ts

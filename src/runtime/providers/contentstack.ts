@@ -1,5 +1,12 @@
 import { joinURL } from "ufo";
-import type { ProviderGetImage } from '@nuxt/image'
+import { defineProvider } from '@nuxt/image/runtime';
+import type { ImageModifiers } from '@nuxt/image'
+
+// Define custom modifiers for Contentstack provider
+interface ContentstackModifiers extends ImageModifiers {
+  assetuid?: string
+  versionuid?: string
+}
 
 // Create a simple URL builder that works without @nuxt/image dependencies
 function buildParams(modifiers: Record<string, any>): string {
@@ -45,9 +52,9 @@ function buildParams(modifiers: Record<string, any>): string {
   return params.toString();
 }
 
-const getImage: ProviderGetImage = (
+const getImage = (
   src: string,
-  { modifiers = {}, baseURL = "/" } = {}
+  { modifiers = {}, baseURL = "/" }: { modifiers?: Partial<ContentstackModifiers>; baseURL?: string } = {}
 ) => {
   // Ensure src is a string
   if (typeof src !== 'string') {
@@ -62,13 +69,14 @@ const getImage: ProviderGetImage = (
   }
 
   // Handle asset-specific modifiers
-  const { assetuid, versionuid, ...imageModifiers } = modifiers;
+  const { assetuid, versionuid, ...imageModifiers } = modifiers as ContentstackModifiers;
 
-  // Add automatic optimization defaults
-  const enhancedModifiers = {
-    auto: "webp,compress",
-    quality: 80,
-    ...imageModifiers, // User modifiers override defaults
+  // Add automatic optimization defaults (only if not already set)
+  // Use Record<string, any> since we're building URL params that may include Contentstack-specific options
+  const enhancedModifiers: Record<string, any> = {
+    ...imageModifiers, // User modifiers first
+    auto: (imageModifiers as any).auto ?? "webp,compress",
+    quality: imageModifiers.quality ?? 80,
   };
 
   const operations = buildParams(enhancedModifiers);
@@ -92,8 +100,10 @@ const getImage: ProviderGetImage = (
   };
 };
 
-// Default export is required for @nuxt/image providers in Nuxt 4
-export default getImage
+// Export provider using defineProvider (v2 format) with typed modifiers
+export default defineProvider<ContentstackModifiers>({
+  getImage
+})
 
 // Also export named for backwards compatibility
 export { getImage }

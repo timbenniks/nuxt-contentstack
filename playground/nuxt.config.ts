@@ -10,7 +10,7 @@ export default defineNuxtConfig({
     apiKey: process.env.NUXT_CONTENTSTACK_API_KEY as string,
     deliveryToken: process.env.NUXT_CONTENTSTACK_DELIVERY_TOKEN as string,
     environment: process.env.NUXT_CONTENTSTACK_ENVIRONMENT as string,
-    region: 'eu',
+    region: process.env.NUXT_CONTENTSTACK_REGION as string,
 
     // Optional core settings
     branch: 'main',

@@ -2,7 +2,8 @@ import { defineNuxtModule, addPlugin, addImportsDir, createResolver, useLogger, 
 import { defu } from 'defu'
 import chalk from 'chalk'
 import { name, version } from '../package.json'
-import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions, type Region } from './runtime/utils'
+import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions } from './runtime/utils'
+import type { RegionInput } from '@timbenniks/contentstack-endpoints'
 
 // Simplified, developer-friendly configuration
 export interface ModuleOptions {
@@ -10,9 +11,10 @@ export interface ModuleOptions {
   apiKey: string
   deliveryToken: string
   environment: string
-  region?: Region
+  region?: RegionInput
   branch?: string
   locale?: string
+  host?: string,
 
   // Live Preview settings (simplified)
   livePreview?: {
@@ -26,7 +28,8 @@ export interface ModuleOptions {
       includeByQueryParameter?: boolean
     }
     mode?: 'builder' | 'preview'
-    ssr?: boolean
+    ssr?: boolean,
+    host?: string
   }
 
   // Personalization settings (simplified)
@@ -57,7 +60,8 @@ function transformModuleOptions(options: ModuleOptions): {
     locale = 'en-us',
     livePreview = {},
     personalization = {},
-    debug = false
+    debug = false,
+    host,
   } = options
 
   // Build Delivery SDK options
@@ -68,6 +72,7 @@ function transformModuleOptions(options: ModuleOptions): {
     region,
     branch,
     locale,
+    host: host || getURLsforRegion(region).contentDelivery,
     live_preview: {
       enable: livePreview.enable || false,
       host: '', // Will be set automatically based on region
@@ -92,7 +97,7 @@ function transformModuleOptions(options: ModuleOptions): {
     debug: debug,
     mode: livePreview.mode || 'builder',
     clientUrlParams: {
-      host: '', // Will be set automatically based on region
+      host: livePreview.host || getURLsforRegion(region).application,
     },
     editButton: editButtonConfig,
   }
@@ -122,7 +127,7 @@ export default defineNuxtModule<ModuleOptions>({
     configKey: name,
     docs: 'https://github.com/timbenniks/nuxt-contentstack',
     compatibility: {
-      nuxt: '>=4',
+      nuxt: '>=3.20.1'
     },
   },
 

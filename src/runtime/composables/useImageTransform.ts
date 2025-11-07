@@ -1,5 +1,4 @@
 import { ref, computed, readonly } from 'vue'
-
 export interface ImageTransformOptions {
   auto?: 'webp' | 'webp,compress'
   quality?: number

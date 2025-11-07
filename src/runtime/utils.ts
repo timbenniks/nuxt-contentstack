@@ -1,13 +1,8 @@
 import type { StackConfig } from '@contentstack/delivery-sdk'
-import {
-  getRegionForString,
-  getContentstackEndpoints,
-} from '@timbenniks/contentstack-endpoints'
-
-export type Region = 'us' | 'eu' | 'au' | 'azure-na' | 'azure-eu' | 'gcp-na' | 'gcp-eu'
-
+import { getContentstackEndpoints } from '@timbenniks/contentstack-endpoints'
+import type { RegionInput } from '@timbenniks/contentstack-endpoints'
 export type DeliverySdkOptions = Omit<StackConfig, 'region'> & {
-  region?: Region
+  region?: RegionInput
 }
 
 export type LivePreviewSdkOptions = {
@@ -35,8 +30,8 @@ export type PersonalizeSdkOptions = {
   host?: string
 }
 
-export function getURLsforRegion(region?: Region) {
-  return getContentstackEndpoints(getRegionForString(region || 'eu'), true)
+export function getURLsforRegion(region: RegionInput = 'na') {
+  return getContentstackEndpoints(region, true)
 }
 
 /**

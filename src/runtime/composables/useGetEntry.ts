@@ -1,5 +1,5 @@
-import contentstack, { type LivePreviewQuery } from '@contentstack/delivery-sdk'
-import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-preview-utils'
+import contentstack, { type LivePreviewQuery, type Stack } from '@contentstack/delivery-sdk'
+import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
 import { toRaw } from 'vue'
 import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
@@ -26,9 +26,9 @@ export const useGetEntry = async <T>(options: {
   } = options
 
   const { editableTags, stack, livePreviewEnabled, variantAlias } = useNuxtApp().$contentstack as {
-    editableTags: boolean
-    stack: IStackSdk
+    stack: Stack
     livePreviewEnabled: boolean
+    editableTags: boolean
     variantAlias?: { value: string }
   }
 
@@ -51,8 +51,8 @@ export const useGetEntry = async <T>(options: {
 
     if (variantAlias && variantAlias.value !== '') {
       const variants = toRaw(variantAlias.value)
-      entryQuery.addParams({ include_applied_variants: true })
-      entryQuery.addParams({ include_dimension: true })
+      entryQuery.addParams({ "include_applied_variants": "true" })
+      entryQuery.addParams({ "include_dimension": "true" })
       entryQuery.variants(variants)
     }
 
