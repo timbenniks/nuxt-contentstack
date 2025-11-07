@@ -168,6 +168,7 @@ export default defineNuxtModule<ModuleOptions>({
     const commonJSDeps = [
       '@contentstack/utils',
       '@contentstack/delivery-sdk',
+      '@contentstack/core',
       '@contentstack/live-preview-utils',
       '@contentstack/personalize-edge-sdk',
       'classnames',
