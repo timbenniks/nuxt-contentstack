@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.2
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.1...v0.1.2)
+
+### 🚀 Enhancements
+
+- Add '@contentstack/core' to commonJS dependencies in module.ts ([26b2385](https://github.com/timbenniks/nuxt-contentstack/commit/26b2385))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.1
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.47...v0.1.1)
