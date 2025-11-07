@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.4
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.3...v0.1.4)
+
+### 🚀 Enhancements
+
+- Enhance Vite configuration for ESM support and Contentstack package resolution in module.ts ([799b647](https://github.com/timbenniks/nuxt-contentstack/commit/799b647))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.3
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.2...v0.1.3)
