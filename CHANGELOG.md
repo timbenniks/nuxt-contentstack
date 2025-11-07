@@ -1,5 +1,21 @@
 # Changelog
 
+## v0.1.1
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.47...v0.1.1)
+
+### 💅 Refactors
+
+- Improve contentstack plugin structure by defining it as a separate constant and updating imports ([2642660](https://github.com/timbenniks/nuxt-contentstack/commit/2642660))
+
+### 🏡 Chore
+
+- **release:** V0.1.0 - Update version to 0.1.0, enhance README with requirements for Nuxt and @nuxt/image, and improve dependency management in package.json and playground configurations ([6dee57d](https://github.com/timbenniks/nuxt-contentstack/commit/6dee57d))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.0.47
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.0.46...v0.0.47)
