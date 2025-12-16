@@ -1,9 +1,15 @@
-import contentstack, { type LivePreviewQuery, type Stack } from '@contentstack/delivery-sdk'
-import ContentstackLivePreview from '@contentstack/live-preview-utils'
-import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
-import { toRaw } from 'vue'
-import { useAsyncData, useNuxtApp, useRoute, type AsyncData } from '#app'
-import { replaceCslp } from '../utils'
+import type { Stack } from '@contentstack/delivery-sdk'
+import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
+import {
+  setupLivePreview,
+  applyVariants,
+  applyReferenceFields,
+  processEntryData,
+  setupLivePreviewRefresh,
+  shouldReplaceCslp,
+} from './utils'
+import { DEFAULT_LOCALE } from '../constants'
+import { handleContentstackError, logContentstackError } from './error-handling'
 
 export const useGetEntryByUrl = async <T>(options: {
   contentTypeUid: string
@@ -18,7 +24,7 @@ export const useGetEntryByUrl = async <T>(options: {
     url,
     referenceFieldPath = [],
     jsonRtePath = [],
-    locale = 'en-us',
+    locale = DEFAULT_LOCALE,
     replaceHtmlCslp,
   } = options
 
@@ -29,76 +35,43 @@ export const useGetEntryByUrl = async <T>(options: {
     variantAlias?: { value: string }
   }
 
-  // Only replace CSLP when editableTags is enabled, otherwise use user preference or default to false
-  const shouldReplaceCslp = replaceHtmlCslp ?? editableTags
+  const shouldReplaceCslpValue = shouldReplaceCslp(editableTags, replaceHtmlCslp)
 
   const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${url}-${locale}-${variantAlias?.value ? variantAlias.value : ''}`, async () => {
-    let result: { entries: T[] } | null = null
+    try {
+      setupLivePreview(stack, livePreviewEnabled)
 
-    const route = useRoute()
-    const qs = { ...toRaw(route.query) }
+      const entryQuery = stack.contentType(contentTypeUid)
+        .entry()
+        .locale(locale)
+        .includeFallback()
+        .includeEmbeddedItems()
 
-    if (livePreviewEnabled && qs?.live_preview) {
-      stack.livePreviewQuery(qs as unknown as LivePreviewQuery)
-    }
+      applyVariants(entryQuery, variantAlias)
+      applyReferenceFields(entryQuery, referenceFieldPath)
 
-
-    const entryQuery = stack.contentType(contentTypeUid)
-      .entry()
-      .locale(locale)
-      .includeFallback()
-      .includeEmbeddedItems()
-      .includeReference(referenceFieldPath ?? [])
-
-    if (variantAlias && variantAlias.value !== '') {
-      const variants = toRaw(variantAlias.value)
-
-      entryQuery.addParams({ include_applied_variants: true })
-      entryQuery.addParams({ include_dimension: true })
-      entryQuery.variants(variants)
-    }
-
-    if (referenceFieldPath) {
-      for (const path of referenceFieldPath) {
-        entryQuery.includeReference(path)
-      }
-    }
-
-    if (entryQuery) {
-      result = await entryQuery.query()
+      const result = await entryQuery.query()
         .equalTo('url', url)
-        .find() as { entries: T[] }
+        .find() as { entries: any[] }
 
-      const data = result?.entries?.[0] as EmbeddedItem
+      const entryData = result?.entries?.[0]
 
-      if (jsonRtePath && data) {
-        contentstack.Utils.jsonToHTML({
-          entry: data,
-          paths: jsonRtePath,
-        })
-      }
-
-      if (editableTags) {
-        contentstack.Utils.addEditableTags(data, contentTypeUid, true, locale)
-      }
-
-      let finalData
-      if (shouldReplaceCslp) {
-        finalData = replaceCslp(data)
-      }
-      else {
-        finalData = data
-      }
-
-      return finalData
+      return processEntryData(entryData, {
+        contentTypeUid,
+        locale,
+        jsonRtePath,
+        editableTags,
+        shouldReplaceCslp: shouldReplaceCslpValue,
+      }) as T
+    }
+    catch (error) {
+      const contentstackError = handleContentstackError(error, 'useGetEntryByUrl')
+      logContentstackError(contentstackError)
+      return null
     }
   })
 
-  if (livePreviewEnabled) {
-    if (import.meta.client) {
-      ContentstackLivePreview.onEntryChange(refresh)
-    }
-  }
+  setupLivePreviewRefresh(livePreviewEnabled, refresh)
 
   // @ts-expect-error doesnt export all useAsyncData props
   return { data, status, refresh }

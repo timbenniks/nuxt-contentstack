@@ -1,6 +1,8 @@
 import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
 import type { Stack } from '@contentstack/delivery-sdk'
+import { DEFAULT_LOCALE } from '../constants'
+import { handleContentstackError, logContentstackError } from './error-handling'
 
 /**
  * Composable to fetch multiple assets with optional filtering
@@ -14,7 +16,7 @@ export const useGetAssets = async <T = any>(options: {
   where?: Record<string, any>
 }): Promise<AsyncData<{ assets: T[]; count?: number } | null, Error>> => {
   const {
-    locale = 'en-us',
+    locale = DEFAULT_LOCALE,
     limit = 10,
     skip = 0,
     orderBy,
@@ -105,7 +107,8 @@ export const useGetAssets = async <T = any>(options: {
       }
     }
     catch (error) {
-      console.error('Error fetching assets:', error)
+      const contentstackError = handleContentstackError(error, 'useGetAssets')
+      logContentstackError(contentstackError)
       return null
     }
   })

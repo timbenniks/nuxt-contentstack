@@ -2,30 +2,23 @@
 import { computed, ref, useSeoMeta, useNuxtApp } from "#imports";
 import ContentstackFallbackBlock from "./ContentstackFallbackBlock.vue";
 import { useGetEntryByUrl } from "../composables/useGetEntryByUrl";
-import { replaceCslp } from "../utils";
+import {
+  extractBlocksFromPath,
+  processBlock,
+  getComponentForBlock as getComponent,
+  getBlockProps as getProps,
+  getBlockKey as getKey,
+  getCslpData,
+  type ContentstackBlock,
+  type ProcessedBlock,
+} from "./utils/blockUtils";
+import { generateSeoFromEntry, type SeoMetaInput } from "./utils/seoUtils";
+import { DEFAULT_BLOCKS_FIELD_PATH, DEFAULT_LOCALE } from "../constants";
 
 // Types
-interface ContentstackBlock {
-  [key: string]: any;
-  _content_type_uid?: string;
-  _metadata?: {
-    uid: string;
-    [key: string]: any;
-  };
-}
-
-interface ProcessedBlock {
-  name: string;
-  props: Record<string, any>;
-  originalBlock: ContentstackBlock;
-}
-
 interface ComponentMapping {
   [blockType: string]: any;
 }
-
-// SEO Meta types - use Nuxt's native useSeoMeta types
-type SeoMetaInput = Parameters<typeof useSeoMeta>[0];
 
 // Props
 interface Props {
@@ -56,9 +49,9 @@ interface Props {
 
   // Entry fetching props (from useGetEntryByUrl)
   /** Content type UID for fetching entry */
-  contentTypeUid?: string;
+  contentTypeUid?: string | undefined;
   /** URL to fetch entry by */
-  url?: string;
+  url?: string | undefined;
   /** Reference field paths to include */
   referenceFieldPath?: string[];
   /** JSON RTE field paths */
@@ -90,80 +83,14 @@ const props = withDefaults(defineProps<Props>(), {
   blockNamePrefix: "",
   referenceFieldPath: () => [],
   jsonRtePath: () => [],
-  locale: "en-us",
+  locale: DEFAULT_LOCALE,
   replaceHtmlCslp: undefined,
-  blocksFieldPath: "components",
+  blocksFieldPath: DEFAULT_BLOCKS_FIELD_PATH,
   seoMeta: undefined,
   autoSeoMeta: false,
+  contentTypeUid: undefined,
+  url: undefined,
 });
-
-// Helper function to extract blocks from nested object path
-function extractBlocksFromPath(data: any, path: string): ContentstackBlock[] {
-  const fieldPath = path.split(".");
-  let blocks = data;
-
-  for (const field of fieldPath) {
-    blocks = blocks?.[field];
-  }
-
-  return Array.isArray(blocks) ? blocks : [];
-}
-
-// Helper function to generate SEO metadata from entry data
-function generateSeoFromEntry(
-  entryData: any,
-  autoSeoMeta: boolean | Record<string, string>
-): SeoMetaInput {
-  if (!entryData) return {};
-
-  // Default field mapping when autoSeoMeta is true
-  const defaultMapping: Record<string, string> = {
-    title: "seo_title|title|name",
-    description: "seo_description|description|summary",
-    ogTitle: "seo_title|title|name",
-    ogDescription: "seo_description|description|summary",
-    ogImage: "featured_image.url|og_image.url|image.url",
-  };
-
-  // Use custom mapping if provided, otherwise use default
-  const fieldMapping =
-    typeof autoSeoMeta === "object" ? autoSeoMeta : defaultMapping;
-
-  const seoObject: Record<string, any> = {};
-
-  for (const [seoKey, fieldPath] of Object.entries(fieldMapping)) {
-    // Handle static values (no field path)
-    if (!fieldPath.includes("|") && !fieldPath.includes(".")) {
-      seoObject[seoKey] = fieldPath;
-      continue;
-    }
-
-    // Handle field paths with fallbacks (separated by |)
-    const fieldOptions = fieldPath.split("|");
-
-    for (const field of fieldOptions) {
-      let value;
-
-      // Handle nested field paths (e.g., 'featured_image.url')
-      if (field.includes(".")) {
-        const nestedPath = field.split(".");
-        value = entryData;
-        for (const part of nestedPath) {
-          value = value?.[part];
-        }
-      } else {
-        value = entryData[field];
-      }
-
-      if (value) {
-        seoObject[seoKey] = value;
-        break; // Use first available value
-      }
-    }
-  }
-
-  return seoObject;
-}
 
 // Main logic
 const shouldFetchEntry = computed(() => !!(props.contentTypeUid && props.url));
@@ -236,76 +163,26 @@ const processedBlocks = computed((): ProcessedBlock[] => {
   const blocksToProcess = extractedBlocks.value;
   if (!blocksToProcess || blocksToProcess.length === 0) return [];
 
-  return blocksToProcess.map((block: ContentstackBlock) => {
-    let name = "";
-    let blockProps = {};
-
-    if (props.autoExtractBlockName) {
-      // Auto-extract from object structure (like your original component)
-      const entries = Object.entries(block);
-      const blockEntry = entries.find(([key]) => !key.startsWith("_"));
-
-      if (blockEntry) {
-        name = blockEntry[0];
-        // Only clean CSLP when editableTags is enabled
-        blockProps = editableTags
-          ? (replaceCslp(blockEntry[1] || {}) as Record<string, any>)
-          : blockEntry[1] || {};
-      }
-    } else {
-      // Use _content_type_uid or provided name
-      name = block._content_type_uid || "unknown";
-      // Only clean CSLP when editableTags is enabled
-      blockProps = editableTags
-        ? (replaceCslp({ ...block }) as Record<string, any>)
-        : { ...block };
-    }
-
-    // Remove prefix if specified
-    if (props.blockNamePrefix && name.startsWith(props.blockNamePrefix)) {
-      name = name.slice(props.blockNamePrefix.length);
-    }
-
-    return {
-      name,
-      props: blockProps,
-      originalBlock: block,
-    };
-  });
+  return blocksToProcess.map((block: ContentstackBlock) =>
+    processBlock(block, {
+      autoExtractBlockName: props.autoExtractBlockName,
+      blockNamePrefix: props.blockNamePrefix,
+      editableTags,
+    })
+  );
 });
 
 // Methods
 function getComponentForBlock(block: ProcessedBlock): any {
-  const component = props.componentMap[block.name];
-  return component || props.fallbackComponent;
+  return getComponent(block, props.componentMap, props.fallbackComponent);
 }
 
 function getBlockProps(block: ProcessedBlock): Record<string, any> {
-  return {
-    ...block.props,
-    // Add some helpful meta props
-    blockType: block.name,
-    blockMetadata: block.originalBlock._metadata,
-  };
+  return getProps(block, block.originalBlock._metadata);
 }
 
 function getBlockKey(block: ProcessedBlock, index: number): string {
-  // Try to get key from specified field path
-  const keyPath = props.keyField.split(".");
-  let key: any = block.originalBlock;
-
-  for (const path of keyPath) {
-    key = key?.[path];
-  }
-
-  // Fallback to index if no key found
-  return (typeof key === "string" ? key : null) || `block-${index}`;
-}
-
-function getCslpData(block: ProcessedBlock, index: number): string | undefined {
-  // Support for Contentstack Live Preview
-  const cslp = block.originalBlock.cslp || block.props.cslp;
-  return cslp?.[`blocks__${index}`]?.["data-cslp"] || cslp?.["data-cslp"];
+  return getKey(block, props.keyField, index);
 }
 </script>
 

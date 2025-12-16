@@ -1,23 +1,23 @@
 import contentstack from '@contentstack/delivery-sdk'
 import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-preview-utils'
-import Personalize from '@contentstack/personalize-edge-sdk'
 import { defineNuxtPlugin, useState, useRequestEvent, type Plugin } from '#app'
 import { getRegionForString } from '@timbenniks/contentstack-endpoints'
 import type { StackConfig } from '@contentstack/delivery-sdk'
 import type { LivePreviewSdkOptions, DeliverySdkOptions, PersonalizeSdkOptions } from './utils'
 import { VB_EmptyBlockParentClass } from '@contentstack/live-preview-utils'
 import { toRaw } from 'vue'
+import { DEFAULT_REGION } from './constants'
 
 // Utility function
 function convertToStackConfig(options: DeliverySdkOptions): StackConfig {
   const { region, ...rest } = options
   return {
     ...rest,
-    region: getRegionForString(region || 'eu'),
+    region: getRegionForString(region || DEFAULT_REGION),
   } as StackConfig
 }
 
-const contentstackPlugin: Plugin = (_nuxtApp) => {
+const contentstackPlugin: Plugin = async (_nuxtApp) => {
   const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions }: {
     deliverySdkOptions: DeliverySdkOptions
     livePreviewSdkOptions: LivePreviewSdkOptions
@@ -46,13 +46,18 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
 
   const variantAlias = useState('variantAlias', () => '')
 
-  if (personalizationEnabled && personalizationProjectUid) {
-    Personalize.setEdgeApiUrl(`https://${personalizationHost}`)
-    Personalize.init(personalizationProjectUid)
+  // Handle personalization only on server
+  let PersonalizeModule: any = null
+  if (import.meta.server && personalizationEnabled && personalizationProjectUid) {
+    try {
+      PersonalizeModule = (await import('@contentstack/personalize-edge-sdk')).default
+      PersonalizeModule.setEdgeApiUrl(`https://${personalizationHost}`)
+      PersonalizeModule.init(personalizationProjectUid)
 
-    if (import.meta.server) {
       const event = useRequestEvent()
       variantAlias.value = event?.context.p13n
+    } catch (error) {
+      console.error('Failed to initialize personalization:', error)
     }
   }
 
@@ -63,7 +68,7 @@ const contentstackPlugin: Plugin = (_nuxtApp) => {
         editableTags,
         stack,
         ContentstackLivePreview,
-        Personalize,
+        Personalize: PersonalizeModule,
         variantAlias,
         VB_EmptyBlockParentClass,
       },

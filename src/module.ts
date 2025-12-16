@@ -4,6 +4,8 @@ import chalk from 'chalk'
 import { name, version } from '../package.json'
 import { getURLsforRegion, type LivePreviewSdkOptions, type DeliverySdkOptions, type PersonalizeSdkOptions } from './runtime/utils'
 import type { RegionInput } from '@timbenniks/contentstack-endpoints'
+import { configureViteForContentstack } from './vite-config'
+import { DEFAULT_LOCALE, DEFAULT_BRANCH, DEFAULT_REGION } from './runtime/constants'
 
 // Simplified, developer-friendly configuration
 export interface ModuleOptions {
@@ -55,9 +57,9 @@ function transformModuleOptions(options: ModuleOptions): {
     apiKey,
     deliveryToken,
     environment,
-    region = 'us',
-    branch = 'main',
-    locale = 'en-us',
+    region = DEFAULT_REGION,
+    branch = DEFAULT_BRANCH,
+    locale = DEFAULT_LOCALE,
     livePreview = {},
     personalization = {},
     debug = false,
@@ -135,9 +137,9 @@ export default defineNuxtModule<ModuleOptions>({
     apiKey: '',
     deliveryToken: '',
     environment: '',
-    region: 'us',
-    branch: 'main',
-    locale: 'en-us',
+    region: DEFAULT_REGION,
+    branch: DEFAULT_BRANCH,
+    locale: DEFAULT_LOCALE,
     livePreview: {
       enable: false,
       previewToken: '',
@@ -160,77 +162,26 @@ export default defineNuxtModule<ModuleOptions>({
     const transformedOptions = transformModuleOptions(options)
     const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions, debug } = transformedOptions
 
-    // Add CommonJS packages to transpile to handle ESM import issues
+    // Configure Vite and build for Contentstack packages
     _nuxt.options.build = _nuxt.options.build || {}
     _nuxt.options.build.transpile = _nuxt.options.build.transpile || []
 
-    // All CommonJS dependencies that might cause issues
-    const commonJSDeps = [
+    // Transpile Contentstack packages for ESM support
+    const contentstackPackages = [
       '@contentstack/utils',
       '@contentstack/delivery-sdk',
       '@contentstack/core',
-      '@contentstack/live-preview-utils',
-      '@contentstack/personalize-edge-sdk',
-      'classnames',
-      'humps',
-      'lodash',
-      'qs',
-      'lodash-es',
-      'lodash.merge',
+      '@contentstack/live-preview-utils'
     ]
 
-    commonJSDeps.forEach((dep) => {
+    contentstackPackages.forEach((dep) => {
       if (!_nuxt.options.build.transpile.includes(dep)) {
         _nuxt.options.build.transpile.push(dep)
       }
     })
 
-    // Configure Vite to properly handle CommonJS dependencies
-    _nuxt.options.vite = _nuxt.options.vite || {}
-    _nuxt.options.vite.optimizeDeps = _nuxt.options.vite.optimizeDeps || {}
-    _nuxt.options.vite.optimizeDeps.include = _nuxt.options.vite.optimizeDeps.include || []
-
-    commonJSDeps.forEach((dep) => {
-      if (!_nuxt.options.vite.optimizeDeps!.include!.includes(dep)) {
-        _nuxt.options.vite.optimizeDeps!.include!.push(dep)
-      }
-    })
-
-    // Configure Vite resolve to prefer ESM over CommonJS
-    _nuxt.options.vite.resolve = _nuxt.options.vite.resolve || {}
-    _nuxt.options.vite.resolve.conditions = _nuxt.options.vite.resolve.conditions || []
-    if (!_nuxt.options.vite.resolve.conditions.includes('import')) {
-      _nuxt.options.vite.resolve.conditions.unshift('import', 'module')
-    }
-
-    // Ensure proper resolution of Contentstack packages
-    _nuxt.options.vite.resolve.mainFields = _nuxt.options.vite.resolve.mainFields || ['module', 'main']
-    if (!_nuxt.options.vite.resolve.mainFields.includes('module')) {
-      _nuxt.options.vite.resolve.mainFields.unshift('module')
-    }
-
-    // Configure esbuild options for better CommonJS handling
-    _nuxt.options.vite.optimizeDeps.esbuildOptions = _nuxt.options.vite.optimizeDeps.esbuildOptions || {}
-    _nuxt.options.vite.optimizeDeps.esbuildOptions.platform = 'browser'
-    _nuxt.options.vite.optimizeDeps.esbuildOptions.format = 'esm'
-
-    // Ensure proper package resolution by configuring Vite to handle @contentstack/core
-    // The resolve.conditions and mainFields above should handle ESM preference
-
-    // Force ESM for these packages in SSR
-    _nuxt.options.vite.ssr = _nuxt.options.vite.ssr || {}
-    if (!_nuxt.options.vite.ssr.noExternal) {
-      _nuxt.options.vite.ssr.noExternal = []
-    }
-    if (_nuxt.options.vite.ssr && Array.isArray(_nuxt.options.vite.ssr.noExternal)) {
-      commonJSDeps.forEach((dep) => {
-        if (_nuxt.options.vite.ssr && Array.isArray(_nuxt.options.vite.ssr.noExternal)) {
-          if (!(_nuxt.options.vite.ssr.noExternal as string[]).includes(dep)) {
-            (_nuxt.options.vite.ssr.noExternal as string[]).push(dep)
-          }
-        }
-      })
-    }
+    // Configure Vite for Contentstack packages
+    configureViteForContentstack(_nuxt)
 
     // Store the transformed SDK configs in runtime config
     _nuxt.options.runtimeConfig.public.contentstack = defu(_nuxt.options.runtimeConfig.public.contentstack, {
@@ -253,8 +204,8 @@ export default defineNuxtModule<ModuleOptions>({
       logger.error(`Missing required ${chalk.bold('deliveryToken')} in your Contentstack configuration.`)
     }
 
-    logger.success(`Contentstack region: ${chalk.bold(options.region || 'us')}`)
-    logger.success(`Contentstack branch: ${chalk.bold(options.branch || 'main')}`)
+    logger.success(`Contentstack region: ${chalk.bold(options.region || DEFAULT_REGION)}`)
+    logger.success(`Contentstack branch: ${chalk.bold(options.branch || DEFAULT_BRANCH)}`)
 
     // Handle live preview setup
     if (options.livePreview?.enable) {

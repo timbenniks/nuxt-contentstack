@@ -1,6 +1,8 @@
 import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
 import type { Stack } from '@contentstack/delivery-sdk'
+import { DEFAULT_LOCALE } from '../constants'
+import { handleContentstackError, logContentstackError } from './error-handling'
 /**
  * Composable to fetch a single asset by its UID
  */
@@ -10,7 +12,7 @@ export const useGetAsset = async <T = any>(options: {
 }): Promise<AsyncData<T | null, Error>> => {
   const {
     assetUid,
-    locale = 'en-us',
+    locale = DEFAULT_LOCALE,
   } = options
 
   const { stack, livePreviewEnabled } = useNuxtApp().$contentstack as {
@@ -28,7 +30,8 @@ export const useGetAsset = async <T = any>(options: {
       return result as T
     }
     catch (error) {
-      console.error('Error fetching asset:', error)
+      const contentstackError = handleContentstackError(error, 'useGetAsset')
+      logContentstackError(contentstackError)
       return null
     }
   })

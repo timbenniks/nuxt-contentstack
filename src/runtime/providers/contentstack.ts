@@ -1,6 +1,6 @@
 import { joinURL } from "ufo";
 import { defineProvider } from '@nuxt/image/runtime';
-import type { ImageModifiers } from '@nuxt/image'
+import type { ImageModifiers } from '@nuxt/image';
 
 // Define custom modifiers for Contentstack provider
 interface ContentstackModifiers extends ImageModifiers {
@@ -75,8 +75,8 @@ const getImage = (
   // Use Record<string, any> since we're building URL params that may include Contentstack-specific options
   const enhancedModifiers: Record<string, any> = {
     ...imageModifiers, // User modifiers first
-    auto: (imageModifiers as any).auto ?? "webp,compress",
-    quality: imageModifiers.quality ?? 80,
+    auto: (imageModifiers as Record<string, any>).auto ?? "webp,compress",
+    quality: (imageModifiers as Record<string, any>).quality ?? 80,
   };
 
   const operations = buildParams(enhancedModifiers);
@@ -95,13 +95,16 @@ const getImage = (
     }
   }
 
+  // Return a plain extensible object - Nuxt Image v2 needs to add properties like imgEl
+  // Use object literal to ensure it's extensible (plain objects are extensible by default)
   return {
     url: url + (operations ? "?" + operations : ""),
   };
 };
 
-// Export provider using defineProvider (v2 format) with typed modifiers
-export default defineProvider<ContentstackModifiers>({
+// Export provider using defineProvider (v2 format)
+// Note: Removed generic type parameter to match Nuxt Image v2 provider pattern
+export default defineProvider({
   getImage
 })
 

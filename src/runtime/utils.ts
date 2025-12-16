@@ -1,6 +1,8 @@
 import type { StackConfig } from '@contentstack/delivery-sdk'
 import { getContentstackEndpoints } from '@timbenniks/contentstack-endpoints'
 import type { RegionInput } from '@timbenniks/contentstack-endpoints'
+import { DEFAULT_REGION } from './constants'
+
 export type DeliverySdkOptions = Omit<StackConfig, 'region'> & {
   region?: RegionInput
 }
@@ -30,7 +32,7 @@ export type PersonalizeSdkOptions = {
   host?: string
 }
 
-export function getURLsforRegion(region: RegionInput = 'na') {
+export function getURLsforRegion(region: RegionInput = DEFAULT_REGION) {
   return getContentstackEndpoints(region, true)
 }
 
