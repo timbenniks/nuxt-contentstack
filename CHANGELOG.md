@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.5
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.4...v0.1.5)
+
+### 🏡 Chore
+
+- **release:** V0.1.4 - Update dependencies, enhance Vite configuration for Contentstack packages, and improve error handling in composables ([a9351cf](https://github.com/timbenniks/nuxt-contentstack/commit/a9351cf))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.4
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.3...v0.1.4)
