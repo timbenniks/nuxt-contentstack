@@ -1,6 +1,6 @@
 {
   "name": "nuxt-contentstack",
-  "version": "0.1.9",
+  "version": "0.1.10",
   "description": "Contentstack integration for Nuxt",
   "repository": {
     "type": "git",

@@ -1,5 +1,9 @@
 # Changelog
 
+## v0.1.10
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.9...v0.1.10)
+
 ## v0.1.9
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.6...v0.1.9)
