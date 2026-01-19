@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.9
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.6...v0.1.9)
+
+### 🏡 Chore
+
+- Update dependencies and version for nuxt-contentstack ([73ceebb](https://github.com/timbenniks/nuxt-contentstack/commit/73ceebb))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.6
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.5...v0.1.6)
