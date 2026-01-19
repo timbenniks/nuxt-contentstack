@@ -1,6 +1,6 @@
 {
   "name": "nuxt-contentstack",
-  "version": "0.1.6",
+  "version": "0.1.8",
   "description": "Contentstack integration for Nuxt",
   "repository": {
     "type": "git",
@@ -34,8 +34,8 @@
     }
   },
   "dependencies": {
-    "@contentstack/delivery-sdk": "^4.10.4",
-    "@contentstack/live-preview-utils": "^4.1.3",
+    "@contentstack/delivery-sdk": "^4.11.0",
+    "@contentstack/live-preview-utils": "^4.2.0",
     "@contentstack/personalize-edge-sdk": "^1.0.19",
     "@nuxt/kit": "^4.2.2",
     "@timbenniks/contentstack-endpoints": "^2.1.0",
@@ -48,13 +48,13 @@
     "@nuxt/image": "^2.0.0",
     "@nuxt/module-builder": "^1.0.2",
     "@nuxt/schema": "^4.2.2",
-    "@nuxt/test-utils": "^3.21.0",
+    "@nuxt/test-utils": "^3.23.0",
     "@types/node": "latest",
     "changelogen": "^0.6.2",
     "eslint": "^9.39.2",
     "nuxt": "^4.2.2",
     "typescript": "latest",
     "vitest": "3.2.4",
-    "vue-tsc": "^3.1.8"
+    "vue-tsc": "^3.2.2"
   }
 }
