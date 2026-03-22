@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.12
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.10...v0.1.12)
+
+### 🩹 Fixes
+
+- Audit fixes and useContentstack composable ([83a5fce](https://github.com/timbenniks/nuxt-contentstack/commit/83a5fce))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.10
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.9...v0.1.10)
