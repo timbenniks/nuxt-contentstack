@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { computed, ref, useSeoMeta, useNuxtApp } from "#imports";
+import { computed, ref, useSeoMeta } from "#imports";
+import { useContentstack } from "../composables/useContentstack";
 import ContentstackFallbackBlock from "./ContentstackFallbackBlock.vue";
 import { useGetEntryByUrl } from "../composables/useGetEntryByUrl";
 import {
@@ -96,9 +97,7 @@ const props = withDefaults(defineProps<Props>(), {
 const shouldFetchEntry = computed(() => !!(props.contentTypeUid && props.url));
 
 // Get editableTags setting from Contentstack context
-const { editableTags } = useNuxtApp().$contentstack as {
-  editableTags: boolean;
-};
+const { editableTags } = useContentstack();
 
 // Only replace CSLP when editableTags is enabled, otherwise use user preference or default to false
 const shouldReplaceCslp = props.replaceHtmlCslp ?? editableTags;
@@ -210,10 +209,7 @@ function getBlockKey(block: ProcessedBlock, index: number): string {
   <!-- Main content when blocks are available -->
   <section
     v-else-if="extractedBlocks && extractedBlocks.length > 0"
-    :class="[
-      containerClass,
-      extractedBlocks.length === 0 ? emptyBlockClass : '',
-    ]"
+    :class="containerClass"
     v-bind="containerProps"
   >
     <component

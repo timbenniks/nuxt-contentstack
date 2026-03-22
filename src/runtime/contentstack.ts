@@ -18,20 +18,18 @@ function convertToStackConfig(options: DeliverySdkOptions): StackConfig {
 }
 
 const contentstackPlugin: Plugin = async (_nuxtApp) => {
-  const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions }: {
+  const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions } = _nuxtApp.$config.public.contentstack as {
     deliverySdkOptions: DeliverySdkOptions
     livePreviewSdkOptions: LivePreviewSdkOptions
-    personalizeSdkOptions: PersonalizeSdkOptions
-  } = _nuxtApp.$config.public.contentstack as {
-    deliverySdkOptions: DeliverySdkOptions
-    livePreviewSdkOptions: LivePreviewSdkOptions
-    personalizeSdkOptions: PersonalizeSdkOptions
+    personalizeSdkOptions?: PersonalizeSdkOptions
   }
 
   const stack = contentstack.stack(convertToStackConfig(toRaw(deliverySdkOptions)))
   const livePreviewEnabled = deliverySdkOptions?.live_preview?.enable
   const { editableTags } = livePreviewSdkOptions
-  const { enable: personalizationEnabled, host: personalizationHost, projectUid: personalizationProjectUid } = personalizeSdkOptions
+  const personalizationEnabled = personalizeSdkOptions?.enable ?? false
+  const personalizationHost = personalizeSdkOptions?.host ?? ''
+  const personalizationProjectUid = personalizeSdkOptions?.projectUid ?? ''
 
   if (livePreviewEnabled && import.meta.client) {
     ContentstackLivePreview.init({

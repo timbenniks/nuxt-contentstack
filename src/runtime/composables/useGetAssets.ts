@@ -1,6 +1,6 @@
-import ContentstackLivePreview from '@contentstack/live-preview-utils'
-import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
-import type { Stack } from '@contentstack/delivery-sdk'
+import { useAsyncData, type AsyncData } from '#app'
+import { setupLivePreviewRefresh } from './utils'
+import { useContentstack } from './useContentstack'
 import { DEFAULT_LOCALE } from '../constants'
 import { handleContentstackError, logContentstackError } from './error-handling'
 
@@ -24,10 +24,7 @@ export const useGetAssets = async <T = any>(options: {
     where = {},
   } = options
 
-  const { stack, livePreviewEnabled } = useNuxtApp().$contentstack as {
-    stack: Stack
-    livePreviewEnabled: boolean
-  }
+  const { stack, livePreviewEnabled } = useContentstack()
 
   const cacheKey = `assets-${locale}-${limit}-${skip}-${JSON.stringify(where)}`
 
@@ -82,9 +79,8 @@ export const useGetAssets = async <T = any>(options: {
                   case '$regex': {
                     const regex = new RegExp(operatorValue as string, 'i')
                     if (!regex.test(asset[field])) return false
-                    break;
-                  }
                     break
+                  }
                   default:
                     if (asset[field] !== operatorValue) return false
                 }
@@ -113,11 +109,7 @@ export const useGetAssets = async <T = any>(options: {
     }
   })
 
-  if (livePreviewEnabled) {
-    if (import.meta.client) {
-      ContentstackLivePreview.onEntryChange(refresh)
-    }
-  }
+  setupLivePreviewRefresh(livePreviewEnabled, refresh)
 
   // @ts-expect-error doesnt export all useAsyncData props
   return { data, status, refresh }

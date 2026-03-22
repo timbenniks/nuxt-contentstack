@@ -158,6 +158,19 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, _nuxt) {
     const resolver = createResolver(import.meta.url)
 
+    // Validate required config before using it
+    if (!options.apiKey) {
+      logger.error(`Missing required ${chalk.bold('apiKey')} in your Contentstack configuration.`)
+    }
+
+    if (!options.environment) {
+      logger.error(`Missing required ${chalk.bold('environment')} in your Contentstack configuration.`)
+    }
+
+    if (!options.deliveryToken) {
+      logger.error(`Missing required ${chalk.bold('deliveryToken')} in your Contentstack configuration.`)
+    }
+
     // Transform simplified config to internal SDK configs
     const transformedOptions = transformModuleOptions(options)
     const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions, debug } = transformedOptions
@@ -190,19 +203,6 @@ export default defineNuxtModule<ModuleOptions>({
       personalizeSdkOptions,
       debug
     })
-
-    // Validation with better error messages
-    if (!options.apiKey) {
-      logger.error(`Missing required ${chalk.bold('apiKey')} in your Contentstack configuration.`)
-    }
-
-    if (!options.environment) {
-      logger.error(`Missing required ${chalk.bold('environment')} in your Contentstack configuration.`)
-    }
-
-    if (!options.deliveryToken) {
-      logger.error(`Missing required ${chalk.bold('deliveryToken')} in your Contentstack configuration.`)
-    }
 
     logger.success(`Contentstack region: ${chalk.bold(options.region || DEFAULT_REGION)}`)
     logger.success(`Contentstack branch: ${chalk.bold(options.branch || DEFAULT_BRANCH)}`)

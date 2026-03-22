@@ -1,6 +1,6 @@
 {
   "name": "nuxt-contentstack",
-  "version": "0.1.10",
+  "version": "0.1.11",
   "description": "Contentstack integration for Nuxt",
   "repository": {
     "type": "git",
@@ -22,11 +22,14 @@
     "dev": "nuxi dev playground",
     "dev:build": "nuxi build playground",
     "dev:prepare": "nuxt-module-build build --stub && nuxt-module-build prepare && nuxi prepare playground",
-    "release": "npm run test && npm run lint && npm run prepack && changelogen --release && npm publish && git push --follow-tags",
+    "release": "npm run test && npm run lint && npm run prepack && changelogen --release && npm publish --access=public && git push --follow-tags",
     "lint": "eslint .",
     "test": "vitest run",
     "test:watch": "vitest watch",
     "test:types": "vue-tsc --noEmit && cd playground && vue-tsc --noEmit"
+  },
+  "peerDependencies": {
+    "@nuxt/image": "^2.0.0"
   },
   "peerDependenciesMeta": {
     "@nuxt/image": {
@@ -34,27 +37,27 @@
     }
   },
   "dependencies": {
-    "@contentstack/delivery-sdk": "^4.11.0",
+    "@contentstack/delivery-sdk": "^5.1.2",
     "@contentstack/live-preview-utils": "^4.2.0",
-    "@contentstack/personalize-edge-sdk": "^1.0.19",
-    "@nuxt/kit": "^4.2.2",
+    "@contentstack/personalize-edge-sdk": "^1.0.21",
+    "@nuxt/kit": "^4.4.2",
     "@timbenniks/contentstack-endpoints": "^2.1.0",
     "chalk": "^5.6.2",
     "defu": "^6.1.4"
   },
   "devDependencies": {
     "@nuxt/devtools": "^2.7.0",
-    "@nuxt/eslint-config": "^1.12.1",
+    "@nuxt/eslint-config": "^1.15.2",
     "@nuxt/image": "^2.0.0",
     "@nuxt/module-builder": "^1.0.2",
-    "@nuxt/schema": "^4.2.2",
+    "@nuxt/schema": "^4.4.2",
     "@nuxt/test-utils": "^3.23.0",
-    "@types/node": "latest",
+    "@types/node": "^22.15.0",
     "changelogen": "^0.6.2",
-    "eslint": "^9.39.2",
-    "nuxt": "^4.2.2",
-    "typescript": "latest",
-    "vitest": "3.2.4",
-    "vue-tsc": "^3.2.2"
+    "eslint": "^9.39.4",
+    "nuxt": "^4.4.2",
+    "typescript": "^5.9.3",
+    "vitest": "4.1.0",
+    "vue-tsc": "^3.2.6"
   }
 }

@@ -1,8 +1,9 @@
-import ContentstackLivePreview from '@contentstack/live-preview-utils'
-import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
-import type { Stack } from '@contentstack/delivery-sdk'
+import { useAsyncData, type AsyncData } from '#app'
+import { setupLivePreviewRefresh } from './utils'
+import { useContentstack } from './useContentstack'
 import { DEFAULT_LOCALE } from '../constants'
 import { handleContentstackError, logContentstackError } from './error-handling'
+
 /**
  * Composable to fetch a single asset by its UID
  */
@@ -15,10 +16,7 @@ export const useGetAsset = async <T = any>(options: {
     locale = DEFAULT_LOCALE,
   } = options
 
-  const { stack, livePreviewEnabled } = useNuxtApp().$contentstack as {
-    stack: Stack
-    livePreviewEnabled: boolean
-  }
+  const { stack, livePreviewEnabled } = useContentstack()
 
   const { data, status, refresh } = await useAsyncData(`asset-${assetUid}-${locale}`, async () => {
     try {
@@ -36,11 +34,7 @@ export const useGetAsset = async <T = any>(options: {
     }
   })
 
-  if (livePreviewEnabled) {
-    if (import.meta.client) {
-      ContentstackLivePreview.onEntryChange(refresh)
-    }
-  }
+  setupLivePreviewRefresh(livePreviewEnabled, refresh)
 
   // @ts-expect-error doesnt export all useAsyncData props
   return { data, status, refresh }

@@ -167,7 +167,9 @@ export const useImageTransform = (baseUrl: string, options: ImageTransformOption
     }
 
     const queryString = params.toString()
-    return queryString ? `${baseUrl}?${queryString}` : baseUrl
+    if (!queryString) return baseUrl
+    const separator = baseUrl.includes('?') ? '&' : '?'
+    return `${baseUrl}${separator}${queryString}`
   })
 
   const updateTransform = (newOptions: Partial<ImageTransformOptions>) => {

@@ -1,5 +1,4 @@
-import type { Stack } from '@contentstack/delivery-sdk'
-import { useAsyncData, useNuxtApp, type AsyncData } from '#app'
+import { useAsyncData, type AsyncData } from '#app'
 import {
   setupLivePreview,
   applyVariants,
@@ -8,6 +7,7 @@ import {
   setupLivePreviewRefresh,
   shouldReplaceCslp,
 } from './utils'
+import { useContentstack } from './useContentstack'
 import { DEFAULT_LOCALE } from '../constants'
 import { handleContentstackError, logContentstackError } from './error-handling'
 
@@ -28,12 +28,7 @@ export const useGetEntryByUrl = async <T>(options: {
     replaceHtmlCslp,
   } = options
 
-  const { editableTags, stack, livePreviewEnabled, variantAlias } = useNuxtApp().$contentstack as {
-    stack: Stack
-    livePreviewEnabled: boolean
-    editableTags: boolean
-    variantAlias?: { value: string }
-  }
+  const { editableTags, stack, livePreviewEnabled, variantAlias } = useContentstack()
 
   const shouldReplaceCslpValue = shouldReplaceCslp(editableTags, replaceHtmlCslp)
 

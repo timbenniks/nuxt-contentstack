@@ -32,14 +32,9 @@ export function generateSeoFromEntry(
   const seoObject: Record<string, any> = {}
 
   for (const [seoKey, fieldPath] of Object.entries(fieldMapping)) {
-    // Handle static values (no field path)
-    if (!fieldPath.includes('|') && !fieldPath.includes('.')) {
-      seoObject[seoKey] = fieldPath
-      continue
-    }
-
     // Handle field paths with fallbacks (separated by |)
     const fieldOptions = fieldPath.split('|')
+    let found = false
 
     for (const field of fieldOptions) {
       let value
@@ -57,8 +52,15 @@ export function generateSeoFromEntry(
 
       if (value) {
         seoObject[seoKey] = value
+        found = true
         break // Use first available value
       }
+    }
+
+    // If no field matched and the value has no pipe/dot separators,
+    // treat it as a static value (e.g., { robots: "noindex" })
+    if (!found && !fieldPath.includes('|') && !fieldPath.includes('.') && !(fieldPath in entryData)) {
+      seoObject[seoKey] = fieldPath
     }
   }
 

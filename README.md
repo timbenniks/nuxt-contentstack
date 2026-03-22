@@ -35,6 +35,7 @@ yarn add nuxt@^3.20.1 @nuxt/image@^2.0.0
 ## Features
 
 - Complete set of Vue composables (entries, assets, by URL)
+- Typed `useContentstack()` helper for accessing SDKs and config
 - Advanced filtering, pagination, and sorting
 - Live Preview & Visual Builder support
 - Personalization support with server-side middleware
@@ -98,6 +99,7 @@ export default defineNuxtConfig({
 | `region`        | `string`  | No       | `'us'`    | Contentstack region                            |
 | `branch`        | `string`  | No       | `'main'`  | Content branch                                 |
 | `locale`        | `string`  | No       | `'en-us'` | Default locale                                 |
+| `host`          | `string`  | No       | -         | Override the Delivery SDK host URL              |
 | `debug`         | `boolean` | No       | `false`   | Enable debug logging                           |
 
 ### Live Preview
@@ -110,6 +112,7 @@ export default defineNuxtConfig({
 | `editButton`   | `boolean \| object`      | `false`     | Enable/edit button config             |
 | `mode`         | `'builder' \| 'preview'` | `'builder'` | Live preview mode                     |
 | `ssr`          | `boolean`                | `false`     | Enable SSR mode (experimental)        |
+| `host`         | `string`                 | -           | Override the Live Preview host URL    |
 
 Edit button object:
 
@@ -131,7 +134,9 @@ editButton: {
 
 ## Provides
 
-Access via `useNuxtApp().$contentstack`:
+### `useContentstack()`
+
+Typed composable for accessing Contentstack SDKs and configuration. This is the recommended way to access the plugin provides.
 
 ```ts
 const {
@@ -142,13 +147,15 @@ const {
   editableTags, // boolean
   variantAlias, // Variant manifest for personalization
   VB_EmptyBlockParentClass, // Visual Builder empty block class
-} = useNuxtApp().$contentstack;
+} = useContentstack();
 ```
+
+You can also access the same values via `useNuxtApp().$contentstack`, but `useContentstack()` provides full TypeScript types out of the box.
 
 ### Personalization SDK Usage
 
 ```ts
-const { Personalize } = useNuxtApp().$contentstack;
+const { Personalize } = useContentstack();
 
 // Set user attributes
 await Personalize.set({ age: 20 });
@@ -163,6 +170,8 @@ await Personalize.triggerEvent("eventKey");
 ## Composables
 
 All composables support live preview updates, personalization variants, and Nuxt's caching system.
+
+> **Note:** All data-fetching composables are async and must be `await`ed. This means they need to be called at the top level of `<script setup>` (which supports top-level await via `<Suspense>` automatically). They cannot be called conditionally inside `setup()`.
 
 ### `useGetEntryByUrl`
 
@@ -371,6 +380,10 @@ const componentMapping = {
 | `showEmptyState`       | `boolean`                           | `true`                                 | Show empty state                                           |
 | `keyField`             | `string`                            | `'_metadata.uid'`                      | Key field for blocks                                       |
 | `autoExtractBlockName` | `boolean`                           | `true`                                 | Auto-extract block name                                    |
+| `blockNamePrefix`      | `string`                            | `''`                                   | Prefix to remove from block names when mapping components  |
+| `containerProps`       | `Record<string, any>`               | `{}`                                   | Additional props to bind to the container element          |
+| `emptyStateClass`      | `string`                            | `'contentstack-empty-state'`           | CSS class for empty state container                        |
+| `emptyStateMessage`    | `string`                            | `'No content blocks available'`        | Message shown in empty state                               |
 
 ### SEO Metadata
 
@@ -398,6 +411,7 @@ const componentMapping = {
     title: 'seo_title|title|name',
     description: 'meta_description|description',
     ogImage: 'featured_image.url',
+    robots: 'noindex',
   }"
 />
 ```
@@ -407,6 +421,37 @@ Default auto-SEO mapping:
 - `title`: `seo_title` → `title` → `name`
 - `description`: `seo_description` → `description` → `summary`
 - `ogImage`: `featured_image.url` → `og_image.url` → `image.url`
+
+Field mapping syntax:
+
+- **Pipe-separated fallbacks:** `'seo_title|title|name'` — tries each field in order, uses the first with a value
+- **Dot notation:** `'featured_image.url'` — resolves nested fields
+- **Single field:** `'title'` — looks up the field on the entry
+- **Static value:** If a single value doesn't match any entry field, it's used as a literal (e.g., `robots: 'noindex'`)
+
+### Exposed Methods
+
+The component exposes a `refreshEntry()` method via template refs that can be used to programmatically refresh the fetched entry data:
+
+```vue
+<script setup>
+const blocksRef = ref();
+
+function handleRefresh() {
+  blocksRef.value?.refreshEntry();
+}
+</script>
+
+<template>
+  <ContentstackModularBlocks
+    ref="blocksRef"
+    content-type-uid="page"
+    :url="$route.path"
+    :component-map="componentMapping"
+  />
+  <button @click="handleRefresh">Refresh</button>
+</template>
+```
 
 ### Slots
 
