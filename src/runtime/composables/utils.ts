@@ -1,6 +1,6 @@
 import contentstack, { type LivePreviewQuery, type Stack } from '@contentstack/delivery-sdk'
 import ContentstackLivePreview from '@contentstack/live-preview-utils'
-import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
+import type { EntryEmbedable, EntryModel } from '@contentstack/utils'
 import { toRaw } from 'vue'
 import { useRoute } from '#imports'
 import { replaceCslp } from '../utils'
@@ -64,7 +64,7 @@ export function applyReferenceFields(
 /**
  * Processes entry data: converts JSON RTE, adds editable tags, and optionally replaces CSLP
  */
-export function processEntryData<T extends EmbeddedItem>(
+export function processEntryData<T extends EntryEmbedable>(
   entry: T | null,
   options: {
     contentTypeUid: string
@@ -81,14 +81,14 @@ export function processEntryData<T extends EmbeddedItem>(
   // Convert JSON RTE to HTML
   if (jsonRtePath && jsonRtePath.length > 0) {
     contentstack.Utils.jsonToHTML({
-      entry,
+      entry: entry as EntryEmbedable,
       paths: jsonRtePath,
     })
   }
 
   // Add editable tags if enabled
   if (editableTags) {
-    contentstack.Utils.addEditableTags(entry, contentTypeUid, true, locale)
+    contentstack.Utils.addEditableTags(entry as EntryModel, contentTypeUid, true, locale)
   }
 
   // Replace CSLP if needed
@@ -102,7 +102,7 @@ export function processEntryData<T extends EmbeddedItem>(
 /**
  * Processes multiple entries: converts JSON RTE, adds editable tags, and optionally replaces CSLP
  */
-export function processEntriesData<T extends EmbeddedItem>(
+export function processEntriesData<T extends EntryEmbedable>(
   entries: T[],
   options: {
     contentTypeUid: string
@@ -140,4 +140,3 @@ export function shouldReplaceCslp(
 ): boolean {
   return replaceHtmlCslp ?? editableTags
 }
-

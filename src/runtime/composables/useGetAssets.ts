@@ -1,4 +1,5 @@
-import { useAsyncData, type AsyncData } from '#imports'
+import { useAsyncData } from '#imports'
+import type { AsyncData, NuxtError } from 'nuxt/app'
 import { setupLivePreviewRefresh } from './utils'
 import { useContentstack } from './useContentstack'
 import { DEFAULT_LOCALE } from '../constants'
@@ -14,7 +15,7 @@ export const useGetAssets = async <T = any>(options: {
   orderBy?: string
   includeCount?: boolean
   where?: Record<string, any>
-}): Promise<AsyncData<{ assets: T[]; count?: number } | null, Error>> => {
+}): Promise<AsyncData<{ assets: T[]; count?: number } | null, NuxtError<unknown> | undefined>> => {
   const {
     locale = DEFAULT_LOCALE,
     limit = 10,
@@ -28,7 +29,7 @@ export const useGetAssets = async <T = any>(options: {
 
   const cacheKey = `assets-${locale}-${limit}-${skip}-${JSON.stringify(where)}`
 
-  const { data, status, refresh } = await useAsyncData(cacheKey, async () => {
+  const asyncData = await useAsyncData(cacheKey, async () => {
     try {
       const assetsQuery = stack.asset()
         .locale(locale)
@@ -107,10 +108,11 @@ export const useGetAssets = async <T = any>(options: {
       logContentstackError(contentstackError)
       return null
     }
+  }, {
+    default: () => null,
   })
 
-  setupLivePreviewRefresh(livePreviewEnabled, refresh)
+  setupLivePreviewRefresh(livePreviewEnabled, asyncData.refresh)
 
-  // @ts-expect-error doesnt export all useAsyncData props
-  return { data, status, refresh }
+  return asyncData
 }

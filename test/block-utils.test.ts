@@ -8,7 +8,7 @@ describe('Block Utils', () => {
       const result = extractBlocksFromPath(data, 'components')
 
       expect(result).toHaveLength(1)
-      expect(result[0].hero.title).toBe('Hello')
+      expect(result[0]?.hero.title).toBe('Hello')
     })
 
     it('should extract blocks from a nested path', () => {

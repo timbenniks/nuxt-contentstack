@@ -1,4 +1,5 @@
-import { useAsyncData, type AsyncData } from '#imports'
+import { useAsyncData } from '#imports'
+import type { AsyncData, NuxtError } from 'nuxt/app'
 import {
   setupLivePreview,
   applyVariants,
@@ -21,7 +22,7 @@ export const useGetEntry = async <T>(options: {
   jsonRtePath?: string[]
   locale?: string
   replaceHtmlCslp?: boolean
-}): Promise<AsyncData<T | null, Error>> => {
+}): Promise<AsyncData<T | null, NuxtError<unknown> | undefined>> => {
   const {
     contentTypeUid,
     entryUid,
@@ -35,7 +36,7 @@ export const useGetEntry = async <T>(options: {
 
   const shouldReplaceCslpValue = shouldReplaceCslp(editableTags, replaceHtmlCslp)
 
-  const { data, status, refresh } = await useAsyncData(`${contentTypeUid}-${entryUid}-${locale}-${variantAlias?.value ? variantAlias.value : ''}`, async () => {
+  const asyncData = await useAsyncData(`${contentTypeUid}-${entryUid}-${locale}-${variantAlias?.value ? variantAlias.value : ''}`, async () => {
     setupLivePreview(stack, livePreviewEnabled)
 
     const entryQuery = stack.contentType(contentTypeUid)
@@ -63,10 +64,11 @@ export const useGetEntry = async <T>(options: {
       logContentstackError(contentstackError)
       return null
     }
+  }, {
+    default: () => null,
   })
 
-  setupLivePreviewRefresh(livePreviewEnabled, refresh)
+  setupLivePreviewRefresh(livePreviewEnabled, asyncData.refresh)
 
-  // @ts-expect-error doesnt export all useAsyncData props
-  return { data, status, refresh }
+  return asyncData as AsyncData<T | null, NuxtError<unknown> | undefined>
 }

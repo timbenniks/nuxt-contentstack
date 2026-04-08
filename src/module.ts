@@ -40,6 +40,10 @@ export interface ModuleOptions {
     projectUid?: string
   }
 
+  // Advanced
+  /** Extra packages to transpile for CJS→ESM compatibility on the client. */
+  extraTranspile?: string[]
+
   // General settings
   debug?: boolean
 }
@@ -152,6 +156,7 @@ export default defineNuxtModule<ModuleOptions>({
       enable: false,
       projectUid: '',
     },
+    extraTranspile: [],
     debug: false,
   },
 
@@ -190,8 +195,9 @@ export default defineNuxtModule<ModuleOptions>({
     const transformedOptions = transformModuleOptions(options)
     const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions, debug } = transformedOptions
 
-    // Configure Vite to pre-bundle CJS dependencies for browser compatibility
-    configureViteForContentstack(_nuxt)
+    // Harden downstream builds so Contentstack browser packages are transformed
+    // consistently in consumer apps instead of relying only on optimizeDeps.
+    configureViteForContentstack(_nuxt, options.extraTranspile)
 
     // Store the transformed SDK configs in runtime config
     _nuxt.options.runtimeConfig.public.contentstack = defu(_nuxt.options.runtimeConfig.public.contentstack, {

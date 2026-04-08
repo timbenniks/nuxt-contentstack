@@ -1,4 +1,5 @@
-import { useAsyncData, type AsyncData } from '#imports'
+import { useAsyncData } from '#imports'
+import type { AsyncData, NuxtError } from 'nuxt/app'
 import { setupLivePreviewRefresh } from './utils'
 import { useContentstack } from './useContentstack'
 import { DEFAULT_LOCALE } from '../constants'
@@ -10,7 +11,7 @@ import { handleContentstackError, logContentstackError } from './error-handling'
 export const useGetAsset = async <T = any>(options: {
   assetUid: string
   locale?: string
-}): Promise<AsyncData<T | null, Error>> => {
+}): Promise<AsyncData<T | null, NuxtError<unknown> | undefined>> => {
   const {
     assetUid,
     locale = DEFAULT_LOCALE,
@@ -18,7 +19,7 @@ export const useGetAsset = async <T = any>(options: {
 
   const { stack, livePreviewEnabled } = useContentstack()
 
-  const { data, status, refresh } = await useAsyncData(`asset-${assetUid}-${locale}`, async () => {
+  const asyncData = await useAsyncData(`asset-${assetUid}-${locale}`, async () => {
     try {
       const assetQuery = stack.asset(assetUid)
         .locale(locale)
@@ -32,10 +33,11 @@ export const useGetAsset = async <T = any>(options: {
       logContentstackError(contentstackError)
       return null
     }
+  }, {
+    default: () => null,
   })
 
-  setupLivePreviewRefresh(livePreviewEnabled, refresh)
+  setupLivePreviewRefresh(livePreviewEnabled, asyncData.refresh)
 
-  // @ts-expect-error doesnt export all useAsyncData props
-  return { data, status, refresh }
+  return asyncData as AsyncData<T | null, NuxtError<unknown> | undefined>
 }

@@ -91,6 +91,7 @@ export default defineNuxtConfig({
 | `branch`        | `string`  | No       | `'main'`  | Content branch                                 |
 | `locale`        | `string`  | No       | `'en-us'` | Default locale                                 |
 | `host`          | `string`  | No       | -         | Override the Delivery SDK host URL              |
+| `extraTranspile`| `string[]`| No       | `[]`      | Extra packages to transpile for CJS/ESM compat |
 | `debug`         | `boolean` | No       | `false`   | Enable debug logging                           |
 
 ### Live Preview
