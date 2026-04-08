@@ -3,7 +3,7 @@ export default defineNuxtConfig({
   'devtools': {
     enabled: false,
   },
-  'modules': ['@nuxt/image', '../src/module', '@nuxt/devtools'],
+  'modules': ['../src/module', '@nuxt/image', '@nuxt/devtools'],
 
   'nuxt-contentstack': {
     // Required core settings
@@ -28,13 +28,4 @@ export default defineNuxtConfig({
 
     debug: true
   },
-
-  image: {
-    providers: {
-      contentstack: {
-        name: 'contentstack',
-        provider: '../src/runtime/providers/contentstack.ts'
-      }
-    }
-  }
 })

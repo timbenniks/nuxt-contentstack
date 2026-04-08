@@ -158,6 +158,21 @@ export default defineNuxtModule<ModuleOptions>({
   setup(options, _nuxt) {
     const resolver = createResolver(import.meta.url)
 
+    // Auto-register Contentstack image provider if @nuxt/image is installed
+    const hasNuxtImage = _nuxt.options.modules?.some((m: any) =>
+      m === '@nuxt/image' || (Array.isArray(m) && m[0] === '@nuxt/image'),
+    )
+    if (hasNuxtImage) {
+      const imageOptions = (_nuxt.options as any).image = (_nuxt.options as any).image || {}
+      imageOptions.providers = imageOptions.providers || {}
+      if (!imageOptions.providers.contentstack) {
+        imageOptions.providers.contentstack = {
+          provider: resolver.resolve('./runtime/providers/contentstack'),
+          options: {},
+        }
+      }
+    }
+
     // Validate required config before using it
     if (!options.apiKey) {
       logger.error(`Missing required ${chalk.bold('apiKey')} in your Contentstack configuration.`)

@@ -7,7 +7,7 @@
 [![License][license-src]][license-href]
 [![Nuxt][nuxt-src]][nuxt-href]
 
-Contentstack integration for Nuxt.
+Contentstack integration for Nuxt 4 (Nuxt 3.20.1+ also supported).
 
 - [✨ &nbsp;Release Notes](/CHANGELOG.md)
 - [🏀 Online playground](https://stackblitz.com/github/timbenniks/nuxt-contentstack?file=playground%2Fapp.vue)
@@ -17,20 +17,8 @@ Contentstack integration for Nuxt.
 
 ## Requirements
 
-This module requires:
-
-- **Nuxt** `3.20.1` or higher (including Nuxt 4.x)
-- **@nuxt/image** `^2.0.0` (required for image provider functionality)
-
-Make sure to install these dependencies in your project:
-
-```bash
-npm install nuxt@^3.20.1 @nuxt/image@^2.0.0
-# or
-pnpm add nuxt@^3.20.1 @nuxt/image@^2.0.0
-# or
-yarn add nuxt@^3.20.1 @nuxt/image@^2.0.0
-```
+- **Nuxt 4** (recommended) or **Nuxt 3** `>=3.20.1`
+- **@nuxt/image** `^2.0.0` (optional, for image provider functionality)
 
 ## Features
 
@@ -53,7 +41,10 @@ npx nuxi module add nuxt-contentstack
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ["nuxt-contentstack"],
+  modules: [
+    "nuxt-contentstack",
+    "@nuxt/image", // optional, for image provider support
+  ],
 
   "nuxt-contentstack": {
     // Required
@@ -465,11 +456,9 @@ Built-in fallback component for unmapped block types. Displays block title, type
 
 ## @nuxt/image Integration
 
-> **Note:** This module requires `@nuxt/image` version 2.0.0 or higher. Make sure you have it installed before using the Contentstack image provider.
+The Contentstack image provider is **automatically registered** when `@nuxt/image` is installed. No manual provider configuration needed.
 
 ### Setup
-
-The `@nuxt/image` module should already be installed as a peer dependency. If not, install it:
 
 ```bash
 npm install @nuxt/image@^2.0.0
@@ -478,17 +467,22 @@ npm install @nuxt/image@^2.0.0
 ```ts
 // nuxt.config.ts
 export default defineNuxtConfig({
-  modules: ["nuxt-contentstack", "@nuxt/image"],
+  modules: [
+    "nuxt-contentstack", // must be listed before @nuxt/image
+    "@nuxt/image",
+  ],
+});
+```
 
+> **Important:** `nuxt-contentstack` must be listed **before** `@nuxt/image` in the modules array so the provider is registered before `@nuxt/image` processes its configuration.
+
+To set Contentstack as the **default** image provider (so you don't need `provider="contentstack"` on every `<NuxtImg>`):
+
+```ts
+// nuxt.config.ts
+export default defineNuxtConfig({
   image: {
-    providers: {
-      contentstack: {
-        name: "contentstack",
-        provider:
-          "node_modules/nuxt-contentstack/dist/runtime/providers/contentstack",
-      },
-    },
-    provider: "contentstack", // Optional: set as default
+    provider: "contentstack",
   },
 });
 ```
@@ -512,6 +506,7 @@ export default defineNuxtConfig({
     :src="image.url"
     sizes="100vw sm:50vw lg:33vw"
     :modifiers="{ auto: 'webp,compress' }"
+    provider="contentstack"
   />
 
   <!-- Art direction -->
@@ -519,6 +514,7 @@ export default defineNuxtConfig({
     :src="image.url"
     sizes="100vw md:50vw"
     :modifiers="{ auto: 'webp,compress' }"
+    provider="contentstack"
   />
 </template>
 ```
