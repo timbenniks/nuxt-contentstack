@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.16
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.15...v0.1.16)
+
+### 🚀 Enhancements
+
+- Add nested optimizeDeps support for CJS transitive dependencies in Vite config ([1be9766](https://github.com/timbenniks/nuxt-contentstack/commit/1be9766))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.15
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.14...v0.1.15)
