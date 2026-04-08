@@ -28,8 +28,6 @@ const contentstackPlugin = async (_nuxtApp: any) => {
   const livePreviewEnabled = deliverySdkOptions?.live_preview?.enable
   const { editableTags } = livePreviewSdkOptions
   const personalizationEnabled = personalizeSdkOptions?.enable ?? false
-  const personalizationHost = personalizeSdkOptions?.host ?? ''
-  const personalizationProjectUid = personalizeSdkOptions?.projectUid ?? ''
 
   if (livePreviewEnabled && import.meta.client) {
     ContentstackLivePreview.init({
@@ -43,19 +41,29 @@ const contentstackPlugin = async (_nuxtApp: any) => {
   }
 
   const variantAlias = useState('variantAlias', () => '')
+  let personalizeSdk: any = null
 
-  // Handle personalization only on server
-  let PersonalizeModule: any = null
-  if (import.meta.server && personalizationEnabled && personalizationProjectUid) {
+  // Server: read variant alias from middleware (runtime/server/middleware/personalize.ts)
+  // The middleware handles SDK init with the request object and cookie management.
+  if (import.meta.server && personalizationEnabled) {
+    const event = useRequestEvent()
+    if (event?.context.p13n) {
+      variantAlias.value = event.context.p13n
+    }
+  }
+
+  // Client: initialize SDK instance for set(), triggerImpression(), triggerEvent()
+  // The server middleware sets cookies via addStateToResponse(), so the client SDK
+  // hydrates from cookies without an extra network call.
+  if (import.meta.client && personalizationEnabled && personalizeSdkOptions?.projectUid) {
     try {
-      PersonalizeModule = (await import('@contentstack/personalize-edge-sdk')).default
-      PersonalizeModule.setEdgeApiUrl(`https://${personalizationHost}`)
-      PersonalizeModule.init(personalizationProjectUid)
-
-      const event = useRequestEvent()
-      variantAlias.value = event?.context.p13n
+      const Personalize = (await import('@contentstack/personalize-edge-sdk')).default
+      if (personalizeSdkOptions.host) {
+        Personalize.setEdgeApiUrl(`https://${personalizeSdkOptions.host}`)
+      }
+      personalizeSdk = await Personalize.init(personalizeSdkOptions.projectUid)
     } catch (error) {
-      console.error('Failed to initialize personalization:', error)
+      console.error('Failed to initialize client-side personalization:', error)
     }
   }
 
@@ -66,7 +74,7 @@ const contentstackPlugin = async (_nuxtApp: any) => {
         editableTags,
         stack,
         ContentstackLivePreview: ContentstackLivePreview as typeof ContentstackLivePreview,
-        Personalize: PersonalizeModule,
+        personalizeSdk,
         variantAlias,
         VB_EmptyBlockParentClass: VB_EmptyBlockParentClass as string,
       },

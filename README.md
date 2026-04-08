@@ -133,10 +133,10 @@ Typed composable for accessing Contentstack SDKs and configuration. This is the 
 const {
   stack, // Delivery SDK Stack instance
   ContentstackLivePreview, // Live Preview Utils SDK
-  Personalize, // Personalize SDK
+  personalizeSdk, // Personalize SDK instance (client-side only)
   livePreviewEnabled, // boolean
   editableTags, // boolean
-  variantAlias, // Variant manifest for personalization
+  variantAlias, // Variant aliases for personalization
   VB_EmptyBlockParentClass, // Visual Builder empty block class
 } = useContentstack();
 ```
@@ -145,18 +145,30 @@ You can also access the same values via `useNuxtApp().$contentstack`, but `useCo
 
 ### Personalization SDK Usage
 
+The module uses the instance-based Personalize SDK (v1.0.9+). Server-side personalization (variant resolution, cookie management) is handled automatically by the built-in server middleware. The client-side SDK instance is available for user interactions:
+
 ```ts
-const { Personalize } = useContentstack();
+const { personalizeSdk } = useContentstack();
 
 // Set user attributes
-await Personalize.set({ age: 20 });
+await personalizeSdk?.set({ age: 20 });
 
-// Trigger impression
-await Personalize.triggerImpression(experienceShortId);
+// Trigger impression for an experience
+await personalizeSdk?.triggerImpression(experienceShortUid);
+
+// Batch impressions
+await personalizeSdk?.triggerImpressions({
+  experienceShortUids: ["exp1", "exp2"],
+});
 
 // Trigger conversion event
-await Personalize.triggerEvent("eventKey");
+await personalizeSdk?.triggerEvent("eventKey");
+
+// Set explicit user ID
+await personalizeSdk?.setUserId("user-123");
 ```
+
+> **Note:** `personalizeSdk` is `null` on the server. Use optional chaining (`?.`) or guard with `import.meta.client` when calling SDK methods.
 
 ## Composables
 
