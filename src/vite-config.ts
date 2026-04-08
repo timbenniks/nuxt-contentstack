@@ -28,6 +28,16 @@ const CONTENTSTACK_TRANSITIVE_CJS = [
   'humps',
 ]
 
+/**
+ * Vite's optimizeDeps.include supports a nested syntax ("parent > child") that
+ * forces pre-bundling of a CJS transitive dep even when the parent lives outside
+ * the project root (e.g. a linked local module). Without this, Vite serves the
+ * raw CJS file via /@fs/ which breaks ESM imports.
+ */
+const CONTENTSTACK_NESTED_OPTIMIZEDEPS = CONTENTSTACK_BROWSER_PACKAGES.flatMap(
+  pkg => CONTENTSTACK_TRANSITIVE_CJS.map(dep => `${pkg} > ${dep}`),
+)
+
 const CONTENTSTACK_SERVER_ONLY_PACKAGES = [
   '@contentstack/personalize-edge-sdk',
 ]
@@ -89,6 +99,11 @@ export function configureViteForContentstack(nuxt: Nuxt, extraTranspile: string[
   const include = normalizeArray(nuxt.options.vite.optimizeDeps.include)
   nuxt.options.vite.optimizeDeps.include = appendUnique(
     include,
-    [...CONTENTSTACK_BROWSER_PACKAGES, ...CONTENTSTACK_TRANSITIVE_CJS, ...extraTranspile],
+    [
+      ...CONTENTSTACK_BROWSER_PACKAGES,
+      ...CONTENTSTACK_TRANSITIVE_CJS,
+      ...CONTENTSTACK_NESTED_OPTIMIZEDEPS,
+      ...extraTranspile,
+    ],
   )
 }
