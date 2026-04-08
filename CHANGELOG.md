@@ -1,5 +1,17 @@
 # Changelog
 
+## v0.1.17
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.16...v0.1.17)
+
+### 🚀 Enhancements
+
+- Enhance Vite configuration to ensure proper ESM default-export interop for CJS transitive dependencies ([8bcdeb9](https://github.com/timbenniks/nuxt-contentstack/commit/8bcdeb9))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.16
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.15...v0.1.16)
