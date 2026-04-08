@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.1.14
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.12...v0.1.14)
+
+### 🚀 Enhancements
+
+- Enhance personalization SDK integration and add comprehensive tests ([e10067a](https://github.com/timbenniks/nuxt-contentstack/commit/e10067a))
+- Add extraTranspile option for CJS→ESM compatibility in module configuration ([a0a59c8](https://github.com/timbenniks/nuxt-contentstack/commit/a0a59c8))
+
+### 🩹 Fixes
+
+- Update README and package.json for Nuxt 4 support; auto-register Contentstack image provider ([c6cf173](https://github.com/timbenniks/nuxt-contentstack/commit/c6cf173))
+
+### 🏡 Chore
+
+- Update dependencies and refactor Vite configuration ([9319270](https://github.com/timbenniks/nuxt-contentstack/commit/9319270))
+- **release:** V0.1.13 ([1eab7c2](https://github.com/timbenniks/nuxt-contentstack/commit/1eab7c2))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.13
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.12...v0.1.13)
