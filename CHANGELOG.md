@@ -1,5 +1,27 @@
 # Changelog
 
+## v0.1.13
+
+[compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.12...v0.1.13)
+
+### 🚀 Enhancements
+
+- Enhance personalization SDK integration and add comprehensive tests ([e10067a](https://github.com/timbenniks/nuxt-contentstack/commit/e10067a))
+
+### 🩹 Fixes
+
+- Audit fixes and useContentstack composable ([83a5fce](https://github.com/timbenniks/nuxt-contentstack/commit/83a5fce))
+- Update README and package.json for Nuxt 4 support; auto-register Contentstack image provider ([c6cf173](https://github.com/timbenniks/nuxt-contentstack/commit/c6cf173))
+
+### 🏡 Chore
+
+- **release:** V0.1.12 ([5997c92](https://github.com/timbenniks/nuxt-contentstack/commit/5997c92))
+- Update dependencies and refactor Vite configuration ([9319270](https://github.com/timbenniks/nuxt-contentstack/commit/9319270))
+
+### ❤️ Contributors
+
+- Tim Benniks <tbenniks@gmail.com>
+
 ## v0.1.12
 
 [compare changes](https://github.com/timbenniks/nuxt-contentstack/compare/v0.1.10...v0.1.12)
