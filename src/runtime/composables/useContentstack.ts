@@ -1,5 +1,5 @@
 import type { Stack } from '@contentstack/delivery-sdk'
-import { useNuxtApp } from '#app'
+import { useNuxtApp } from '#imports'
 
 export interface ContentstackContext {
   stack: Stack

@@ -175,25 +175,7 @@ export default defineNuxtModule<ModuleOptions>({
     const transformedOptions = transformModuleOptions(options)
     const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions, debug } = transformedOptions
 
-    // Configure Vite and build for Contentstack packages
-    _nuxt.options.build = _nuxt.options.build || {}
-    _nuxt.options.build.transpile = _nuxt.options.build.transpile || []
-
-    // Transpile Contentstack packages for ESM support
-    const contentstackPackages = [
-      '@contentstack/utils',
-      '@contentstack/delivery-sdk',
-      '@contentstack/core',
-      '@contentstack/live-preview-utils'
-    ]
-
-    contentstackPackages.forEach((dep) => {
-      if (!_nuxt.options.build.transpile.includes(dep)) {
-        _nuxt.options.build.transpile.push(dep)
-      }
-    })
-
-    // Configure Vite for Contentstack packages
+    // Configure Vite to pre-bundle CJS dependencies for browser compatibility
     configureViteForContentstack(_nuxt)
 
     // Store the transformed SDK configs in runtime config

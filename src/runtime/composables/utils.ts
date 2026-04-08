@@ -2,7 +2,7 @@ import contentstack, { type LivePreviewQuery, type Stack } from '@contentstack/d
 import ContentstackLivePreview from '@contentstack/live-preview-utils'
 import type { EmbeddedItem } from '@contentstack/utils/dist/types/Models/embedded-object'
 import { toRaw } from 'vue'
-import { useRoute } from '#app'
+import { useRoute } from '#imports'
 import { replaceCslp } from '../utils'
 
 /**

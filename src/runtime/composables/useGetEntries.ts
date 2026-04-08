@@ -1,4 +1,4 @@
-import { useAsyncData, type AsyncData } from '#app'
+import { useAsyncData, type AsyncData } from '#imports'
 import {
   setupLivePreview,
   applyVariants,

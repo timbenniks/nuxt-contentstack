@@ -33,7 +33,7 @@ export default defineNuxtConfig({
     providers: {
       contentstack: {
         name: 'contentstack',
-        provider: '../dist/runtime/providers/contentstack.ts'
+        provider: '../src/runtime/providers/contentstack.ts'
       }
     }
   }

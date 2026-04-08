@@ -1,4 +1,4 @@
-import { useAsyncData, type AsyncData } from '#app'
+import { useAsyncData, type AsyncData } from '#imports'
 import { setupLivePreviewRefresh } from './utils'
 import { useContentstack } from './useContentstack'
 import { DEFAULT_LOCALE } from '../constants'

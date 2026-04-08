@@ -1,4 +1,4 @@
-import type { useSeoMeta } from '#app'
+import type { useSeoMeta } from '#imports'
 
 /**
  * SEO Meta input type from Nuxt's useSeoMeta

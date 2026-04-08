@@ -1,6 +1,6 @@
 import contentstack from '@contentstack/delivery-sdk'
 import ContentstackLivePreview, { type IStackSdk } from '@contentstack/live-preview-utils'
-import { defineNuxtPlugin, useState, useRequestEvent, type Plugin } from '#app'
+import { defineNuxtPlugin, useState, useRequestEvent } from '#imports'
 import { getRegionForString } from '@timbenniks/contentstack-endpoints'
 import type { StackConfig } from '@contentstack/delivery-sdk'
 import type { LivePreviewSdkOptions, DeliverySdkOptions, PersonalizeSdkOptions } from './utils'
@@ -17,7 +17,7 @@ function convertToStackConfig(options: DeliverySdkOptions): StackConfig {
   } as StackConfig
 }
 
-const contentstackPlugin: Plugin = async (_nuxtApp) => {
+const contentstackPlugin = async (_nuxtApp: any) => {
   const { deliverySdkOptions, livePreviewSdkOptions, personalizeSdkOptions } = _nuxtApp.$config.public.contentstack as {
     deliverySdkOptions: DeliverySdkOptions
     livePreviewSdkOptions: LivePreviewSdkOptions
@@ -65,10 +65,10 @@ const contentstackPlugin: Plugin = async (_nuxtApp) => {
         livePreviewEnabled,
         editableTags,
         stack,
-        ContentstackLivePreview,
+        ContentstackLivePreview: ContentstackLivePreview as typeof ContentstackLivePreview,
         Personalize: PersonalizeModule,
         variantAlias,
-        VB_EmptyBlockParentClass,
+        VB_EmptyBlockParentClass: VB_EmptyBlockParentClass as string,
       },
     },
   }

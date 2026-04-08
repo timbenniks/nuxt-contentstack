@@ -15,15 +15,4 @@ export const DEFAULT_REGION = 'us'
 /** Default field path for extracting modular blocks from entry data */
 export const DEFAULT_BLOCKS_FIELD_PATH = 'components'
 
-/** Vite resolve conditions for ESM support */
-export const VITE_RESOLVE_CONDITIONS = {
-  IMPORT: 'import',
-  MODULE: 'module',
-} as const
-
-/** Vite resolve main fields for ESM support */
-export const VITE_RESOLVE_MAIN_FIELDS = {
-  MODULE: 'module',
-  MAIN: 'main',
-} as const
 
