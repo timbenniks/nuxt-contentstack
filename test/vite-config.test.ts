@@ -2,7 +2,24 @@ import { describe, it, expect } from 'vitest'
 import { configureViteForContentstack } from '../src/vite-config'
 
 function createMockNuxt(): any {
-  return { options: { build: {}, vite: {} } }
+  const hooks: Record<string, ((...args: unknown[]) => void)[]> = {}
+  return {
+    options: { build: {}, vite: {} },
+    hook(name: string, fn: (...args: unknown[]) => void) {
+      hooks[name] ??= []
+      hooks[name].push(fn)
+    },
+    /** Simulate Nuxt calling a registered hook */
+    _callHook(name: string, ...args: any[]) {
+      for (const fn of hooks[name] ?? []) fn(...args)
+    },
+  }
+}
+
+/** Call configureViteForContentstack and then simulate the vite:extendConfig hook */
+function configureAndApply(nuxt: any, extraTranspile?: string[]) {
+  configureViteForContentstack(nuxt, extraTranspile)
+  nuxt._callHook('vite:extendConfig', nuxt.options.vite)
 }
 
 const CS_BROWSER_RE = /^@contentstack\/(?!personalize-edge-sdk)/
@@ -55,14 +72,14 @@ describe('configureViteForContentstack', () => {
 
   it('should exclude personalize SDK from optimizeDeps', () => {
     const nuxt = createMockNuxt()
-    configureViteForContentstack(nuxt)
+    configureAndApply(nuxt)
 
     expect(nuxt.options.vite.optimizeDeps.exclude).toContain('@contentstack/personalize-edge-sdk')
   })
 
   it('should include Contentstack packages and transitive CJS deps in optimizeDeps', () => {
     const nuxt = createMockNuxt()
-    configureViteForContentstack(nuxt)
+    configureAndApply(nuxt)
 
     const include = nuxt.options.vite.optimizeDeps.include
     expect(include).toContain('@contentstack/delivery-sdk')
@@ -76,8 +93,8 @@ describe('configureViteForContentstack', () => {
 
   it('should not duplicate entries on multiple calls', () => {
     const nuxt = createMockNuxt()
-    configureViteForContentstack(nuxt)
-    configureViteForContentstack(nuxt)
+    configureAndApply(nuxt)
+    configureAndApply(nuxt)
 
     const transpile = nuxt.options.build.transpile
     const include = nuxt.options.vite.optimizeDeps.include
@@ -104,7 +121,7 @@ describe('configureViteForContentstack', () => {
   it('should preserve existing SSR externals', () => {
     const nuxt = createMockNuxt()
     nuxt.options.vite.ssr = { external: ['some-existing-package'] }
-    configureViteForContentstack(nuxt)
+    configureAndApply(nuxt)
 
     expect(nuxt.options.vite.ssr.external).toContain('some-existing-package')
     expect(nuxt.options.vite.ssr.external).toContain('@contentstack/personalize-edge-sdk')
@@ -112,7 +129,7 @@ describe('configureViteForContentstack', () => {
 
   it('should add extraTranspile packages to build.transpile and optimizeDeps.include', () => {
     const nuxt = createMockNuxt()
-    configureViteForContentstack(nuxt, ['some-cjs-lib', 'another-cjs-lib'])
+    configureAndApply(nuxt, ['some-cjs-lib', 'another-cjs-lib'])
 
     expect(nuxt.options.build.transpile).toContain('some-cjs-lib')
     expect(nuxt.options.build.transpile).toContain('another-cjs-lib')
@@ -123,7 +140,7 @@ describe('configureViteForContentstack', () => {
   it('should preserve user-defined noExternal=true', () => {
     const nuxt = createMockNuxt()
     nuxt.options.vite.ssr = { noExternal: true }
-    configureViteForContentstack(nuxt)
+    configureAndApply(nuxt)
 
     expect(nuxt.options.vite.ssr.noExternal).toBe(true)
   })
