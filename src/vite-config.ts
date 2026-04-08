@@ -18,9 +18,7 @@ const CONTENTSTACK_BROWSER_PACKAGES = [
 
 /**
  * Transitive CJS dependencies inside the Contentstack packages above.
- * `build.transpile` does NOT transitively process sub-dependencies, so these
- * must be listed explicitly to avoid "does not provide an export named 'default'"
- * errors on the client.
+ * These must be pre-bundled by Vite to get proper ESM default-export interop.
  */
 const CONTENTSTACK_TRANSITIVE_CJS = [
   'lodash',
@@ -29,10 +27,9 @@ const CONTENTSTACK_TRANSITIVE_CJS = [
 ]
 
 /**
- * Vite's optimizeDeps.include supports a nested syntax ("parent > child") that
- * forces pre-bundling of a CJS transitive dep even when the parent lives outside
- * the project root (e.g. a linked local module). Without this, Vite serves the
- * raw CJS file via /@fs/ which breaks ESM imports.
+ * Vite's optimizeDeps.include nested syntax ("parent > child") forces
+ * pre-bundling of a CJS transitive dep even when the parent lives outside
+ * the project root (e.g. a linked local module).
  */
 const CONTENTSTACK_NESTED_OPTIMIZEDEPS = CONTENTSTACK_BROWSER_PACKAGES.flatMap(
   pkg => CONTENTSTACK_TRANSITIVE_CJS.map(dep => `${pkg} > ${dep}`),
@@ -93,17 +90,31 @@ export function configureViteForContentstack(nuxt: Nuxt, extraTranspile: string[
   const exclude = normalizeArray(nuxt.options.vite.optimizeDeps.exclude)
   nuxt.options.vite.optimizeDeps.exclude = appendUnique(exclude, CONTENTSTACK_SERVER_ONLY_PACKAGES)
 
-  // optimizeDeps.include is a dev-only warm-cache hint — it speeds up Vite's
-  // initial dev-server scan but is NOT required for correctness (build.transpile
-  // handles the actual CJS→ESM transformation for both dev and production).
-  const include = normalizeArray(nuxt.options.vite.optimizeDeps.include)
-  nuxt.options.vite.optimizeDeps.include = appendUnique(
-    include,
-    [
-      ...CONTENTSTACK_BROWSER_PACKAGES,
-      ...CONTENTSTACK_TRANSITIVE_CJS,
-      ...CONTENTSTACK_NESTED_OPTIMIZEDEPS,
-      ...extraTranspile,
-    ],
-  )
+  // Use vite:extendConfig hook to set optimizeDeps.include AFTER Nuxt has
+  // finished processing build.transpile (which can add entries to
+  // optimizeDeps.exclude, overriding our include settings).
+  // Also remove CJS transitive deps from exclude so they get pre-bundled.
+  const allIncludes = [
+    ...CONTENTSTACK_BROWSER_PACKAGES,
+    ...CONTENTSTACK_TRANSITIVE_CJS,
+    ...CONTENTSTACK_NESTED_OPTIMIZEDEPS,
+    ...extraTranspile,
+  ]
+
+  nuxt.hook('vite:extendConfig', (config) => {
+    config.optimizeDeps ??= {}
+
+    // Remove CJS transitive deps from exclude — Nuxt may have added them
+    // because they appear in build.transpile, but they MUST be pre-bundled
+    // to get proper ESM default-export interop in the browser.
+    if (Array.isArray(config.optimizeDeps.exclude)) {
+      const depsToKeepBundled = new Set([...CONTENTSTACK_TRANSITIVE_CJS, ...extraTranspile])
+      config.optimizeDeps.exclude = config.optimizeDeps.exclude.filter(
+        dep => !depsToKeepBundled.has(dep),
+      )
+    }
+
+    const include = normalizeArray(config.optimizeDeps.include)
+    config.optimizeDeps.include = appendUnique(include, allIncludes)
+  })
 }
